@@ -1,0 +1,28 @@
+{
+  "name": "barber",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "dev:frontend": "npm run dev --prefix frontend",
+    "dev:backend": "npm run dev --prefix backend",
+    "dev": "npm run dev:backend & npm run dev:frontend"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "prisma": "^6.19.0",
+    "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "@vueuse/core": "^14.0.0",
+    "axios": "^1.13.2",
+    "pinia": "^3.0.4",
+    "vue-router": "^4.6.3"
+  }
+}
