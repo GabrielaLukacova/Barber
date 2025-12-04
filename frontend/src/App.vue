@@ -9,6 +9,6 @@
 </template>
 
 <script setup lang="ts">
-import MainNav from './components/MainNav.vue';
-import SiteFooter from './components/SiteFooter.vue';
+import MainNav from '@/shared/components/MainNav.vue';
+import SiteFooter from '@/shared/components/SiteFooter.vue';
 </script>

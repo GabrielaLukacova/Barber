@@ -12,16 +12,19 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/multer": "^2.0.0",
     "autoprefixer": "^10.4.22",
     "postcss": "^8.5.6",
-    "prisma": "^6.19.0",
     "tailwindcss": "^4.1.17",
     "tsx": "^4.20.6"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.0",
     "@vueuse/core": "^14.0.0",
     "axios": "^1.13.2",
+    "cors": "^2.8.5",
+    "multer": "^2.0.2",
+    "mysql2": "^3.15.3",
     "pinia": "^3.0.4",
     "vue-router": "^4.6.3"
   }
