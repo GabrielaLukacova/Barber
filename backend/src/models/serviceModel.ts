@@ -1,13 +1,10 @@
-import { query } from '../db/db';
+import { db, schema } from '../db/db';
+import { eq, desc } from 'drizzle-orm';
 
-export interface ServiceRow {
-  serviceID: number;
-  name: string;
-  imagePath: string | null;
-  duration: number;
-  price: number;
-  isBooked: number;
-}
+const { Service, AppointmentService } = schema;
+
+// Type inferred from Drizzle schema
+export type ServiceRow = typeof Service.$inferSelect;
 
 export interface ServiceCreateInput {
   name: string;
@@ -27,57 +24,69 @@ export interface ServiceUpdateInput {
 
 class ServiceModel {
   async findAll(): Promise<ServiceRow[]> {
-    const rows = await query<ServiceRow>(
-      'SELECT serviceID, name, imagePath, duration, price, isBooked FROM Service ORDER BY serviceID DESC',
-    );
+    const rows = await db
+      .select()
+      .from(Service)
+      .orderBy(desc(Service.serviceID));
     return rows;
   }
 
   async findById(id: number): Promise<ServiceRow | undefined> {
-    const rows = await query<ServiceRow>(
-      'SELECT serviceID, name, imagePath, duration, price, isBooked FROM Service WHERE serviceID = ?',
-      [id],
-    );
+    const rows = await db
+      .select()
+      .from(Service)
+      .where(eq(Service.serviceID, id))
+      .limit(1);
+
     return rows[0];
   }
 
   async create(input: ServiceCreateInput): Promise<ServiceRow> {
-    const result = await query<{ insertId: number }>(
-      'INSERT INTO Service (name, imagePath, duration, price, isBooked) VALUES (?, ?, ?, ?, ?)',
-      [
-        input.name,
-        input.imagePath,
-        input.duration,
-        input.price,
-        input.isBooked ? 1 : 0,
-      ],
-    );
+    // Insert the new row
+    await db.insert(Service).values({
+      name: input.name,
+      imagePath: input.imagePath,
+      duration: input.duration,
+      price: input.price,
+      isBooked: input.isBooked,
+    });
 
-    const insertId = (result as any).insertId as number;
+    // Fetch the created row by unique name (UNIQUE(name))
+    const rows = await db
+      .select()
+      .from(Service)
+      .where(eq(Service.name, input.name))
+      .orderBy(desc(Service.serviceID))
+      .limit(1);
 
-    const created = await this.findById(insertId);
-    if (!created) {
+    if (!rows[0]) {
       throw new Error('Failed to load created service');
     }
-    return created;
+
+    return rows[0];
   }
 
   async update(id: number, input: ServiceUpdateInput): Promise<void> {
-    await query(
-      'UPDATE Service SET name = ?, imagePath = ?, duration = ?, price = ?, isBooked = ? WHERE serviceID = ?',
-      [
-        input.name,
-        input.imagePath,
-        input.duration,
-        input.price,
-        input.isBooked ? 1 : 0,
-        id,
-      ],
-    );
+    await db
+      .update(Service)
+      .set({
+        name: input.name,
+        imagePath: input.imagePath,
+        duration: input.duration,
+        price: input.price,
+        isBooked: input.isBooked,
+      })
+      .where(eq(Service.serviceID, id));
   }
 
   async delete(id: number): Promise<void> {
-    await query('DELETE FROM Service WHERE serviceID = ?', [id]);
+    // 1) delete dependent AppointmentService rows to avoid FK errors
+    await db
+      .delete(AppointmentService)
+      .where(eq(AppointmentService.serviceID, id));
+
+    // 2) delete the Service row
+    await db.delete(Service).where(eq(Service.serviceID, id));
   }
 }
 
