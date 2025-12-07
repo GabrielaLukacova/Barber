@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from 'express';
 import { serviceService } from '../services/serviceService';
+import { createServiceSchema, updateServiceSchema } from '../validation/serviceSchemas';
 
 // Allow req.file (multer) on Request type
 declare module 'express-serve-static-core' {
@@ -40,27 +41,33 @@ export class ServiceController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const { name, duration, price, isBooked } = req.body;
-
-      if (!name || !duration || !price) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-
       let imagePath: string | null = null;
       if (req.file) {
         imagePath = `/uploads/services/${req.file.filename}`;
       }
 
-      const created = await serviceService.createService({
-        name: String(name),
-        duration: Number(duration),
-        price: Number(price),
-        isBooked: isBooked === '1' || isBooked === 'true' || isBooked === true,
+      const parsed = createServiceSchema.parse({
+        ...req.body,
         imagePath,
       });
 
+      const created = await serviceService.createService({
+        name: parsed.name,
+        duration: parsed.duration,
+        price: parsed.price,
+        isBooked: parsed.isBooked ?? false,
+        imagePath: parsed.imagePath ?? null,
+      });
+
       res.status(201).json(created);
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'ZodError') {
+        const issues = err.issues?.map((i: any) => i.message) ?? [];
+        return res
+          .status(400)
+          .json({ error: 'Validation error', details: issues });
+      }
+
       console.error('ServiceController.create error:', err);
       next(err);
     }
@@ -73,27 +80,33 @@ export class ServiceController {
         return res.status(400).json({ error: 'Invalid service ID' });
       }
 
-      const { name, duration, price, isBooked } = req.body;
-
-      if (!name || !duration || !price) {
-        return res.status(400).json({ error: 'Missing required fields' });
-      }
-
-      let imagePath: string | undefined;
+      let imagePath: string | null | undefined;
       if (req.file) {
         imagePath = `/uploads/services/${req.file.filename}`;
       }
 
-      await serviceService.updateService(id, {
-        name: String(name),
-        duration: Number(duration),
-        price: Number(price),
-        isBooked: isBooked === '1' || isBooked === 'true' || isBooked === true,
+      const parsed = updateServiceSchema.parse({
+        ...req.body,
         imagePath,
       });
 
+      await serviceService.updateService(id, {
+        name: parsed.name,
+        duration: parsed.duration,
+        price: parsed.price,
+        isBooked: parsed.isBooked ?? false,
+        imagePath: parsed.imagePath ?? null,
+      });
+
       res.json({ success: true });
-    } catch (err) {
+    } catch (err: any) {
+      if (err?.name === 'ZodError') {
+        const issues = err.issues?.map((i: any) => i.message) ?? [];
+        return res
+          .status(400)
+          .json({ error: 'Validation error', details: issues });
+      }
+
       console.error('ServiceController.update error:', err);
       next(err);
     }

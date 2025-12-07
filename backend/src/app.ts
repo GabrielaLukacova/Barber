@@ -1,7 +1,9 @@
 // backend/src/app.ts
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
+import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index';
+import { swaggerSpec } from './config/swagger';
 
 const app = express();
 
@@ -10,6 +12,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static('uploads'));
+
+// Swagger docs
+app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Health check route
 app.get('/health', (_req: Request, res: Response) => {
@@ -22,13 +27,22 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use('/api', routes);
 
-// Simple error handler that logs everything and returns JSON
+// Centralized error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('💥 Unhandled error:', err);
-  res
-    .status(500)
-    .json({ error: 'Internal server error', message: err?.message ?? String(err) });
+
+  const status =
+    err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
+  const message =
+    status === 500
+      ? 'Internal server error'
+      : err.message || 'Something went wrong';
+
+  res.status(status).json({
+    error: status === 500 ? 'Internal server error' : 'Error',
+    message,
+  });
 });
 
 export default app;

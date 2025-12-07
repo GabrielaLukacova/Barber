@@ -74,9 +74,8 @@ export const OpeningHours = mysqlTable('OpeningHours', {
 // TimeOff
 export const TimeOff = mysqlTable('TimeOff', {
   timeOffID: int('timeOffID').autoincrement().primaryKey(),
-  // You can change these to date/time if your MySQL columns are DATE/TIME
-  start: datetime('start'),
-  end: datetime('end'),
+  start: datetime('start', { mode: 'string' }).notNull(),
+  end: datetime('end', { mode: 'string' }).notNull(),
   reason: text('reason'),
 });
 
@@ -84,7 +83,7 @@ export const TimeOff = mysqlTable('TimeOff', {
 export const Appointment = mysqlTable('Appointment', {
   appointmentID: int('appointmentID').autoincrement().primaryKey(),
   clientID: int('clientID').references(() => Client.clientID),
-  appointmentDate: date('appointmentDate').notNull(),
+  appointmentDate: date('appointmentDate', { mode: 'string' }).notNull(),
   startTime: time('startTime').notNull(),
   endTime: time('endTime').notNull(),
   status: varchar('status', { length: 20 }).notNull().default('BOOKED'),
