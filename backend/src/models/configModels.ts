@@ -74,15 +74,24 @@ export class ConfigModels {
   }
 
   async createOpeningHours(input: OpeningHoursInput): Promise<OpeningHoursRow> {
-    const [row] = await db
-      .insert(OpeningHours)
-      .values({
-        dayOfWeek: input.dayOfWeek,
-        openingTime: input.openingTime ?? null,
-        closingTime: input.closingTime ?? null,
-      })
-      .returning();
-    return row;
+    const result = await db.insert(OpeningHours).values({
+      dayOfWeek: input.dayOfWeek,
+      openingTime: input.openingTime ?? null,
+      closingTime: input.closingTime ?? null,
+    });
+
+    const insertId = Number((result as any).insertId);
+    const rows = await db
+      .select()
+      .from(OpeningHours)
+      .where(eq(OpeningHours.openingHoursID, insertId))
+      .limit(1);
+
+    if (!rows[0]) {
+      throw new Error('Failed to fetch created OpeningHours row');
+    }
+
+    return rows[0];
   }
 
   async updateOpeningHours(id: number, input: OpeningHoursInput): Promise<void> {
@@ -115,15 +124,24 @@ export class ConfigModels {
   }
 
   async createTimeOff(input: TimeOffInput): Promise<TimeOffRow> {
-    const [row] = await db
-      .insert(TimeOff)
-      .values({
-        start: input.start,
-        end: input.end,
-        reason: input.reason ?? null,
-      })
-      .returning();
-    return row;
+    const result = await db.insert(TimeOff).values({
+      start: input.start,
+      end: input.end,
+      reason: input.reason ?? null,
+    });
+
+    const insertId = Number((result as any).insertId);
+    const rows = await db
+      .select()
+      .from(TimeOff)
+      .where(eq(TimeOff.timeOffID, insertId))
+      .limit(1);
+
+    if (!rows[0]) {
+      throw new Error('Failed to fetch created TimeOff row');
+    }
+
+    return rows[0];
   }
 
   async updateTimeOff(id: number, input: TimeOffInput): Promise<void> {
@@ -156,18 +174,27 @@ export class ConfigModels {
   }
 
   async createBarberShop(input: BarberShopInput): Promise<BarberShopRow> {
-    const [row] = await db
-      .insert(BarberShop)
-      .values({
-        name: input.name,
-        phoneNumber: input.phoneNumber ?? null,
-        email: input.email ?? null,
-        street: input.street ?? null,
-        postalCode: input.postalCode ?? null,
-        description: input.description ?? null,
-      })
-      .returning();
-    return row;
+    const result = await db.insert(BarberShop).values({
+      name: input.name,
+      phoneNumber: input.phoneNumber ?? null,
+      email: input.email ?? null,
+      street: input.street ?? null,
+      postalCode: input.postalCode ?? null,
+      description: input.description ?? null,
+    });
+
+    const insertId = Number((result as any).insertId);
+    const rows = await db
+      .select()
+      .from(BarberShop)
+      .where(eq(BarberShop.barberShopID, insertId))
+      .limit(1);
+
+    if (!rows[0]) {
+      throw new Error('Failed to fetch created BarberShop row');
+    }
+
+    return rows[0];
   }
 
   async updateBarberShop(id: number, input: BarberShopInput): Promise<void> {
@@ -206,18 +233,27 @@ export class ConfigModels {
   }
 
   async createGalleryImage(input: GalleryImageInput): Promise<GalleryImageRow> {
-    const [row] = await db
-      .insert(GalleryImage)
-      .values({
-        barberShopID: input.barberShopID,
-        filePath: input.filePath,
-        altText: input.altText,
-        title: input.title ?? null,
-        description: input.description ?? null,
-        sortOrder: input.sortOrder ?? 0,
-      })
-      .returning();
-    return row;
+    const result = await db.insert(GalleryImage).values({
+      barberShopID: input.barberShopID,
+      filePath: input.filePath,
+      altText: input.altText,
+      title: input.title ?? null,
+      description: input.description ?? null,
+      sortOrder: input.sortOrder ?? 0,
+    });
+
+    const insertId = Number((result as any).insertId);
+    const rows = await db
+      .select()
+      .from(GalleryImage)
+      .where(eq(GalleryImage.imageID, insertId))
+      .limit(1);
+
+    if (!rows[0]) {
+      throw new Error('Failed to fetch created GalleryImage row');
+    }
+
+    return rows[0];
   }
 
   async updateGalleryImage(id: number, input: GalleryImageInput): Promise<void> {
@@ -253,14 +289,22 @@ export class ConfigModels {
   }
 
   async createPostalCode(input: PostalCodeInput): Promise<PostalCodeRow> {
-    const [row] = await db
-      .insert(PostalCode)
-      .values({
-        postalCode: input.postalCode,
-        city: input.city,
-      })
-      .returning();
-    return row;
+    await db.insert(PostalCode).values({
+      postalCode: input.postalCode,
+      city: input.city,
+    });
+
+    const rows = await db
+      .select()
+      .from(PostalCode)
+      .where(eq(PostalCode.postalCode, input.postalCode))
+      .limit(1);
+
+    if (!rows[0]) {
+      throw new Error('Failed to fetch created PostalCode row');
+    }
+
+    return rows[0];
   }
 
   async updatePostalCode(code: string, input: PostalCodeInput): Promise<void> {
