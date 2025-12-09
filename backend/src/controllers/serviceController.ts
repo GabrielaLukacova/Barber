@@ -90,13 +90,20 @@ export class ServiceController {
         imagePath,
       });
 
-      await serviceService.updateService(id, {
+      // Build payload without forcing imagePath to null.
+      const payload: any = {
         name: parsed.name,
         duration: parsed.duration,
         price: parsed.price,
         isBooked: parsed.isBooked ?? false,
-        imagePath: parsed.imagePath ?? null,
-      });
+      };
+
+      // Only override imagePath if a new file was actually uploaded
+      if (imagePath !== undefined) {
+        payload.imagePath = imagePath;
+      }
+
+      await serviceService.updateService(id, payload);
 
       res.json({ success: true });
     } catch (err: any) {

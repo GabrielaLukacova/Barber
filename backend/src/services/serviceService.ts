@@ -29,12 +29,22 @@ export class ServiceService {
   }
 
   async updateService(id: number, input: ServiceInput): Promise<void> {
+    const existing = await serviceModel.findById(id);
+    if (!existing) {
+      throw new Error('Service not found');
+    }
+
+    // If imagePath is provided (even null), use it.
+    // If it's undefined (no new file), keep existing.imagePath.
+    const imagePath =
+      input.imagePath !== undefined ? (input.imagePath ?? null) : existing.imagePath;
+
     await serviceModel.update(id, {
       name: input.name,
       duration: input.duration,
       price: input.price,
       isBooked: input.isBooked ?? false,
-      imagePath: input.imagePath ?? null,
+      imagePath,
     });
   }
 
