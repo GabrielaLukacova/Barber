@@ -41,13 +41,15 @@
           >
             <td class="px-4 py-2">
               <div class="flex items-center gap-2">
-                <img
-                  v-if="svc.imagePath"
-                  :src="svc.imagePath"
-                  alt="Service image"
-                  class="w-12 h-12 rounded-md object-cover border"
-                />
-                <span v-else class="text-xs text-gray-400 italic">No image</span>
+                <div class="w-16 h-16 rounded-md overflow-hidden bg-gray-100 border flex items-center justify-center">
+                  <img
+                    v-if="svc.imagePath"
+                    :src="getImageUrl(svc.imagePath)"
+                    alt="Service image"
+                    class="w-full h-full object-cover"
+                  />
+                  <span v-else class="text-[10px] text-gray-400 italic">No image</span>
+                </div>
               </div>
             </td>
             <td class="px-4 py-2 font-medium text-gray-900">
@@ -78,20 +80,21 @@
           </tr>
           <tr v-if="services.length === 0">
             <td colspan="5" class="px-4 py-4 text-center text-gray-400 text-sm">
-              No services yet. Click “New service” to add one.
+              No services yet. Click "New service" to add one.
             </td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!-- Modal form -->
     <div
       v-if="formVisible"
       class="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
     >
-      <div class="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+      <div class="bg-white text-gray-900 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
         <header class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold text-gray-900">
+          <h2 class="text-lg font-semibold">
             {{ formMode === 'create' ? 'Add service' : 'Edit service' }}
           </h2>
           <button
@@ -121,7 +124,7 @@
               accept="image/*"
               :required="formMode === 'create'"
               @change="onImageChange"
-              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black bg-white"
+              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black bg-white text-gray-900"
             />
             <p class="text-[11px] text-gray-400">
               {{ formMode === 'create'
@@ -200,6 +203,16 @@ import {
   type Service,
   type ServicePayload,
 } from '@/modules/admin/services/serviceApi';
+
+// Backend base for images (admin panel)
+const backendBase = 'https://barber-backend-b77j.onrender.com';
+
+function getImageUrl(path: string | null) {
+  if (!path) return '';
+  if (path.startsWith('http')) return path;
+  if (path.startsWith('/')) return backendBase + path;
+  return backendBase + '/' + path;
+}
 
 const services = ref<Service[]>([]);
 const loading = ref(false);

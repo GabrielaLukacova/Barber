@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
-import type { LoginPayload } from '../services/authApi';
-import { login as loginRequest } from '../services/authApi';
+import type { LoginPayload } from '@/modules/admin/auth/authApi';
+import { login as loginRequest } from '@/modules/admin/auth/authApi';
 
 export const useAuthStore = defineStore('auth', () => {
   const token = ref<string | null>(localStorage.getItem('admin_token'));
@@ -17,6 +17,8 @@ export const useAuthStore = defineStore('auth', () => {
 
     localStorage.setItem('admin_token', result.token);
     localStorage.setItem('admin_username', result.username);
+
+    return result;
   }
 
   function logout() {

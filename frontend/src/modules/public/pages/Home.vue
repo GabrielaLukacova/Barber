@@ -15,13 +15,18 @@
         <p class="text-sm text-zinc-600">Book online and show up — easy.</p>
       </div>
     </div>
-
-    <div class="text-center">
-      <RouterLink to="/services" class="btn btn-primary">See services & prices</RouterLink>
-    </div>
   </section>
+
+  <ServicesSection />
+  <BookingSection />
+  <GallerySection />
+  <ContactSection />
 </template>
 
 <script setup lang="ts">
 import Hero from '@/modules/public/components/Hero.vue';
+import ServicesSection from '@/modules/public/sections/ServicesSection.vue';
+import BookingSection from '@/modules/public/sections/BookingSection.vue';
+import GallerySection from '@/modules/public/sections/GallerySection.vue';
+import ContactSection from '@/modules/public/sections/ContactSection.vue';
 </script>

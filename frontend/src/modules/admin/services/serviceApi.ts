@@ -1,8 +1,10 @@
+import api from '@/services/api';
+
 // DATA TYPES
 export interface ServiceDto {
   serviceID: number;
   name: string;
-  imagePath: string | null;  // returned from backend
+  imagePath: string | null; // returned from backend
   duration: number;
   price: number;
   isBooked: boolean;
@@ -13,7 +15,7 @@ export interface CreateServicePayload {
   duration: number;
   price: number;
   isBooked?: boolean;
-  imageFile?: File | null;    // only file, not path
+  imageFile?: File | null; // only file, not path
 }
 
 export interface UpdateServicePayload extends CreateServicePayload {
@@ -23,40 +25,20 @@ export interface UpdateServicePayload extends CreateServicePayload {
 export type Service = ServiceDto;
 export type ServicePayload = CreateServicePayload;
 
-
-// AUTH HEADERS
-function getAuthHeaders(): HeadersInit {
-  const token = localStorage.getItem('admin_token');
-  const headers: HeadersInit = {};
-  if (token) headers['Authorization'] = `Bearer ${token}`;
-  return headers;
-}
-
-
-// API CLIENT
+// API CLIENT USING AXIOS + VITE_API_URL
 export class AdminServiceApi {
-  private baseUrl = '/api/services';
+  private baseUrl = '/services'; // api.ts adds /api prefix
 
   async getAll(): Promise<ServiceDto[]> {
-    const res = await fetch(this.baseUrl, {
-      headers: { ...getAuthHeaders() },
-    });
-
-    if (!res.ok) throw new Error('Failed to load services');
-    return res.json();
+    const res = await api.get<ServiceDto[]>(this.baseUrl);
+    return res.data;
   }
 
   async getById(id: number): Promise<ServiceDto> {
-    const res = await fetch(`${this.baseUrl}/${id}`, {
-      headers: { ...getAuthHeaders() },
-    });
-
-    if (!res.ok) throw new Error('Failed to load service');
-    return res.json();
+    const res = await api.get<ServiceDto>(this.baseUrl + '/' + id);
+    return res.data;
   }
 
-
-  // CREATE SERVICE
   async create(payload: CreateServicePayload): Promise<void> {
     const formData = new FormData();
 
@@ -69,22 +51,9 @@ export class AdminServiceApi {
       formData.append('image', payload.imageFile);
     }
 
-    const res = await fetch(this.baseUrl, {
-      method: 'POST',
-      headers: {
-        ...getAuthHeaders(),
-      },
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to create service');
-    }
+    await api.post(this.baseUrl, formData);
   }
 
-
-  // UPDATE SERVICE
   async update(payload: UpdateServicePayload): Promise<void> {
     const formData = new FormData();
 
@@ -97,33 +66,13 @@ export class AdminServiceApi {
       formData.append('image', payload.imageFile);
     }
 
-    const res = await fetch(`${this.baseUrl}/${payload.serviceID}`, {
-      method: 'PUT',
-      headers: { ...getAuthHeaders() },
-      body: formData,
-    });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to update service');
-    }
+    await api.put(this.baseUrl + '/' + payload.serviceID, formData);
   }
 
-
-  // DELETE SERVICE
   async delete(id: number): Promise<void> {
-    const res = await fetch(`${this.baseUrl}/${id}`, {
-      method: 'DELETE',
-      headers: { ...getAuthHeaders() },
-    });
-
-    if (!res.ok) {
-      const data = await res.json().catch(() => ({}));
-      throw new Error(data.error || 'Failed to delete service');
-    }
+    await api.delete(this.baseUrl + '/' + id);
   }
 }
-
 
 // EXPORT HELPER FUNCTIONS
 export const adminServiceApi = new AdminServiceApi();

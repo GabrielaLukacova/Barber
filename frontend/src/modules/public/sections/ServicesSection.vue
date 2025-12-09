@@ -4,13 +4,14 @@ import { useServicesStore } from '@/stores/services';
 
 const servicesStore = useServicesStore();
 
-const apiBaseUrl = import.meta.env.VITE_API_URL;
+// Hardcoded backend base as fallback so images ALWAYS work
+const backendBase = 'https://barber-backend-b77j.onrender.com';
 
 function getImageUrl(path: string | null) {
   if (!path) return '';
   if (path.startsWith('http')) return path;
-  if (path.startsWith('/')) return apiBaseUrl + path;
-  return apiBaseUrl + '/' + path;
+  if (path.startsWith('/')) return backendBase + path;
+  return backendBase + '/' + path;
 }
 
 function formatPrice(price: number) {
@@ -27,19 +28,19 @@ const error = computed(() => servicesStore.error);
 </script>
 
 <template>
-  <section class="mx-auto max-w-5xl px-4 py-10 space-y-6">
-    <header class="space-y-2">
-      <h1 class="text-3xl font-semibold text-slate-900">Services & Prices</h1>
+  <section id="services" class="mx-auto max-w-6xl px-4 py-12 space-y-8">
+    <header class="space-y-2 text-center">
+      <h2 class="text-3xl font-semibold text-slate-900">Services & Prices</h2>
       <p class="text-sm text-slate-500">
         Choose from our most popular cuts and treatments.
       </p>
     </header>
 
-    <p v-if="error" class="text-sm text-red-500">
+    <p v-if="error" class="text-sm text-red-500 text-center">
       {{ error }}
     </p>
 
-    <p v-else-if="loading" class="text-sm text-slate-500">
+    <p v-else-if="loading" class="text-sm text-slate-500 text-center">
       Loading services…
     </p>
 
@@ -73,9 +74,9 @@ const error = computed(() => servicesStore.error);
 
         <div class="flex-1 space-y-1">
           <div class="flex items-center justify-between gap-2">
-            <h2 class="text-base font-semibold text-slate-900">
+            <h3 class="text-base font-semibold text-slate-900">
               {{ svc.name }}
-            </h2>
+            </h3>
             <span class="text-sm font-medium text-slate-800">
               {{ formatPrice(svc.price) }}
             </span>

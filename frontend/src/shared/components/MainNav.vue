@@ -5,17 +5,27 @@
         <span class="font-semibold tracking-wide text-brand.black">Kim's Frisør</span>
       </div>
       <ul class="hidden md:flex items-center gap-6 text-sm">
-        <li><RouterLink class="hover:opacity-80" to="/">Home</RouterLink></li>
-        <li><RouterLink class="hover:opacity-80" to="/services">Services</RouterLink></li>
-        <li><RouterLink class="hover:opacity-80" to="/booking">Booking</RouterLink></li>
-        <li><RouterLink class="hover:opacity-80" to="/gallery">Gallery</RouterLink></li>
-        <li><RouterLink class="hover:opacity-80" to="/contact">Contact</RouterLink></li>
+        <li>
+          <RouterLink class="hover:opacity-80" to="/">Home</RouterLink>
+        </li>
+        <li>
+          <a href="#services" class="hover:opacity-80">Services</a>
+        </li>
+        <li>
+          <a href="#booking" class="hover:opacity-80">Booking</a>
+        </li>
+        <li>
+          <a href="#gallery" class="hover:opacity-80">Gallery</a>
+        </li>
+        <li>
+          <a href="#contact" class="hover:opacity-80">Contact</a>
+        </li>
       </ul>
       <div class="flex items-center gap-2">
         <button class="btn btn-ghost text-xs">EN</button>
         <span class="text-zinc-400">|</span>
         <button class="btn btn-ghost text-xs">DA</button>
-        <RouterLink to="/booking" class="btn btn-primary text-sm">Book now</RouterLink>
+        <a href="#booking" class="btn btn-primary text-sm">Book now</a>
       </div>
     </nav>
   </header>

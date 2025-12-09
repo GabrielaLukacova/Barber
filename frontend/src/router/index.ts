@@ -1,12 +1,8 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router';
 import { useAuthStore } from '@/modules/auth/stores/auth';
 
-// Public pages
+// Public: single-page home
 const Home = () => import('@/modules/public/pages/Home.vue');
-const Services = () => import('@/modules/public/pages/Services.vue');
-const Booking = () => import('@/modules/public/pages/Booking.vue');
-const Gallery = () => import('@/modules/public/pages/Gallery.vue');
-const Contact = () => import('@/modules/public/pages/Contact.vue');
 
 // Auth
 const AdminLogin = () => import('@/modules/auth/pages/AdminLogin.vue');
@@ -23,13 +19,8 @@ const AdminGallery = () => import('@/modules/admin/pages/Gallery.vue');
 const AdminHours = () => import('@/modules/admin/pages/OpeningHours.vue');
 const AdminTimeOff = () => import('@/modules/admin/pages/TimeOff.vue');
 
-// Routes
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home, name: 'home' },
-  { path: '/services', component: Services, name: 'services' },
-  { path: '/booking', component: Booking, name: 'booking' },
-  { path: '/gallery', component: Gallery, name: 'gallery' },
-  { path: '/contact', component: Contact, name: 'contact' },
 
   { path: '/admin/login', component: AdminLogin, name: 'admin-login' },
 
