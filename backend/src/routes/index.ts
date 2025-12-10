@@ -17,7 +17,7 @@ router.use('/clients', clientRouter);
 router.use('/appointments', appointmentRouter);
 router.use('/opening-hours', openingHoursRouter);
 router.use('/time-off', timeOffRouter);
-router.use('/barber-shops', barberShopRouter);
+router.use('/barber-shop', barberShopRouter);
 router.use('/gallery-images', galleryImageRouter);
 router.use('/postal-codes', postalCodeRouter);
 

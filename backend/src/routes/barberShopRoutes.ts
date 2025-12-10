@@ -6,38 +6,17 @@ const router = Router();
 
 /**
  * @openapi
- * /api/barber-shops:
+ * /api/barber-shop:
  *   get:
- *     summary: List barber shops
- *     tags: [BarberShop]
- *   post:
- *     summary: Create barber shop
- *     tags: [BarberShop]
- *     security:
- *       - BearerAuth: []
- */
-router.get('/', BarberShopController.getAll);
-router.post('/', requireAdmin, BarberShopController.create);
-
-/**
- * @openapi
- * /api/barber-shops/{id}:
- *   get:
- *     summary: Get barber shop by ID
+ *     summary: Get main barber shop profile
  *     tags: [BarberShop]
  *   put:
- *     summary: Update barber shop
- *     tags: [BarberShop]
- *     security:
- *       - BearerAuth: []
- *   delete:
- *     summary: Delete barber shop
+ *     summary: Update main barber shop profile
  *     tags: [BarberShop]
  *     security:
  *       - BearerAuth: []
  */
-router.get('/:id', BarberShopController.getOne);
-router.put('/:id', requireAdmin, BarberShopController.update);
-router.delete('/:id', requireAdmin, BarberShopController.delete);
+router.get('/', BarberShopController.getFirst);
+router.put('/', requireAdmin, BarberShopController.updateFirst);
 
 export default router;
