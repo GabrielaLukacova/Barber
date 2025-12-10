@@ -1,0 +1,34 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Simple custom helpers that your components use */
+
+.card {
+  @apply bg-white rounded-xl border border-zinc-200 shadow-sm;
+}
+
+.btn {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg text-sm font-medium;
+}
+
+.btn-primary {
+  @apply bg-black text-white hover:bg-zinc-800;
+}
+
+.btn-secondary {
+  @apply bg-white text-zinc-900 border border-zinc-300 hover:bg-zinc-50;
+}
+
+/* Brand-ish colors used in BookingWizard (fallback if not defined in tailwind.config) */
+.bg-brand\.gray {
+  background-color: #f4f4f5;
+}
+.border-brand\.beige {
+  border-color: #f5e6c8;
+}
+
+/* Basic body styling */
+body {
+  @apply bg-zinc-50 text-zinc-900;
+}

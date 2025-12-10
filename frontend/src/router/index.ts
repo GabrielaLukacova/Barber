@@ -18,6 +18,7 @@ const AdminClients = () => import('@/modules/admin/pages/Clients.vue');
 const AdminGallery = () => import('@/modules/admin/pages/Gallery.vue');
 const AdminHours = () => import('@/modules/admin/pages/OpeningHours.vue');
 const AdminTimeOff = () => import('@/modules/admin/pages/TimeOff.vue');
+const AdminBarberShop = () => import('@/modules/admin/pages/BarberShop.vue');
 
 const routes: RouteRecordRaw[] = [
   { path: '/', component: Home, name: 'home' },
@@ -34,6 +35,7 @@ const routes: RouteRecordRaw[] = [
       { path: 'services', name: 'admin-services', component: AdminServices },
       { path: 'clients', name: 'admin-clients', component: AdminClients },
       { path: 'gallery', name: 'admin-gallery', component: AdminGallery },
+      { path: 'shop', name: 'admin-shop', component: AdminBarberShop },
       { path: 'hours', name: 'admin-hours', component: AdminHours },
       { path: 'timeoff', name: 'admin-timeoff', component: AdminTimeOff },
     ],

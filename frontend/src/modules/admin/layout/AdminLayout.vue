@@ -11,7 +11,7 @@
       <nav class="flex-1 px-3 py-4 space-y-1">
         <RouterLink
           v-for="item in navItems"
-          :key="item.name"
+          :key="item.namePrefix"
           :to="item.to"
           class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium
                  text-slate-300 hover:bg-slate-800 hover:text-slate-50 transition"
@@ -87,6 +87,12 @@ const navItems = [
     icon: 'photo_library',
   },
   {
+    namePrefix: 'admin-shop',
+    label: 'Barber Shop',
+    to: { name: 'admin-shop' },
+    icon: 'store',
+  },
+  {
     namePrefix: 'admin-hours',
     label: 'Opening Hours',
     to: { name: 'admin-hours' },
@@ -107,6 +113,5 @@ async function onLogout() {
 </script>
 
 <style scoped>
-/* Use Material Icons Outlined font if you want the same icon set as PHP version */
 @import url('https://fonts.googleapis.com/icon?family=Material+Icons+Outlined');
 </style>

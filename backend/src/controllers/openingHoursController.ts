@@ -1,39 +1,32 @@
 import type { Request, Response, NextFunction } from 'express';
-import { eq, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 import {
   createOpeningHoursSchema,
   updateOpeningHoursSchema,
 } from '../validation/openingHoursSchemas';
 
+const DAY_ORDER = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
+
+function sortByDay(list: Array<{ dayOfWeek: string }>) {
+  return [...list].sort(
+    (a, b) => DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek),
+  );
+}
+
 export class OpeningHoursController {
-  // Uses DB VIEW: shop_opening_hours
   static async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
-      const viewResult = await db.execute(
-        sql`SELECT "dayOfWeek", "openingTime", "closingTime" FROM "shop_opening_hours"`
-      );
-      const viewRows = (viewResult as any).rows ?? (viewResult as any);
-
-      const tableRows = await db.select().from(schema.OpeningHours);
-      const idByDay = new Map(
-        (tableRows as any[]).map((row) => [row.dayOfWeek, row.openingHoursID]),
-      );
-
-      const merged = (viewRows as any[]).map((row) => {
-        const id = idByDay.get(row.dayOfWeek);
-        if (!id) {
-          throw new Error(`No OpeningHours row found for dayOfWeek=${row.dayOfWeek}`);
-        }
-        return {
-          openingHoursID: id,
-          dayOfWeek: row.dayOfWeek,
-          openingTime: row.openingTime,
-          closingTime: row.closingTime,
-        };
-      });
-
-      res.json(merged);
+      const list = await db.select().from(schema.OpeningHours);
+      res.json(sortByDay(list));
     } catch (err) {
       console.error('OpeningHoursController.getAll error:', err);
       next(err);
