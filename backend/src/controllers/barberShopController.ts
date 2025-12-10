@@ -6,6 +6,13 @@ import {
   updateBarberShopSchema,
 } from '../validation/barberShopSchemas';
 
+// Helper: convert "" / whitespace / undefined to null
+function toNullable(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed === '' ? null : trimmed;
+}
+
 export class BarberShopController {
   static async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -48,11 +55,11 @@ export class BarberShopController {
         .insert(schema.BarberShop)
         .values({
           name: parsed.name,
-          phoneNumber: parsed.phoneNumber ?? null,
-          email: parsed.email ?? null,
-          street: parsed.street ?? null,
-          postalCode: parsed.postalCode ?? null,
-          description: parsed.description ?? null,
+          phoneNumber: toNullable(parsed.phoneNumber),
+          email: toNullable(parsed.email),
+          street: toNullable(parsed.street),
+          postalCode: toNullable(parsed.postalCode),
+          description: toNullable(parsed.description),
         })
         .execute();
 
@@ -82,11 +89,11 @@ export class BarberShopController {
         .update(schema.BarberShop)
         .set({
           name: parsed.name,
-          phoneNumber: parsed.phoneNumber ?? null,
-          email: parsed.email ?? null,
-          street: parsed.street ?? null,
-          postalCode: parsed.postalCode ?? null,
-          description: parsed.description ?? null,
+          phoneNumber: toNullable(parsed.phoneNumber),
+          email: toNullable(parsed.email),
+          street: toNullable(parsed.street),
+          postalCode: toNullable(parsed.postalCode),
+          description: toNullable(parsed.description),
         })
         .where(eq(schema.BarberShop.barberShopID, id))
         .execute();
