@@ -6,7 +6,7 @@ import {
   updateBarberShopSchema,
 } from '../validation/barberShopSchemas';
 
-// Helper: convert "" / whitespace / undefined to null
+// Helper: empty string or whitespace -> null
 function toNullable(value: unknown): string | null {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
@@ -58,7 +58,7 @@ export class BarberShopController {
           phoneNumber: toNullable(parsed.phoneNumber),
           email: toNullable(parsed.email),
           street: toNullable(parsed.street),
-          postalCode: toNullable(parsed.postalCode),
+          // ⛔ postalCode skipped for now to avoid FK issues
           description: toNullable(parsed.description),
         })
         .execute();
@@ -92,7 +92,7 @@ export class BarberShopController {
           phoneNumber: toNullable(parsed.phoneNumber),
           email: toNullable(parsed.email),
           street: toNullable(parsed.street),
-          postalCode: toNullable(parsed.postalCode),
+          // ⛔ postalCode skipped here as well
           description: toNullable(parsed.description),
         })
         .where(eq(schema.BarberShop.barberShopID, id))
