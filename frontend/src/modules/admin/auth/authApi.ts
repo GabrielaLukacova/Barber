@@ -1,25 +1,29 @@
-import axios from '@/services/api';
+import api from '@/services/api';
 
 export interface LoginPayload {
   username: string;
   password: string;
 }
 
-export interface LoginResponse {
+export interface LoginResult {
   token: string;
   username: string;
 }
 
-export async function login(payload: LoginPayload): Promise<LoginResponse> {
-  const res = await axios.post<LoginResponse>('/auth/login', payload);
+/**
+ * Calls the deployed backend /api/auth/login using the shared Axios client.
+ * IMPORTANT: it does NOT touch localStorage – the Pinia auth store does that.
+ */
+export async function login(payload: LoginPayload): Promise<LoginResult> {
+  const res = await api.post('/auth/login', {
+    username: payload.username,
+    password: payload.password,
+  });
 
-  localStorage.setItem('admin_token', res.data.token);
-  localStorage.setItem('admin_username', res.data.username);
+  const { token } = res.data as { token: string };
 
-  return res.data;
-}
-
-export function logout() {
-  localStorage.removeItem('admin_token');
-  localStorage.removeItem('admin_username');
+  return {
+    token,
+    username: payload.username,
+  };
 }
