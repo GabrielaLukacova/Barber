@@ -5,14 +5,12 @@ const {
   OpeningHours,
   TimeOff,
   BarberShop,
-  GalleryImage,
   PostalCode,
 } = schema;
 
 export type OpeningHoursRow = typeof OpeningHours.$inferSelect;
 export type TimeOffRow = typeof TimeOff.$inferSelect;
 export type BarberShopRow = typeof BarberShop.$inferSelect;
-export type GalleryImageRow = typeof GalleryImage.$inferSelect;
 export type PostalCodeRow = typeof PostalCode.$inferSelect;
 
 // OpeningHours
@@ -38,17 +36,6 @@ export interface BarberShopInput {
   postalCode?: string | null;
   description?: string | null;
 }
-
-// GalleryImage
-export interface GalleryImageInput {
-  barberShopID: number;
-  filePath: string;
-  altText: string;
-  title?: string | null;
-  description?: string | null;
-  sortOrder?: number;
-}
-
 // PostalCode
 export interface PostalCodeInput {
   postalCode: string;
@@ -215,64 +202,7 @@ export class ConfigModels {
     await db.delete(BarberShop).where(eq(BarberShop.barberShopID, id));
   }
 
-  // --- GalleryImage ---
-  async listGalleryImages(): Promise<GalleryImageRow[]> {
-    return db
-      .select()
-      .from(GalleryImage)
-      .orderBy(asc(GalleryImage.sortOrder), asc(GalleryImage.imageID));
-  }
-
-  async getGalleryImage(id: number): Promise<GalleryImageRow | undefined> {
-    const rows = await db
-      .select()
-      .from(GalleryImage)
-      .where(eq(GalleryImage.imageID, id))
-      .limit(1);
-    return rows[0];
-  }
-
-  async createGalleryImage(input: GalleryImageInput): Promise<GalleryImageRow> {
-    const result = await db.insert(GalleryImage).values({
-      barberShopID: input.barberShopID,
-      filePath: input.filePath,
-      altText: input.altText,
-      title: input.title ?? null,
-      description: input.description ?? null,
-      sortOrder: input.sortOrder ?? 0,
-    });
-
-    const insertId = Number((result as any).insertId);
-    const rows = await db
-      .select()
-      .from(GalleryImage)
-      .where(eq(GalleryImage.imageID, insertId))
-      .limit(1);
-
-    if (!rows[0]) {
-      throw new Error('Failed to fetch created GalleryImage row');
-    }
-
-    return rows[0];
-  }
-
-  async updateGalleryImage(id: number, input: GalleryImageInput): Promise<void> {
-    await db
-      .update(GalleryImage)
-      .set({
-        barberShopID: input.barberShopID,
-        filePath: input.filePath,
-        altText: input.altText,
-        title: input.title ?? null,
-        description: input.description ?? null,
-        sortOrder: input.sortOrder ?? 0,
-      })
-      .where(eq(GalleryImage.imageID, id));
-  }
-
-  async deleteGalleryImage(id: number): Promise<void> {
-    await db.delete(GalleryImage).where(eq(GalleryImage.imageID, id));
-  }
+  // --- PostalCode ---
 
   // --- PostalCode ---
   async listPostalCodes(): Promise<PostalCodeRow[]> {
