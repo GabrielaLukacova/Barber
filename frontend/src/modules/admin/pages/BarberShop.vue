@@ -2,9 +2,9 @@
   <div class="space-y-6">
     <header class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Barber Shop</h1>
+        <h1 class="text-2xl font-semibold text-gray-900">Barber shop profile</h1>
         <p class="text-sm text-gray-500">
-          Manage basic information about the barber shop (name, address, contact).
+          Set the shop details used on the website (name, address, contact, city).
         </p>
       </div>
     </header>
@@ -13,90 +13,106 @@
       {{ error }}
     </div>
 
-    <div v-if="success" class="rounded-md bg-green-50 text-green-700 px-4 py-2 text-sm">
-      {{ success }}
+    <div v-if="success" class="rounded-md bg-emerald-50 text-emerald-800 px-4 py-2 text-sm">
+      Saved successfully.
     </div>
 
-    <div v-if="loading" class="text-sm text-gray-500">Loading shop info…</div>
+    <div v-if="loading" class="text-sm text-gray-500">Loading…</div>
 
-    <div v-else class="border rounded-lg bg-white p-6 max-w-xl space-y-4">
-      <div class="space-y-1">
-        <label class="block text-xs font-medium text-gray-600">Name</label>
-        <input
-          v-model="form.name"
-          type="text"
-          class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-          placeholder="Kim's Frisør"
-        />
-      </div>
-
-      <div class="space-y-1">
-        <label class="block text-xs font-medium text-gray-600">Street</label>
-        <input
-          v-model="form.street"
-          type="text"
-          class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-          placeholder="Street 1"
-        />
-      </div>
-
-      <div class="grid grid-cols-2 gap-4">
-        <div class="space-y-1">
-          <label class="block text-xs font-medium text-gray-600">Postal code</label>
+    <form v-else class="grid gap-6 lg:grid-cols-2" @submit.prevent="onSave">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Name</label>
           <input
-            v-model="form.postalCode"
+            v-model="form.name"
             type="text"
-            class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="6700"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="Kim's Frisør"
           />
         </div>
-        <div class="space-y-1">
-          <label class="block text-xs font-medium text-gray-600">Phone</label>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Street</label>
           <input
-            v-model="form.phoneNumber"
+            v-model="form.street"
             type="text"
-            class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="+45 00 00 00 00"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="Street 1"
           />
+        </div>
+
+        <div class="grid grid-cols-[1.2fr_2fr] gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Postal code</label>
+            <input
+              v-model="form.postalCode"
+              type="text"
+              maxlength="4"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="6700"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">City</label>
+            <input
+              v-model="form.city"
+              type="text"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="Esbjerg"
+            />
+          </div>
         </div>
       </div>
 
-      <div class="space-y-1">
-        <label class="block text-xs font-medium text-gray-600">Email</label>
-        <input
-          v-model="form.email"
-          type="email"
-          class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-          placeholder="hello@kimsfrisor.dk"
-        />
-      </div>
+      <div class="space-y-4">
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Phone</label>
+            <input
+              v-model="form.phoneNumber"
+              type="text"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="+45 00 00 00 00"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Email</label>
+            <input
+              v-model="form.email"
+              type="email"
+              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              placeholder="hello@kimsfrisor.dk"
+            />
+          </div>
+        </div>
 
-      <div class="space-y-1">
-        <label class="block text-xs font-medium text-gray-600">Description</label>
-        <textarea
-          v-model="form.description"
-          rows="4"
-          class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black resize-none"
-          placeholder="Short description of the shop…"
-        />
-      </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700">Description</label>
+          <textarea
+            v-model="form.description"
+            rows="4"
+            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            placeholder="Short text about the barbershop, vibe, services…"
+          />
+        </div>
 
-      <div class="pt-2 flex justify-end">
-        <button
-          type="button"
-          class="px-4 py-2 text-sm rounded-md bg-black text-white hover:bg-gray-800 disabled:opacity-60"
-          :disabled="saving"
-          @click="onSave"
-        >
-          {{ saving ? 'Saving…' : 'Save changes' }}
-        </button>
+        <div class="pt-4">
+          <button
+            type="submit"
+            class="inline-flex items-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-900 disabled:opacity-60"
+            :disabled="saving"
+          >
+            <span v-if="saving">Saving…</span>
+            <span v-else>Save changes</span>
+          </button>
+        </div>
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { onMounted, reactive, ref } from 'vue';
 import {
   fetchBarberShop,
   updateBarberShop,
@@ -106,60 +122,86 @@ import {
 const loading = ref(false);
 const saving = ref(false);
 const error = ref<string | null>(null);
-const success = ref<string | null>(null);
+const success = ref(false);
 
-const form = ref<BarberShopDto>({
+const form = reactive<BarberShopDto>({
   barberShopID: undefined,
   name: '',
-  phoneNumber: '',
-  email: '',
-  street: '',
-  postalCode: '',
-  description: '',
+  phoneNumber: null,
+  email: null,
+  street: null,
+  postalCode: null,
+  description: null,
+  city: null,
 });
 
 async function load() {
   loading.value = true;
   error.value = null;
-  success.value = null;
+  success.value = false;
 
   try {
     const data = await fetchBarberShop();
 
-    if (!data) {
-      // No barber shop yet: keep defaults, allow user to fill in and Save (POST)
-      return;
+    if (data) {
+      form.barberShopID = data.barberShopID;
+      form.name = data.name ?? '';
+      form.phoneNumber = data.phoneNumber ?? null;
+      form.email = data.email ?? null;
+      form.street = data.street ?? null;
+      form.postalCode = data.postalCode ?? null;
+      form.description = data.description ?? null;
+      form.city = data.city ?? null;
+    } else {
+      form.barberShopID = undefined;
+      form.name = '';
+      form.phoneNumber = null;
+      form.email = null;
+      form.street = null;
+      form.postalCode = null;
+      form.description = null;
+      form.city = null;
     }
-
-    form.value = {
-      barberShopID: data.barberShopID,
-      name: data.name ?? '',
-      phoneNumber: data.phoneNumber ?? '',
-      email: data.email ?? '',
-      street: data.street ?? '',
-      postalCode: data.postalCode ?? '',
-      description: data.description ?? '',
-    };
   } catch (e) {
     console.error(e);
-    error.value = 'Failed to load barber shop data.';
+    error.value = 'Failed to load barber shop details.';
   } finally {
     loading.value = false;
   }
 }
 
 async function onSave() {
-  saving.value = true;
-  error.value = null;
-  success.value = null;
-
   try {
-    await updateBarberShop(form.value);
-    success.value = 'Saved successfully.';
+    saving.value = true;
+    error.value = null;
+    success.value = false;
+
+    const norm = (v: any) => {
+      if (v === undefined || v === null) return null;
+      const t = String(v).trim();
+      return t === "" ? null : t;
+    };
+
+    const payload = {
+      ...form,
+      phoneNumber: norm(form.phoneNumber),
+      email: norm(form.email),
+      street: norm(form.street),
+      postalCode: norm(form.postalCode),
+      city: norm((form as any).city),
+      description: norm(form.description),
+    };
+
+    await updateBarberShop(payload as any);
+    success.value = true;
+
     await load();
-  } catch (e) {
+  } catch (e: any) {
     console.error(e);
-    error.value = 'Failed to save barber shop data.';
+    error.value =
+      e?.response?.data?.message ||
+      e?.response?.data?.error ||
+      'Failed to save barber shop.';
   } finally {
     saving.value = false;
   }

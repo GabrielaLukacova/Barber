@@ -7,16 +7,13 @@ export interface BarberShopDto {
   email?: string | null;
   street?: string | null;
   postalCode?: string | null;
+  city?: string | null;
   description?: string | null;
 }
 
 class AdminBarberShopApi {
   private baseUrl = '/barber-shops';
 
-  /**
-   * Get first barber shop (or null if none exists).
-   * Backend returns an array from GET /api/barber-shops.
-   */
   async get(): Promise<BarberShopDto | null> {
     const res = await api.get<BarberShopDto[]>(this.baseUrl);
     const list = res.data || [];
@@ -34,19 +31,10 @@ class AdminBarberShopApi {
 
 export const adminBarberShopApi = new AdminBarberShopApi();
 
-/**
- * Used by BarberShop.vue on load.
- * Returns existing shop or null (so UI can show empty form).
- */
 export async function fetchBarberShop(): Promise<BarberShopDto | null> {
   return adminBarberShopApi.get();
 }
 
-/**
- * Used by BarberShop.vue on save.
- * If barberShopID exists -> PUT
- * else -> POST (create new shop)
- */
 export async function updateBarberShop(payload: BarberShopDto): Promise<void> {
   const { barberShopID, ...rest } = payload;
 

@@ -1,12 +1,22 @@
 <template>
   <div class="space-y-6">
-    <header class="flex items-center justify-between">
+    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
         <h1 class="text-2xl font-semibold text-gray-900">Opening Hours</h1>
         <p class="text-sm text-gray-500">
           Edit when the shop is open. Use the checkbox to mark days as closed.
         </p>
       </div>
+
+      <button
+        type="button"
+        class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-900 disabled:opacity-60 disabled:cursor-not-allowed"
+        :disabled="savingAll || loading || rows.length === 0"
+        @click="onSaveAll"
+      >
+        <span v-if="savingAll">Saving…</span>
+        <span v-else>Save all changes</span>
+      </button>
     </header>
 
     <div v-if="error" class="rounded-md bg-red-50 text-red-700 px-4 py-2 text-sm">
@@ -23,7 +33,6 @@
             <th class="px-4 py-2">Opens</th>
             <th class="px-4 py-2">Closes</th>
             <th class="px-4 py-2">Closed</th>
-            <th class="px-4 py-2 text-right">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -39,16 +48,16 @@
               <input
                 v-model="row.openLocal"
                 type="time"
-                class="w-28 border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                :disabled="row.isClosed || savingId === row.openingHoursID"
+                class="w-28 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-black"
+                :disabled="row.isClosed || savingAll"
               />
             </td>
             <td class="px-4 py-2">
               <input
                 v-model="row.closeLocal"
                 type="time"
-                class="w-28 border rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                :disabled="row.isClosed || savingId === row.openingHoursID"
+                class="w-28 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-black"
+                :disabled="row.isClosed || savingAll"
               />
             </td>
             <td class="px-4 py-2">
@@ -57,24 +66,14 @@
                   type="checkbox"
                   v-model="row.isClosed"
                   class="rounded border-gray-300 text-black focus:ring-black"
-                  :disabled="savingId === row.openingHoursID"
+                  :disabled="savingAll"
                 />
                 <span>Closed</span>
               </label>
             </td>
-            <td class="px-4 py-2 text-right">
-              <button
-                type="button"
-                class="px-3 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50 disabled:opacity-60"
-                :disabled="savingId === row.openingHoursID"
-                @click="onSave(row)"
-              >
-                {{ savingId === row.openingHoursID ? 'Saving…' : 'Save' }}
-              </button>
-            </td>
           </tr>
           <tr v-if="rows.length === 0">
-            <td colspan="5" class="px-4 py-4 text-center text-gray-400 text-sm">
+            <td colspan="4" class="px-4 py-4 text-center text-gray-400 text-sm">
               No opening hours configured.
             </td>
           </tr>
@@ -101,20 +100,16 @@ interface OpeningHoursRow extends OpeningHoursDto {
 const rows = ref<OpeningHoursRow[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
-const savingId = ref<number | null>(null);
+const savingAll = ref(false);
 
 function toLocalTime(t: string | null): string {
   if (!t) return '';
-  // Expect "HH:MM" or "HH:MM:SS" from backend
-  return t.slice(0, 5);
+  return t.slice(0, 5); // "HH:MM"
 }
 
 function toBackendTime(value: string | null): string | null {
   if (!value) return null;
-  // convert "HH:MM" -> "HH:MM:00"
-  if (value.length === 5) {
-    return value + ':00';
-  }
+  if (value.length === 5) return value + ':00';
   return value;
 }
 
@@ -140,23 +135,31 @@ async function load() {
   }
 }
 
-async function onSave(row: OpeningHoursRow) {
+async function onSaveAll() {
+  if (!rows.value.length) return;
+  savingAll.value = true;
+  error.value = null;
+
   try {
-    savingId.value = row.openingHoursID;
-    error.value = null;
+    await Promise.all(
+      rows.value.map((row) => {
+        const openingTime = row.isClosed
+          ? null
+          : toBackendTime(row.openLocal || null);
+        const closingTime = row.isClosed
+          ? null
+          : toBackendTime(row.closeLocal || null);
 
-    const openingTime = row.isClosed ? null : toBackendTime(row.openLocal || null);
-    const closingTime = row.isClosed ? null : toBackendTime(row.closeLocal || null);
+        return updateOpeningHour(row, openingTime, closingTime);
+      }),
+    );
 
-    await updateOpeningHour(row, openingTime, closingTime);
-
-    // reload to ensure we see normalized values
     await load();
   } catch (e) {
     console.error(e);
     error.value = 'Failed to save opening hours.';
   } finally {
-    savingId.value = null;
+    savingAll.value = false;
   }
 }
 

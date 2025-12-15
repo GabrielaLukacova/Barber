@@ -41,7 +41,7 @@
     </aside>
 
     <!-- Main content -->
-    <main class="flex-1 min-h-screen bg-slate-900">
+    <main class="flex-1 min-h-screen bg-slate-900 p-6 text-slate-900 bg-white p-6 text-slate-900 bg-white p-6 text-slate-900 bg-white">
       <RouterView />
     </main>
   </div>
