@@ -6,17 +6,39 @@ import {
   updateBarberShopSchema,
 } from '../validation/barberShopSchemas';
 
-// Helper: empty string or whitespace -> null
-function toNullable(value: unknown): string | null {
-  if (typeof value !== 'string') return null;
-  const trimmed = value.trim();
-  return trimmed === '' ? null : trimmed;
+async function upsertPostalCode(postalCode: string, city: string) {
+  // Postgres upsert
+  await db
+    .insert(schema.PostalCode)
+    .values({ postalCode, city })
+    // drizzle pg supports onConflictDoUpdate
+    .onConflictDoUpdate({
+      target: schema.PostalCode.postalCode,
+      set: { city },
+    })
+    .execute();
 }
 
 export class BarberShopController {
   static async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
-      const rows = await db.select().from(schema.BarberShop);
+      const rows = await db
+        .select({
+          barberShopID: schema.BarberShop.barberShopID,
+          name: schema.BarberShop.name,
+          phoneNumber: schema.BarberShop.phoneNumber,
+          email: schema.BarberShop.email,
+          street: schema.BarberShop.street,
+          postalCode: schema.BarberShop.postalCode,
+          city: schema.PostalCode.city,
+          description: schema.BarberShop.description,
+        })
+        .from(schema.BarberShop)
+        .leftJoin(
+          schema.PostalCode,
+          eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode),
+        );
+
       res.json(rows);
     } catch (err) {
       console.error('BarberShopController.getAll error:', err);
@@ -32,13 +54,24 @@ export class BarberShopController {
       }
 
       const [row] = await db
-        .select()
+        .select({
+          barberShopID: schema.BarberShop.barberShopID,
+          name: schema.BarberShop.name,
+          phoneNumber: schema.BarberShop.phoneNumber,
+          email: schema.BarberShop.email,
+          street: schema.BarberShop.street,
+          postalCode: schema.BarberShop.postalCode,
+          city: schema.PostalCode.city,
+          description: schema.BarberShop.description,
+        })
         .from(schema.BarberShop)
+        .leftJoin(
+          schema.PostalCode,
+          eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode),
+        )
         .where(eq(schema.BarberShop.barberShopID, id));
 
-      if (!row) {
-        return res.status(404).json({ error: 'Barber shop not found' });
-      }
+      if (!row) return res.status(404).json({ error: 'Barber shop not found' });
 
       res.json(row);
     } catch (err) {
@@ -51,15 +84,20 @@ export class BarberShopController {
     try {
       const parsed = createBarberShopSchema.parse(req.body);
 
+      // If both provided, update PostalCode table
+      if (parsed.postalCode && parsed.city) {
+        await upsertPostalCode(parsed.postalCode, parsed.city);
+      }
+
       const result = await db
         .insert(schema.BarberShop)
         .values({
           name: parsed.name,
-          phoneNumber: toNullable(parsed.phoneNumber),
-          email: toNullable(parsed.email),
-          street: toNullable(parsed.street),
-          // ⛔ postalCode skipped for now to avoid FK issues
-          description: toNullable(parsed.description),
+          phoneNumber: parsed.phoneNumber ?? null,
+          email: parsed.email ?? null,
+          street: parsed.street ?? null,
+          postalCode: parsed.postalCode ?? null,
+          description: parsed.description ?? null,
         })
         .execute();
 
@@ -85,15 +123,19 @@ export class BarberShopController {
 
       const parsed = updateBarberShopSchema.parse(req.body);
 
+      if (parsed.postalCode && parsed.city) {
+        await upsertPostalCode(parsed.postalCode, parsed.city);
+      }
+
       await db
         .update(schema.BarberShop)
         .set({
           name: parsed.name,
-          phoneNumber: toNullable(parsed.phoneNumber),
-          email: toNullable(parsed.email),
-          street: toNullable(parsed.street),
-          // ⛔ postalCode skipped here as well
-          description: toNullable(parsed.description),
+          phoneNumber: parsed.phoneNumber ?? null,
+          email: parsed.email ?? null,
+          street: parsed.street ?? null,
+          postalCode: parsed.postalCode ?? null,
+          description: parsed.description ?? null,
         })
         .where(eq(schema.BarberShop.barberShopID, id))
         .execute();

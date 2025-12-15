@@ -1,12 +1,21 @@
 import { z } from 'zod';
 
+const emptyToNull = (v: unknown) => {
+  if (typeof v !== 'string') return v;
+  const t = v.trim();
+  return t === '' ? null : t;
+};
+
+const optStr = z.preprocess(emptyToNull, z.string().nullable().optional());
+
 export const createBarberShopSchema = z.object({
   name: z.string().min(1),
-  phoneNumber: z.string().optional().nullable(),
-  email: z.string().optional().nullable(),
-  street: z.string().optional().nullable(),
-  postalCode: z.string().optional().nullable(),
-  description: z.string().optional().nullable(),
+  phoneNumber: optStr,
+  email: optStr,
+  street: optStr,
+  postalCode: optStr,
+  city: optStr, // <-- used for PostalCode upsert
+  description: optStr,
 });
 
 export const updateBarberShopSchema = createBarberShopSchema;
