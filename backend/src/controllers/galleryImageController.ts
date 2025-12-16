@@ -5,8 +5,11 @@ import { and, asc, eq } from 'drizzle-orm';
 import { db } from '../db/db';
 import * as schema from '../db/schema';
 
-const BARBER_SHOP_ID = Number(process.env.BARBER_SHOP_ID || 1);
-if (!Number.isFinite(BARBER_SHOP_ID)) throw new Error("BARBER_SHOP_ID invalid");
+const BARBER_SHOP_ID = (() => {
+  const raw = process.env.BARBER_SHOP_ID;
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : 4;
+})();
 const GALLERY_DIR = path.join(process.cwd(), 'uploads', 'gallery');
 
 export class GalleryImageController {
