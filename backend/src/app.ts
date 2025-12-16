@@ -11,7 +11,10 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/uploads', express.static('uploads'));
+import path from "node:path";
+
+const UPLOADS_DIR = path.join(process.cwd(), "uploads");
+app.use("/uploads", express.static(UPLOADS_DIR));
 
 // Swagger docs
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
