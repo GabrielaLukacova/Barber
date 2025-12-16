@@ -15,7 +15,7 @@ const AdminDashboard = () => import('@/modules/admin/pages/Dashboard.vue');
 const AdminAppointments = () => import('@/modules/admin/pages/Appointments.vue');
 const AdminServices = () => import('@/modules/admin/pages/Services.vue');
 const AdminClients = () => import('@/modules/admin/pages/Clients.vue');
-const AdminGallery = () => import('@/modules/admin/pages/Gallery.vue');
+const AdminGallery = () => import('@/modules/admin/pages/AdminGallery.vue');
 const AdminHours = () => import('@/modules/admin/pages/OpeningHours.vue');
 const AdminTimeOff = () => import('@/modules/admin/pages/TimeOff.vue');
 const AdminBarberShop = () => import('@/modules/admin/pages/BarberShop.vue');

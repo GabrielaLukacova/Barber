@@ -5,7 +5,10 @@ import bcrypt from 'bcryptjs';
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
 const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET || 'dev_secret';
+const JWT_SECRET: any = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  throw new Error("JWT_SECRET is missing");
+}
 const JWT_EXPIRES_IN: SignOptions['expiresIn'] =
   (process.env.JWT_EXPIRES_IN as SignOptions['expiresIn']) || '1h';
 

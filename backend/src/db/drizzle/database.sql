@@ -35,9 +35,6 @@ CREATE TABLE GalleryImage (
     imageID INT AUTO_INCREMENT PRIMARY KEY,
     barberShopID INT NOT NULL,
     filePath VARCHAR(255) NOT NULL,
-    altText VARCHAR(150) NOT NULL,
-    title VARCHAR(100),
-    description TEXT,
     sortOrder INT DEFAULT 0,
     FOREIGN KEY (barberShopID) REFERENCES BarberShop(barberShopID)
 );

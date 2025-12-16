@@ -9,7 +9,7 @@
 
     <section class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <RouterLink
-        to="{ name: 'admin-appointments' }"
+        :to="{ name: 'admin-appointments' }"
         class="block rounded-2xl bg-slate-800 border border-slate-700 p-6 hover:bg-slate-700 transition"
       >
         <h2 class="text-xl font-semibold flex items-center gap-2">
