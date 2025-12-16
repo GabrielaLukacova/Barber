@@ -1,9 +1,8 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { eq } from 'drizzle-orm';
+import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
-// Zod schema for appointments
 const appointmentSchema = z.object({
   clientID: z
     .union([z.number().int().positive(), z.null()])
@@ -26,6 +25,47 @@ export class AppointmentController {
       res.json(appointments);
     } catch (err) {
       console.error('AppointmentController.getAll error:', err);
+      next(err);
+    }
+  }
+
+  static async getAllWithDetails(_req: Request, res: Response, next: NextFunction) {
+    try {
+      const rows = await db.execute(sql`
+        SELECT
+          a."appointmentID",
+          a."appointmentDate",
+          a."startTime",
+          a."endTime",
+          a."status",
+          a."totalPriceCents",
+          c."clientID",
+          c."firstName",
+          c."lastName",
+          c."email",
+          c."phoneNumber",
+          COALESCE(
+            json_agg(
+              json_build_object(
+                'serviceID', s."serviceID",
+                'name', s."name",
+                'duration', aps."duration",
+                'price', aps."price"
+              )
+            ) FILTER (WHERE s."serviceID" IS NOT NULL),
+            '[]'::json
+          ) AS services
+        FROM "Appointment" a
+        LEFT JOIN "Client" c ON c."clientID" = a."clientID"
+        LEFT JOIN "AppointmentService" aps ON aps."appointmentID" = a."appointmentID"
+        LEFT JOIN "Service" s ON s."serviceID" = aps."serviceID"
+        GROUP BY a."appointmentID", c."clientID"
+        ORDER BY a."appointmentDate" DESC, a."startTime" DESC
+      `);
+
+      res.json((rows as any)?.rows ?? []);
+    } catch (err) {
+      console.error('AppointmentController.getAllWithDetails error:', err);
       next(err);
     }
   }

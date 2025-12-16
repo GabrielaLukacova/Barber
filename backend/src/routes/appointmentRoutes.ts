@@ -59,6 +59,7 @@ const router = Router();
  *         description: Unauthorized.
  */
 router.get('/', AppointmentController.getAll);
+router.get('/with-details', AppointmentController.getAllWithDetails);
 router.post('/', requireAdmin, AppointmentController.create);
 
 /**
