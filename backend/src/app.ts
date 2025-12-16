@@ -22,9 +22,11 @@ app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 // Health check route
 app.get('/health', (_req: Request, res: Response) => {
   res.json({
-    status: 'ok',
+    status: "ok",
     uptime: process.uptime(),
     timestamp: new Date().toISOString(),
+    gitCommit: process.env.RENDER_GIT_COMMIT || process.env.GIT_COMMIT || null,
+    cwd: process.cwd(),
   });
 });
 
