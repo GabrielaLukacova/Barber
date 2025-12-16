@@ -3,8 +3,7 @@ import {
   type OpeningHoursInput,
   type TimeOffInput,
   type BarberShopInput,
-  type GalleryImageInput,
-  type PostalCodeInput,
+  type type PostalCodeInput
 } from '../models/configModels';
 
 export class ConfigService {
@@ -59,22 +58,6 @@ export class ConfigService {
     return configModels.deleteBarberShop(id);
   }
 
-  // GalleryImage
-  listGalleryImages() {
-    return configModels.listGalleryImages();
-  }
-  getGalleryImage(id: number) {
-    return configModels.getGalleryImage(id);
-  }
-  createGalleryImage(input: GalleryImageInput) {
-    return configModels.createGalleryImage(input);
-  }
-  updateGalleryImage(id: number, input: GalleryImageInput) {
-    return configModels.updateGalleryImage(id, input);
-  }
-  deleteGalleryImage(id: number) {
-    return configModels.deleteGalleryImage(id);
-  }
 
   // PostalCode
   listPostalCodes() {
