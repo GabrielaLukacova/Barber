@@ -8,6 +8,7 @@ import timeOffRouter from './timeOffRoutes';
 import barberShopRouter from './barberShopRoutes';
 import galleryImageRouter from './galleryImageRoutes';
 import postalCodeRouter from './postalCodeRoutes';
+import debugRouter from "./debugRoutes";
 import publicBookingRouter from "./public/publicBookingRoutes";
 
 const router = Router();
@@ -21,6 +22,7 @@ router.use('/time-off', timeOffRouter);
 router.use('/barber-shops', barberShopRouter);
 router.use('/gallery-images', galleryImageRouter);
 router.use('/postal-codes', postalCodeRouter);
+router.use('/debug', debugRouter);
 router.use('/public', publicBookingRouter);
 
 export default router;
