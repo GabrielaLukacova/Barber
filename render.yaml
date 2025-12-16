@@ -4,6 +4,6 @@ services:
     env: node
     plan: free
     buildCommand: npm --prefix backend ci && npm --prefix backend run build
-    startCommand: npm --prefix backend start
+    startCommand: npm --prefix backend run start:render
     autoDeploy: true
     healthCheckPath: /health
