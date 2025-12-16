@@ -3,7 +3,7 @@ import {
   type OpeningHoursInput,
   type TimeOffInput,
   type BarberShopInput,
-  type type PostalCodeInput
+  type PostalCodeInput
 } from '../models/configModels';
 
 export class ConfigService {
