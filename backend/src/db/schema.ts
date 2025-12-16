@@ -36,9 +36,6 @@ export const GalleryImage = pgTable('GalleryImage', {
     .notNull()
     .references(() => BarberShop.barberShopID),
   filePath: text('filePath').notNull(),
-  altText: text('altText').notNull(),
-  title: text('title'),
-  description: text('description'),
   sortOrder: integer('sortOrder').default(0),
 });
 

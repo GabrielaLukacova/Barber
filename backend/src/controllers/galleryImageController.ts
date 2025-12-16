@@ -40,9 +40,6 @@ export class GalleryImageController {
       const values = files.map((f) => ({
         barberShopID: BARBER_SHOP_ID,
         filePath: `/uploads/gallery/${f.filename}`,
-        altText: 'Gallery image',
-        title: null,
-        description: null,
         sortOrder: nextSort++,
       }));
 
