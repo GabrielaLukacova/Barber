@@ -1,0 +1,9 @@
+services:
+  - type: web
+    name: barber-backend
+    env: node
+    plan: free
+    buildCommand: npm --prefix backend ci && npm --prefix backend run build
+    startCommand: npm --prefix backend start
+    autoDeploy: true
+    healthCheckPath: /health
