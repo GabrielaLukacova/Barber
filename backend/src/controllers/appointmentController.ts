@@ -1,8 +1,9 @@
 import type { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { and, eq, inArray, sql } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
+// Zod schema for appointments
 const appointmentSchema = z.object({
   clientID: z
     .union([z.number().int().positive(), z.null()])
@@ -29,41 +30,73 @@ export class AppointmentController {
     }
   }
 
+  // ADMIN: show appointments with client + services (LEFT JOIN so guest bookings still appear)
   static async getAllWithDetails(_req: Request, res: Response, next: NextFunction) {
     try {
-      const rows = await db.execute(sql`
-        SELECT
-          a."appointmentID",
-          a."appointmentDate",
-          a."startTime",
-          a."endTime",
-          a."status",
-          a."totalPriceCents",
-          c."clientID",
-          c."firstName",
-          c."lastName",
-          c."email",
-          c."phoneNumber",
-          COALESCE(
-            json_agg(
-              json_build_object(
-                'serviceID', s."serviceID",
-                'name', s."name",
-                'duration', aps."duration",
-                'price', aps."price"
-              )
-            ) FILTER (WHERE s."serviceID" IS NOT NULL),
-            '[]'::json
-          ) AS services
-        FROM "Appointment" a
-        LEFT JOIN "Client" c ON c."clientID" = a."clientID"
-        LEFT JOIN "AppointmentService" aps ON aps."appointmentID" = a."appointmentID"
-        LEFT JOIN "Service" s ON s."serviceID" = aps."serviceID"
-        GROUP BY a."appointmentID", c."clientID"
-        ORDER BY a."appointmentDate" DESC, a."startTime" DESC
-      `);
+      const rows = await db
+        .select({
+          appointmentID: schema.Appointment.appointmentID,
+          appointmentDate: schema.Appointment.appointmentDate,
+          startTime: schema.Appointment.startTime,
+          endTime: schema.Appointment.endTime,
+          status: schema.Appointment.status,
+          totalPriceCents: schema.Appointment.totalPriceCents,
+          clientID: schema.Appointment.clientID,
 
-      res.json((rows as any)?.rows ?? []);
+          firstName: schema.Client.firstName,
+          lastName: schema.Client.lastName,
+          email: schema.Client.email,
+          phoneNumber: schema.Client.phoneNumber,
+
+          serviceID: schema.Service.serviceID,
+          serviceName: schema.Service.name,
+          serviceDuration: schema.AppointmentService.duration,
+          servicePrice: schema.AppointmentService.price,
+        })
+        .from(schema.Appointment)
+        .leftJoin(schema.Client, eq(schema.Client.clientID, schema.Appointment.clientID))
+        .leftJoin(schema.AppointmentService, eq(schema.AppointmentService.appointmentID, schema.Appointment.appointmentID))
+        .leftJoin(schema.Service, eq(schema.Service.serviceID, schema.AppointmentService.serviceID));
+
+      const map = new Map<number, any>();
+
+      for (const r of rows) {
+        const id = r.appointmentID;
+        if (!map.has(id)) {
+          map.set(id, {
+            appointmentID: id,
+            appointmentDate: r.appointmentDate,
+            startTime: r.startTime,
+            endTime: r.endTime,
+            status: r.status,
+            totalPriceCents: r.totalPriceCents ?? null,
+            clientID: r.clientID ?? null,
+            firstName: r.firstName ?? null,
+            lastName: r.lastName ?? null,
+            email: r.email ?? null,
+            phoneNumber: r.phoneNumber ?? null,
+            services: [] as Array<{ serviceID: number; name: string; duration: number; price: number }>,
+          });
+        }
+
+        if (typeof r.serviceID === 'number') {
+          map.get(id).services.push({
+            serviceID: r.serviceID,
+            name: r.serviceName ?? '',
+            duration: Number(r.serviceDuration ?? 0),
+            price: Number(r.servicePrice ?? 0),
+          });
+        }
+      }
+
+      const out = Array.from(map.values()).sort((a, b) => {
+        const ad = String(a.appointmentDate || '');
+        const bd = String(b.appointmentDate || '');
+        if (ad !== bd) return bd.localeCompare(ad);
+        return String(b.startTime || '').localeCompare(String(a.startTime || ''));
+      });
+
+      res.json(out);
     } catch (err) {
       console.error('AppointmentController.getAllWithDetails error:', err);
       next(err);
@@ -141,17 +174,17 @@ export class AppointmentController {
         return res.status(400).json({ error: 'Invalid appointment ID' });
       }
 
-      const parsed = appointmentSchema.parse(req.body);
+      const parsed = appointmentSchema.partial().parse(req.body);
 
       await db
         .update(schema.Appointment)
         .set({
-          clientID: parsed.clientID ?? null,
-          appointmentDate: parsed.appointmentDate,
-          startTime: parsed.startTime,
-          endTime: parsed.endTime,
-          status: parsed.status,
-          totalPriceCents: parsed.totalPriceCents ?? null,
+          clientID: parsed.clientID ?? undefined,
+          appointmentDate: parsed.appointmentDate ?? undefined,
+          startTime: parsed.startTime ?? undefined,
+          endTime: parsed.endTime ?? undefined,
+          status: parsed.status ?? undefined,
+          totalPriceCents: parsed.totalPriceCents ?? undefined,
         })
         .where(eq(schema.Appointment.appointmentID, id))
         .execute();
