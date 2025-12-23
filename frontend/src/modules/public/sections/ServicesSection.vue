@@ -28,7 +28,7 @@ const error = computed(() => servicesStore.error);
 </script>
 
 <template>
-  <section id="services" class="mx-auto max-w-6xl px-4 py-12 space-y-8">
+  <section id="services" class="section-block mx-auto max-w-6xl px-4 py-12 space-y-8">
     <header class="space-y-2 text-center">
       <h2 class="text-3xl font-semibold text-slate-900">Services & Prices</h2>
       <p class="text-sm text-slate-500">

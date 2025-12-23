@@ -37,20 +37,20 @@ onMounted(load);
 </script>
 
 <template>
-  <section id="gallery" class="mx-auto max-w-6xl px-4 py-12">
+  <section id="gallery" class="section-block">
     <div class="flex items-end justify-between gap-4 mb-4">
       <div>
-        <h2 class="text-3xl font-semibold text-slate-900">Gallery</h2>
-        <p class="text-slate-600">A few looks from the shop.</p>
+        <h2 class="text-3xl font-semibold text-zinc-900">Gallery</h2>
+        <p class="text-zinc-600">A few looks from the shop.</p>
       </div>
     </div>
 
     <p v-if="error" class="text-red-600 mb-3">{{ error }}</p>
-    <p v-else-if="loading" class="text-slate-500 mb-3">Loading…</p>
+    <p v-else-if="loading" class="text-zinc-500 mb-3">Loading…</p>
 
     <div
       v-if="sorted.length"
-      class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3"
+      class="grid grid-cols-2 sm:grid-cols-4 gap-4"
     >
       <a
         v-for="img in sorted"
@@ -58,13 +58,13 @@ onMounted(load);
         :href="fullSrc(img.filePath)"
         target="_blank"
         rel="noreferrer"
-        class="group rounded-xl border bg-white overflow-hidden"
+        class="block overflow-hidden"
         title="Open image"
       >
-        <div class="aspect-square bg-slate-100">
+        <div class="aspect-square bg-zinc-100">
           <img
             :src="fullSrc(img.filePath)"
-            class="w-full h-full object-cover"
+            class="w-full h-full object-cover block"
             loading="lazy"
             alt="Gallery image"
           />
@@ -72,6 +72,6 @@ onMounted(load);
       </a>
     </div>
 
-    <p v-else-if="!loading" class="text-slate-500">No images yet.</p>
+    <p v-else-if="!loading" class="text-zinc-500">No images yet.</p>
   </section>
 </template>

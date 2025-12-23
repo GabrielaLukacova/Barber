@@ -1,63 +1,36 @@
 <template>
   <div class="min-h-screen bg-white text-zinc-900">
-    <!-- NAVBAR -->
-    <header
-      class="sticky top-0 z-40 border-b border-zinc-200 bg-white/90 backdrop-blur"
-    >
-      <nav
-        class="mx-auto flex max-w-6xl items-center justify-between px-4 py-3"
-      >
-        <!-- Brand -->
+    <!-- NAVBAR overlays hero (no space taken) -->
+    <header :class="headerClass">
+      <nav class="mx-auto flex max-w-6xl items-center justify-between px-10 py-6">
+        <!-- Brand (no icon) -->
         <button
           type="button"
-          class="flex items-center gap-2 text-sm font-semibold tracking-tight text-zinc-900"
+          class="text-base sm:text-lg font-semibold tracking-tight transition-colors"
+          :class="brandClass"
           @click="scrollTop"
         >
-          <span
-            class="inline-flex h-8 w-8 items-center justify-center rounded-full border border-zinc-200 bg-white text-xs"
-          >
-            
-          </span>
-          <span>{{ shopName }}</span>
+          {{ shopName }}
         </button>
 
-        <!-- Links -->
+        <!-- Links (bigger + readable) -->
         <div
-          class="hidden gap-6 text-[11px] font-medium uppercase tracking-[0.24em] text-zinc-600 md:flex"
+          class="hidden items-center gap-12 text-[15px] font-semibold uppercase tracking-[0.14em] md:flex"
+          :class="navTextClass"
         >
-          <button
-            type="button"
-            class="hover:text-zinc-900"
-            @click="scrollToId('services')"
-          >
+          <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="scrollToId('services')">
             Services
           </button>
-          <button
-            type="button"
-            class="hover:text-zinc-900"
-            @click="scrollToId('booking')"
-          >
+          <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="scrollToId('booking')">
             Booking
           </button>
-          <button
-            type="button"
-            class="hover:text-zinc-900"
-            @click="scrollToId('opening-hours')"
-          >
+          <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="scrollToId('opening-hours')">
             Opening hours
           </button>
-          <button
-            type="button"
-            class="hover:text-zinc-900"
-            @click="scrollToId('gallery')"
-          >
+          <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="scrollToId('gallery')">
             Gallery
           </button>
-          <button
-            type="button"
-            class="hover:text-zinc-900"
-            @click="scrollToId('contact')"
-          >
+          <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="scrollToId('contact')">
             Contact
           </button>
         </div>
@@ -65,39 +38,40 @@
     </header>
 
     <!-- MAIN -->
-    <main class="mx-auto max-w-6xl px-4 py-8 space-y-16">
+    <main class="w-full space-y-0">
       <RouterView />
     </main>
 
-    <!-- FOOTER -->
-    <footer class="mt-12 border-t border-zinc-200 bg-zinc-950">
-      <div class="mx-auto max-w-6xl px-4 py-8 space-y-6">
-        <!-- Barber chips -->
-        <div
-          class="flex flex-wrap items-center justify-center gap-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-zinc-9000"
-        >
-          <div class="flex items-center gap-2">
-            <span class="h-px w-6 bg-zinc-300"></span>
-            <span>Fades</span>
+    <!-- FOOTER (dark, minimal, universal barber vibe) -->
+    <footer class="mt-0 border-t border-zinc-200 bg-white text-zinc-700 dark:border-white/10 dark:bg-zinc-950 dark:text-zinc-200">
+      <div class="mx-auto max-w-6xl px-10 py-14">
+        <div class="flex flex-col items-center gap-6 text-center">
+          <div class="text-base font-semibold tracking-tight text-white">
+            {{ shopName }}
           </div>
-          <div class="flex items-center gap-2">
-            <span class="h-px w-6 bg-zinc-300"></span>
-            <span>Beards</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="h-px w-6 bg-zinc-300"></span>
-            <span>Line-ups</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="h-px w-6 bg-zinc-300"></span>
-            <span>Skin fades</span>
-          </div>
-        </div>
 
-        <!-- Copyright -->
-        <div class="flex items-center justify-center gap-3 text-xs text-zinc-600">
-          <span class="text-lg"></span>
-          <span>© 2025 Kim's Frisør. All rights reserved.</span>
+          <div class="flex flex-wrap items-center justify-center gap-6 text-[12px] font-semibold uppercase tracking-[0.22em] text-zinc-600 dark:text-zinc-300">
+            <span class="inline-flex items-center gap-2">
+              <span class="h-px w-8 bg-[#C7A47D]/70"></span><span>Fades</span>
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="h-px w-8 bg-[#C7A47D]/70"></span><span>Beards</span>
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <span class="h-px w-8 bg-[#C7A47D]/70"></span><span>Line-ups</span>
+            </span>
+          </div>
+
+          <p class="max-w-2xl text-sm text-zinc-600 dark:text-zinc-400">
+            Crafted cuts. Clean details. A calm place to reset your style.
+          </p>
+
+          <div class="h-px w-full max-w-xl bg-zinc-200 dark:bg-white/10"></div>
+
+          <div class="text-xs text-zinc-500 dark:text-zinc-500">
+            <span class="text-[#C7A47D]">●</span>
+            <span class="ml-2">© 2025 {{ shopName }}. All rights reserved.</span>
+          </div>
         </div>
       </div>
     </footer>
@@ -106,7 +80,7 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router';
-import { computed, onMounted, ref } from 'vue';
+import { computed, onMounted, onUnmounted, ref } from "vue";
 import axios from 'axios';
 
 interface BarberShopDto {
@@ -115,7 +89,6 @@ interface BarberShopDto {
 }
 
 const shop = ref<BarberShopDto | null>(null);
-
 const shopName = computed(() => shop.value?.name ?? "Kim's Frisør");
 
 async function loadShopName() {
@@ -136,9 +109,83 @@ function scrollToId(id: string) {
   const el = document.getElementById(id);
   if (!el) return;
   const rect = el.getBoundingClientRect();
-  const offset = window.scrollY + rect.top - 72; // account for navbar height
+  const offset = window.scrollY + rect.top - 84; // navbar height
   window.scrollTo({ top: offset, behavior: 'smooth' });
 }
 
-onMounted(loadShopName);
+/*
+  IMPORTANT:
+  Navbar stays "hero style" while you scroll through the hero.
+  It ONLY changes once you are BELOW the hero section.
+*/
+const afterHero = ref(false);
+const heroEnd = ref(240);
+
+function computeHeroEnd() {
+  const hero = document.getElementById('hero');
+  if (!hero) {
+    heroEnd.value = 240;
+    return;
+  }
+  heroEnd.value = hero.offsetTop + hero.offsetHeight - 84;
+}
+
+function onScroll() {
+  afterHero.value = window.scrollY >= heroEnd.value;
+}
+
+function onResize() {
+  computeHeroEnd();
+  onScroll();
+}
+
+const headerClass = computed(() =>
+  (afterHero.value
+    ? 'fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 bg-white/82 backdrop-blur supports-[backdrop-filter]:bg-white/72'
+    : 'fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent'
+  ) + ' transition-colors duration-300',
+);
+
+const brandClass = computed(() => (afterHero.value ? 'text-zinc-900' : 'text-white'));
+const navTextClass = computed(() => (afterHero.value ? 'text-zinc-700' : 'text-white/90'));
+const linkClass = computed(() => (afterHero.value ? 'hover:text-zinc-900 opacity-95' : 'hover:text-white opacity-95'));
+
+onMounted(() => {
+  initTheme();
+  loadShopName();
+  computeHeroEnd();
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onResize, { passive: true });
+});
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', onScroll);
+  window.removeEventListener('resize', onResize);
+});
+
+
+// --- Dark mode (class strategy) ---
+const isDark = ref(false);
+
+function applyTheme() {
+  document.documentElement.classList.toggle("dark", isDark.value);
+  localStorage.setItem("theme", isDark.value ? "dark" : "light");
+}
+
+function initTheme() {
+  const saved = localStorage.getItem("theme");
+  if (saved === "dark" || saved === "light") {
+    isDark.value = saved === "dark";
+  } else {
+    isDark.value = window.matchMedia?.("(prefers-color-scheme: dark)")?.matches ?? false;
+  }
+  applyTheme();
+}
+
+function toggleTheme() {
+  isDark.value = !isDark.value;
+  applyTheme();
+}
+
 </script>
