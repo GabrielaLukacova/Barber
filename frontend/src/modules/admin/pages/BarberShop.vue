@@ -1,112 +1,65 @@
 <template>
-  <div class="space-y-6">
-    <header class="flex items-center justify-between">
-      <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Barber shop profile</h1>
-        <p class="text-sm text-gray-500">
-          Set the shop details used on the website (name, address, contact, city).
-        </p>
-      </div>
+  <div class="admin-page">
+    <header>
+      <h1 class="admin-title">Barber shop profile</h1>
+      <p class="admin-subtitle">
+        Set the shop details used on the website (name, address, contact, city).
+      </p>
     </header>
 
-    <div v-if="error" class="rounded-md bg-red-50 text-red-700 px-4 py-2 text-sm">
-      {{ error }}
-    </div>
+    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
+    <div v-if="success" class="admin-alert admin-alert--success">Saved successfully.</div>
+    <div v-if="loading" class="admin-alert">Loading…</div>
 
-    <div v-if="success" class="rounded-md bg-emerald-50 text-emerald-800 px-4 py-2 text-sm">
-      Saved successfully.
-    </div>
+    <form v-else class="space-y-5" @submit.prevent="onSave">
+      <div>
+        <label class="admin-label">Name</label>
+        <input v-model="form.name" type="text" class="admin-input" placeholder="Kim's Frisør" />
+      </div>
 
-    <div v-if="loading" class="text-sm text-gray-500">Loading…</div>
+      <div>
+        <label class="admin-label">Street</label>
+        <input v-model="form.street" type="text" class="admin-input" placeholder="Street 1" />
+      </div>
 
-    <form v-else class="grid gap-6 lg:grid-cols-2" @submit.prevent="onSave">
-      <div class="space-y-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Name</label>
-          <input
-            v-model="form.name"
-            type="text"
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="Kim's Frisør"
-          />
+          <label class="admin-label">Postal code</label>
+          <input v-model="form.postalCode" type="text" maxlength="4" class="admin-input" placeholder="6700" />
         </div>
-
         <div>
-          <label class="block text-sm font-medium text-gray-700">Street</label>
-          <input
-            v-model="form.street"
-            type="text"
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="Street 1"
-          />
-        </div>
-
-        <div class="grid grid-cols-[1.2fr_2fr] gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Postal code</label>
-            <input
-              v-model="form.postalCode"
-              type="text"
-              maxlength="4"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              placeholder="6700"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">City</label>
-            <input
-              v-model="form.city"
-              type="text"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              placeholder="Esbjerg"
-            />
-          </div>
+          <label class="admin-label">City</label>
+          <input v-model="form.city" type="text" class="admin-input" placeholder="Esbjerg" />
         </div>
       </div>
 
-      <div class="space-y-4">
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Phone</label>
-            <input
-              v-model="form.phoneNumber"
-              type="text"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              placeholder="+45 00 00 00 00"
-            />
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Email</label>
-            <input
-              v-model="form.email"
-              type="email"
-              class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-              placeholder="hello@kimsfrisor.dk"
-            />
-          </div>
-        </div>
-
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label class="block text-sm font-medium text-gray-700">Description</label>
-          <textarea
-            v-model="form.description"
-            rows="4"
-            class="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
-            placeholder="Short text about the barbershop, vibe, services…"
-          />
+          <label class="admin-label">Phone</label>
+          <input v-model="form.phoneNumber" type="text" class="admin-input" placeholder="+45 00 00 00 00" />
         </div>
-
-        <div class="pt-4">
-          <button
-            type="submit"
-            class="inline-flex items-center rounded-md bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-900 disabled:opacity-60"
-            :disabled="saving"
-          >
-            <span v-if="saving">Saving…</span>
-            <span v-else>Save changes</span>
-          </button>
+        <div>
+          <label class="admin-label">Email</label>
+          <input v-model="form.email" type="email" class="admin-input" placeholder="hello@kimsfrisor.dk" />
         </div>
       </div>
+
+      <div>
+        <label class="admin-label">Description</label>
+
+        <!-- ✅ IMPORTANT: textarea MUST NOT be self-closing -->
+        <textarea
+          v-model="form.description"
+          rows="4"
+          class="admin-textarea"
+          placeholder="Short text about the barbershop…"
+        ></textarea>
+      </div>
+
+      <button type="submit" class="admin-btn admin-btn--accent" :disabled="saving">
+        <span v-if="saving">Saving…</span>
+        <span v-else>Save changes</span>
+      </button>
     </form>
   </div>
 </template>
@@ -179,7 +132,7 @@ async function onSave() {
     const norm = (v: any) => {
       if (v === undefined || v === null) return null;
       const t = String(v).trim();
-      return t === "" ? null : t;
+      return t === '' ? null : t;
     };
 
     const payload = {

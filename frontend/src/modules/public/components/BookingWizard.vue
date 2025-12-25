@@ -6,8 +6,14 @@ import { fetchAvailableSlots, publicBook } from '@/modules/public/services/booki
 
 const servicesStore = useServicesStore();
 const booking = useBookingStore();
+const bookingAny = booking as any;
 
-const todayISO = new Date().toISOString().slice(0, 10);
+/** ✅ Timezone-safe local YYYY-MM-DD */
+function localISODate(d = new Date()) {
+  const tzOffset = d.getTimezoneOffset() * 60000;
+  return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
+}
+const todayISO = localISODate();
 
 const slots = ref<string[]>([]);
 const durationMin = ref<number>(0);
@@ -15,51 +21,76 @@ const loadingSlots = ref(false);
 const submitting = ref(false);
 const errorMsg = ref<string | null>(null);
 
+/** Closed/no slots status (works even if API doesn't support isClosed) */
+const dayStatus = ref<'idle' | 'open' | 'closed' | 'noSlots'>('idle');
+
+/** Step 3 UX */
+const triedSubmit = ref(false);
+const touched = ref({ name: false, email: false, phone: false });
+
 onMounted(async () => {
   await servicesStore.load();
-  if (!booking.services) booking.services = [];
+  if (!bookingAny.services) bookingAny.services = [];
 });
 
-const selectedServiceIDs = computed(() =>
-  (booking.services ?? []).map((s: any) => s.id).filter(Boolean),
+const selectedServiceIDs = computed<number[]>(() =>
+  (bookingAny.services ?? []).map((s: any) => s?.id).filter((id: any) => typeof id === 'number'),
 );
 
 const totalPriceDKK = computed(() =>
-  (booking.services ?? []).reduce((sum: number, s: any) => sum + ((s.priceCents ?? 0) / 100), 0),
+  (bookingAny.services ?? []).reduce((sum: number, s: any) => sum + ((s?.priceCents ?? 0) / 100), 0),
 );
 
-function isSelected(id: number) {
-  return (booking.services ?? []).some((x: any) => x.id === id);
+function isSelected(id?: number) {
+  if (!id) return false;
+  return (bookingAny.services ?? []).some((x: any) => x?.id === id);
 }
 
 function toggleService(svc: any) {
-  const list = booking.services ?? [];
-  const exists = list.some((x: any) => x.id === svc.id);
-  booking.services = exists ? list.filter((x: any) => x.id !== svc.id) : [...list, svc];
+  const id = svc?.id as number | undefined;
+  if (!id) return;
+
+  const list = bookingAny.services ?? [];
+  const exists = list.some((x: any) => x?.id === id);
+  bookingAny.services = exists ? list.filter((x: any) => x?.id !== id) : [...list, svc];
 }
 
 function resetTimeSelection() {
-  booking.slot = null as any;
+  bookingAny.slot = null;
   slots.value = [];
   durationMin.value = 0;
+  dayStatus.value = 'idle';
 }
 
 async function loadSlots() {
   errorMsg.value = null;
   slots.value = [];
   durationMin.value = 0;
+  dayStatus.value = 'idle';
 
-  if (!booking.dateISO || selectedServiceIDs.value.length === 0) return;
+  if (!bookingAny.dateISO || selectedServiceIDs.value.length === 0) return;
 
   loadingSlots.value = true;
   try {
-    const data = await fetchAvailableSlots({
-      date: booking.dateISO,
+    const data: any = await fetchAvailableSlots({
+      date: bookingAny.dateISO,
       serviceIDs: selectedServiceIDs.value as number[],
     });
-    slots.value = data.slots;
-    durationMin.value = data.durationMin;
-    if (!slots.value.includes(booking.slot as any)) booking.slot = null as any;
+
+    slots.value = Array.isArray(data?.slots) ? data.slots : [];
+    durationMin.value = Number(data?.durationMin ?? 0);
+
+    const isClosed = data?.isClosed === true; // optional if backend supports it
+    if (isClosed) {
+      dayStatus.value = 'closed';
+      bookingAny.slot = null;
+    } else if (slots.value.length > 0) {
+      dayStatus.value = 'open';
+      if (!slots.value.includes(bookingAny.slot)) bookingAny.slot = null;
+    } else {
+      dayStatus.value = 'noSlots';
+      bookingAny.slot = null;
+    }
   } catch (e: any) {
     errorMsg.value = e?.response?.data?.error ?? 'Could not load available slots';
   } finally {
@@ -67,44 +98,69 @@ async function loadSlots() {
   }
 }
 
-watch(() => selectedServiceIDs.value.join(','), () => {
-  resetTimeSelection();
-  if (booking.step >= 2) loadSlots();
-});
+watch(
+  [() => bookingAny.dateISO, () => selectedServiceIDs.value.slice().sort().join(',')],
+  async ([newDate, newSvcKey], [oldDate, oldSvcKey]) => {
+    if (newDate === oldDate && newSvcKey === oldSvcKey) return;
+    resetTimeSelection();
+    if (bookingAny.step >= 2) await loadSlots();
+  },
+);
 
-watch(() => booking.dateISO, () => {
-  resetTimeSelection();
-  if (booking.step >= 2) loadSlots();
-});
+const stepLabels = [
+  { n: 1, title: 'Services' },
+  { n: 2, title: 'Date & time' },
+  { n: 3, title: 'Details' },
+  { n: 4, title: 'Done' },
+];
+
+const stepTitle = computed(() => stepLabels.find((s) => s.n === bookingAny.step)?.title ?? 'Booking');
+
+const nameOk = computed(() => !!bookingAny.customerName?.trim());
+const emailOk = computed(() => !!bookingAny.customerEmail?.trim());
+const phoneOk = computed(() => !!bookingAny.customerPhone?.trim());
+const contactOk = computed(() => emailOk.value || phoneOk.value);
+
+const showNameError = computed(() => (touched.value.name || triedSubmit.value) && !nameOk.value);
+const showContactError = computed(
+  () => (touched.value.email || touched.value.phone || triedSubmit.value) && !contactOk.value,
+);
 
 const canNext = computed(() => {
-  if (booking.step === 1) return selectedServiceIDs.value.length > 0;
-  if (booking.step === 2) return !!booking.dateISO && !!booking.slot;
-  if (booking.step === 3) return !!booking.customerName && (!!booking.customerEmail || !!booking.customerPhone);
+  if (bookingAny.step === 1) return selectedServiceIDs.value.length > 0;
+  if (bookingAny.step === 2) return !!bookingAny.dateISO && !!bookingAny.slot && dayStatus.value === 'open';
+  if (bookingAny.step === 3) return nameOk.value && contactOk.value;
   return true;
 });
 
 async function submit() {
-  if (!booking.dateISO || !booking.slot || selectedServiceIDs.value.length === 0) return;
+  triedSubmit.value = true;
+  touched.value.name = true;
+  touched.value.email = true;
+  touched.value.phone = true;
+
+  if (!bookingAny.dateISO || !bookingAny.slot || selectedServiceIDs.value.length === 0) return;
+  if (!nameOk.value || !contactOk.value) return;
+
   submitting.value = true;
   errorMsg.value = null;
 
   try {
     await publicBook({
       serviceIDs: selectedServiceIDs.value as number[],
-      date: booking.dateISO,
-      startTime: booking.slot as any,
-      customerName: booking.customerName,
-      customerEmail: booking.customerEmail || undefined,
-      customerPhone: booking.customerPhone || undefined,
+      date: bookingAny.dateISO,
+      startTime: bookingAny.slot,
+      customerName: bookingAny.customerName,
+      customerEmail: bookingAny.customerEmail || undefined,
+      customerPhone: bookingAny.customerPhone || undefined,
     });
-    booking.step = 4;
+    bookingAny.step = 4;
   } catch (e: any) {
     const status = e?.response?.status;
     if (status === 409) {
       errorMsg.value = e?.response?.data?.error ?? 'That time was just taken. Please choose another slot.';
       await loadSlots();
-      booking.step = 2;
+      bookingAny.step = 2;
       return;
     }
     const details = e?.response?.data?.details;
@@ -117,201 +173,524 @@ async function submit() {
   }
 }
 
-function goNext() {
-  if (booking.step === 1) {
-    booking.step = 2;
-    loadSlots();
+async function goNext() {
+  if (bookingAny.step === 1) {
+    bookingAny.step = 2;
+    await loadSlots();
     return;
   }
-  booking.step++;
+  if (bookingAny.step === 2 && dayStatus.value !== 'open') return;
+  bookingAny.step++;
 }
 
 function goBack() {
-  booking.step = Math.max(1, booking.step - 1);
+  bookingAny.step = Math.max(1, (bookingAny.step ?? 1) - 1);
 }
 
 function fmtPriceDKK(cents: number) {
-  return `${Math.round(cents / 100)} DKK`;
+  const val = (cents ?? 0) / 100;
+  return `${val.toFixed(0)} DKK`;
+}
+
+function fmtPrettyDate(iso?: string | null) {
+  if (!iso) return '—';
+  const parts = iso.split('-');
+  if (parts.length !== 3) return iso;
+
+  const y = Number(parts[0]);
+  const m = Number(parts[1]);
+  const d = Number(parts[2]);
+  if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return iso;
+
+  const date = new Date(y, m - 1, d);
+  return new Intl.DateTimeFormat(undefined, { weekday: 'short', day: '2-digit', month: 'short' }).format(date);
+}
+
+function resetAllUX() {
+  triedSubmit.value = false;
+  touched.value = { name: false, email: false, phone: false };
 }
 </script>
 
 <template>
-  <div class="grid lg:grid-cols-[1.2fr_0.8fr] gap-6">
-    <!-- Main card -->
-    <div class="card p-6 space-y-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <div class="text-sm text-slate-500">Online booking</div>
-          <h3 class="text-2xl font-semibold text-slate-900">Reserve your time</h3>
-        </div>
+  <div class="booking-root">
+    <div class="layout">
+      <!-- MAIN -->
+      <div class="panel">
+        <div class="header-row">
+          <div class="header-copy">
+            <div class="step-title">{{ stepTitle }}</div>
+          </div>
 
-        <div class="flex items-center gap-2 text-xs text-slate-600">
-          <span :class="['px-2 py-1 rounded', booking.step>=1 ? 'bg-brand.beige text-brand.black' : 'bg-zinc-200']">1</span>
-          <span :class="['px-2 py-1 rounded', booking.step>=2 ? 'bg-brand.beige text-brand.black' : 'bg-zinc-200']">2</span>
-          <span :class="['px-2 py-1 rounded', booking.step>=3 ? 'bg-brand.beige text-brand.black' : 'bg-zinc-200']">3</span>
-          <span :class="['px-2 py-1 rounded', booking.step>=4 ? 'bg-brand.beige text-brand.black' : 'bg-zinc-200']">4</span>
-        </div>
-      </div>
-
-      <div v-if="errorMsg" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-        {{ errorMsg }}
-      </div>
-
-      <!-- Step 1 -->
-      <div v-if="booking.step === 1" class="space-y-3">
-        <div class="text-sm text-slate-600">Select one or more services.</div>
-
-        <div class="grid md:grid-cols-2 gap-3">
-          <button
-            v-for="s in servicesStore.items"
-            :key="s.id"
-            type="button"
-            @click="toggleService(s)"
-            :class="[
-              'text-left p-4 rounded-2xl border transition',
-              isSelected(s.id) ? 'border-brand.beige bg-brand.gray' : 'border-zinc-200 hover:bg-zinc-50'
-            ]"
-          >
-            <div class="flex items-start justify-between gap-3">
-              <div>
-                <div class="font-medium text-slate-900">{{ s.name }}</div>
-                <div class="text-sm text-slate-600 mt-1">{{ s.durationMin }} min</div>
-              </div>
-              <div class="text-sm font-medium text-slate-900 whitespace-nowrap">
-                {{ fmtPriceDKK(s.priceCents) }}
+          <div class="stepper">
+            <div class="stepper-row">
+              <div v-for="s in stepLabels" :key="s.n">
+                <div
+                  class="step-dot"
+                  :class="bookingAny.step === s.n ? 'is-active' : bookingAny.step > s.n ? 'is-done' : ''"
+                >
+                  {{ s.n }}
+                </div>
               </div>
             </div>
-          </button>
-        </div>
-      </div>
 
-      <!-- Step 2 -->
-      <div v-else-if="booking.step === 2" class="space-y-4">
-        <div class="grid md:grid-cols-2 gap-3">
-          <div class="card p-4">
-            <div class="font-medium mb-2">Pick a date</div>
-            <input
-              class="w-full rounded-xl border border-zinc-300 p-2"
-              type="date"
-              :min="todayISO"
-              v-model="booking.dateISO"
-            />
-            <div class="text-xs text-zinc-500 mt-2" v-if="durationMin">Total duration: {{ durationMin }} min</div>
+            <div class="stepper-bar">
+              <div
+                class="stepper-bar-fill"
+                :style="{ width: `${(Math.max(1, bookingAny.step) - 1) / 3 * 100}%` }"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div v-if="errorMsg" class="alert alert-error">{{ errorMsg }}</div>
+
+        <!-- STEP 1 -->
+        <div v-if="bookingAny.step === 1" class="step">
+          <div class="services-grid">
+            <button
+              v-for="s in servicesStore.items"
+              :key="s.id"
+              type="button"
+              class="service-tile"
+              :class="isSelected(s.id) ? 'is-selected' : ''"
+              @click="toggleService(s)"
+            >
+              <div class="tile-row">
+                <div class="tile-main">
+                  <div class="tile-name">{{ s.name }}</div>
+                  <div class="tile-meta">{{ s.durationMin }} min</div>
+                </div>
+                <div class="tile-price">{{ fmtPriceDKK(s.priceCents) }}</div>
+              </div>
+            </button>
           </div>
 
-          <div class="card p-4">
-            <div class="font-medium mb-2">Choose a time</div>
+          <div class="inline-summary">
+            <div><span class="em">{{ selectedServiceIDs.length }}</span> selected</div>
+            <div>Estimated total: <span class="em">{{ totalPriceDKK.toFixed(0) }} DKK</span></div>
+          </div>
+        </div>
 
-            <div v-if="!booking.dateISO" class="text-sm text-zinc-500">
-              Choose a date to see available times.
+        <!-- STEP 2 -->
+        <div v-else-if="bookingAny.step === 2" class="step">
+          <div class="two-col">
+            <div class="pane">
+              <div class="pane-head">
+                <div class="pane-title">Date</div>
+                <div class="pane-meta">{{ fmtPrettyDate(bookingAny.dateISO) }}</div>
+              </div>
+
+              <input class="input" type="date" :min="todayISO" v-model="bookingAny.dateISO" :disabled="submitting" />
             </div>
 
-            <div v-else-if="loadingSlots" class="space-y-2">
-              <div class="h-10 rounded-xl bg-zinc-100 animate-pulse"></div>
-              <div class="h-10 rounded-xl bg-zinc-100 animate-pulse"></div>
-              <div class="h-10 rounded-xl bg-zinc-100 animate-pulse"></div>
-            </div>
+            <div class="pane">
+              <div class="pane-head">
+                <div class="pane-title">Time</div>
+                <div class="pane-meta" v-if="bookingAny.dateISO">{{ slots.length }}</div>
+              </div>
 
-            <div v-else class="flex flex-wrap gap-2">
-              <button
-                v-for="t in slots"
-                :key="t"
-                type="button"
-                class="btn"
-                :class="booking.slot===t ? 'btn-primary' : 'btn-ghost'"
-                @click="booking.slot = t"
-              >{{ t }}</button>
+              <div v-if="!bookingAny.dateISO" class="hint">—</div>
 
-              <div v-if="booking.dateISO && slots.length===0" class="text-sm text-zinc-500">
-                No slots available for this date. Try another day.
+              <div v-else-if="loadingSlots" class="skeletons">
+                <div class="skeleton" />
+                <div class="skeleton" />
+                <div class="skeleton" />
+              </div>
+
+              <div v-else>
+                <div v-if="dayStatus === 'closed'" class="alert">Closed</div>
+                <div v-else-if="dayStatus === 'noSlots'" class="alert">No availability</div>
+
+                <div v-if="slots.length" class="times">
+                  <button
+                    v-for="t in slots"
+                    :key="t"
+                    type="button"
+                    class="btn"
+                    :class="bookingAny.slot === t ? 'btn-primary' : 'btn-ghost'"
+                    :disabled="submitting"
+                    @click="bookingAny.slot = t"
+                  >
+                    {{ t }}
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <!-- Step 3 -->
-      <div v-else-if="booking.step === 3" class="space-y-4">
-        <div class="text-sm text-slate-600">Enter your details (email or phone required).</div>
+        <!-- STEP 3 -->
+        <div v-else-if="bookingAny.step === 3" class="step">
+          <div class="two-col">
+            <div class="col-span-2">
+              <label class="label">Name</label>
+              <input
+                v-model="bookingAny.customerName"
+                class="input"
+                :class="showNameError ? 'input-error' : ''"
+                @blur="touched.name = true"
+                :disabled="submitting"
+              />
+              <div v-if="showNameError" class="error-text">Required</div>
+            </div>
 
-        <div class="grid md:grid-cols-2 gap-4">
-          <div class="md:col-span-2">
-            <label class="block text-sm mb-1">Name</label>
-            <input v-model="booking.customerName" class="w-full rounded-xl border border-zinc-300 p-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Email</label>
-            <input v-model="booking.customerEmail" type="email" class="w-full rounded-xl border border-zinc-300 p-2" />
-          </div>
-          <div>
-            <label class="block text-sm mb-1">Phone</label>
-            <input v-model="booking.customerPhone" class="w-full rounded-xl border border-zinc-300 p-2" />
+            <div>
+              <label class="label">Email</label>
+              <input
+                v-model="bookingAny.customerEmail"
+                type="email"
+                class="input"
+                :class="showContactError ? 'input-error' : ''"
+                @blur="touched.email = true"
+                :disabled="submitting"
+              />
+            </div>
+
+            <div>
+              <label class="label">Phone</label>
+              <input
+                v-model="bookingAny.customerPhone"
+                class="input"
+                :class="showContactError ? 'input-error' : ''"
+                @blur="touched.phone = true"
+                :disabled="submitting"
+              />
+            </div>
+
+            <div v-if="showContactError" class="alert alert-error-soft col-span-2">Email or phone required</div>
           </div>
         </div>
-      </div>
 
-      <!-- Step 4 -->
-      <div v-else-if="booking.step === 4" class="text-center py-10">
-        <h3 class="text-2xl font-semibold">Booking confirmed 🎉</h3>
-        <p class="text-zinc-600 mt-2">Thanks! We’ll contact you if anything changes.</p>
-        <button class="btn btn-ghost mt-6" type="button" @click="booking.reset()">Book another</button>
-      </div>
+        <!-- STEP 4 -->
+        <div v-else-if="bookingAny.step === 4" class="step done">
+          <div class="done-wrap">
+            <h3 class="done-title">Booking confirmed</h3>
 
-      <!-- Controls -->
-      <div class="flex items-center justify-between pt-2">
-        <button class="btn btn-ghost" type="button" :disabled="booking.step===1 || submitting" @click="goBack()">
-          Back
-        </button>
+            <div class="confirm">
+              <div class="row">
+                <span class="muted">When</span>
+                <span class="em">{{ fmtPrettyDate(bookingAny.dateISO) }} · {{ bookingAny.slot || '—' }}</span>
+              </div>
 
-        <div class="flex items-center gap-2">
-          <button v-if="booking.step<3" type="button" class="btn btn-primary" :disabled="!canNext" @click="goNext()">
-            Continue
+              <div class="row">
+                <span class="muted">Total</span>
+                <span class="em">{{ totalPriceDKK.toFixed(0) }} DKK</span>
+              </div>
+            </div>
+
+            <button class="btn btn-ghost" type="button" @click="booking.reset(); resetAllUX()">
+              Book another
+            </button>
+          </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+          <button class="btn btn-ghost" type="button" :disabled="bookingAny.step === 1 || submitting" @click="goBack()">
+            Back
           </button>
-          <button v-else-if="booking.step===3" type="button" class="btn btn-primary" :disabled="!canNext || submitting" @click="submit()">
-            {{ submitting ? 'Booking…' : 'Confirm booking' }}
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Summary card -->
-    <div class="card p-6 space-y-4">
-      <div class="font-semibold text-slate-900">Summary</div>
+          <div class="controls-right">
+            <button
+              v-if="bookingAny.step < 3"
+              class="btn btn-primary"
+              :disabled="!canNext || submitting || loadingSlots"
+              @click="goNext()"
+            >
+              Continue
+            </button>
 
-      <div class="text-sm text-slate-700">
-        <div class="text-slate-500 mb-1">Services</div>
-        <div v-if="(booking.services ?? []).length === 0" class="text-slate-500">No services selected</div>
-        <ul v-else class="space-y-1">
-          <li v-for="s in (booking.services ?? [])" :key="s.id" class="flex items-center justify-between gap-3">
-            <span class="truncate">{{ s.name }}</span>
-            <span class="text-slate-500 whitespace-nowrap">{{ fmtPriceDKK(s.priceCents) }}</span>
-          </li>
-        </ul>
-      </div>
-
-      <div class="h-px bg-zinc-200"></div>
-
-      <div class="text-sm text-slate-700 space-y-1">
-        <div class="flex justify-between gap-3">
-          <span class="text-slate-500">Date</span>
-          <span class="text-slate-900">{{ booking.dateISO || '—' }}</span>
-        </div>
-        <div class="flex justify-between gap-3">
-          <span class="text-slate-500">Time</span>
-          <span class="text-slate-900">{{ booking.slot || '—' }}</span>
-        </div>
-        <div class="flex justify-between gap-3">
-          <span class="text-slate-500">Duration</span>
-          <span class="text-slate-900">{{ durationMin ? durationMin + ' min' : '—' }}</span>
+            <button
+              v-else-if="bookingAny.step === 3"
+              class="btn btn-primary"
+              :disabled="!canNext || submitting"
+              @click="submit()"
+            >
+              Confirm
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="h-px bg-zinc-200"></div>
+      <!-- SUMMARY -->
+      <div class="panel">
+        <div class="summary-head">
+          <div class="summary-title">Summary</div>
+        </div>
 
-      <div class="flex items-center justify-between">
-        <span class="text-sm text-slate-500">Estimated total</span>
-        <span class="text-lg font-semibold text-slate-900">{{ totalPriceDKK.toFixed(0) }} DKK</span>
+        <div class="summary-block">
+          <div class="muted">Services</div>
+          <div v-if="!(bookingAny.services ?? []).length" class="muted">—</div>
+          <ul v-else class="services-list">
+            <li v-for="s in bookingAny.services" :key="s.id" class="row">
+              <span class="truncate">{{ s.name }}</span>
+              <span class="muted">{{ fmtPriceDKK(s.priceCents) }}</span>
+            </li>
+          </ul>
+        </div>
+
+        <div class="divider" />
+
+        <div class="summary-block">
+          <div class="row">
+            <span class="muted">Date</span>
+            <span class="value">{{ bookingAny.dateISO ? fmtPrettyDate(bookingAny.dateISO) : '—' }}</span>
+          </div>
+          <div class="row">
+            <span class="muted">Time</span>
+            <span class="value">{{ bookingAny.slot || '—' }}</span>
+          </div>
+          <div class="row">
+            <span class="muted">Duration</span>
+            <span class="value">{{ durationMin ? durationMin + ' min' : '—' }}</span>
+          </div>
+        </div>
+
+        <div class="divider" />
+
+        <div class="row total-row">
+          <span class="muted">Estimated total</span>
+          <span class="em">{{ totalPriceDKK.toFixed(0) }} DKK</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+
+<style scoped>
+.booking-root{
+  color: var(--text);
+
+  --v1: 8px;
+  --v2: 12px;
+  --v3: 16px;
+  --v4: 24px;
+  --v5: 32px;
+
+  --innerX: clamp(14px, 1.5vw, 22px);
+  --innerY: clamp(14px, 1.6vw, 22px);
+}
+
+/* no radius */
+.booking-root,
+.booking-root *{
+  border-radius: 0 !important;
+}
+
+/* Layout */
+.layout{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--v4);
+}
+@media (min-width: 1024px){
+  .layout{ grid-template-columns: 1.2fr .8fr; align-items: start; }
+}
+
+/* Panels */
+.panel{
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+  padding: var(--innerY) var(--innerX);
+}
+
+/* Header row */
+.header-row{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--v3);
+  padding-bottom: var(--v3);
+  border-bottom: 1px solid var(--border);
+}
+@media (min-width: 640px){
+  .header-row{ grid-template-columns: 1fr auto; align-items: start; }
+}
+
+.step-meta{
+  margin: 0 0 var(--v1) 0;
+  font-size: 11px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color: var(--muted2);
+}
+.step-title{
+  margin: 0 0 var(--v1) 0;
+  font-size: 22px;
+  font-weight: 750;
+  color: var(--text);
+}
+.step-desc{
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+
+/* Stepper */
+.stepper{ width: 220px; }
+.stepper-row{ display:flex; gap: 10px; justify-content:flex-end; }
+.step-dot{
+  width: 36px; height: 36px;
+  display:flex; align-items:center; justify-content:center;
+  border: 1px solid var(--border);
+  color: var(--muted2);
+}
+.step-dot.is-active{ background: var(--gold); color: #0f1216; border-color: var(--gold); }
+.step-dot.is-done{ background: rgba(242,244,247,.92); color: #0f1216; border-color: rgba(242,244,247,.92); }
+
+.stepper-bar{ margin-top: var(--v2); height: 2px; background: rgba(255,255,255,.07); }
+.stepper-bar-fill{ height: 2px; background: var(--gold); width: 0; }
+
+/* Steps spacing */
+.step{ padding-top: var(--v4); padding-bottom: var(--v4); }
+
+/* Services */
+.services-grid{ display:grid; grid-template-columns: 1fr; gap: var(--v2); }
+@media (min-width: 768px){ .services-grid{ grid-template-columns: 1fr 1fr; } }
+
+.service-tile{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  padding: 14px 14px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+.service-tile:hover{
+  border-color: rgba(199,164,125,.55);
+  background: rgba(255,255,255,.03);
+  transform: translateY(-1px);
+}
+.service-tile.is-selected{
+  border-color: rgba(199,164,125,.65);
+  background: rgba(199,164,125,.06);
+}
+
+.tile-row{ display:flex; justify-content:space-between; align-items:flex-start; gap: var(--v2); }
+.tile-main{ min-width: 0; }
+.tile-name{ font-weight: 750; color: var(--text); }
+.tile-meta{ margin-top: 6px; font-size: 13px; color: var(--muted2); }
+.tile-price{ font-weight: 750; color: var(--text); }
+
+/* Inline summary */
+.inline-summary{
+  margin-top: var(--v4);
+  padding-top: var(--v3);
+  border-top: 1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  gap: var(--v3);
+  color: var(--muted);
+}
+
+/* Two-col panes */
+.two-col{ display:grid; grid-template-columns: 1fr; gap: var(--v3); }
+@media (min-width: 768px){ .two-col{ grid-template-columns: 1fr 1fr; } }
+.col-span-2{ grid-column: 1 / -1; }
+
+.pane{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.015);
+  padding: 14px 14px;
+}
+
+.pane-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--v2); }
+.pane-title{ font-weight: 750; color: var(--text); }
+.pane-meta{ font-size: 12px; color: var(--muted2); }
+
+/* Inputs */
+.label{ display:block; margin-bottom: 6px; font-size: 13px; color: var(--muted2); }
+.input{
+  width: 100%;
+  border: 1px solid var(--border2);
+  background: rgba(15,18,22,.35);
+  color: var(--text);
+  padding: 10px 12px;
+}
+.input:focus{
+  border-color: rgba(199,164,125,.65);
+  box-shadow: 0 0 0 4px rgba(199,164,125,.12);
+  outline: none;
+}
+.input-error{ border-color: rgba(248,113,113,.55); }
+.error-text{ margin-top: 6px; font-size: 12px; color: rgba(252,165,165,.95); }
+
+/* Text helpers */
+.hint{ margin-top: var(--v2); font-size: 12px; color: var(--muted2); }
+.muted{ color: var(--muted2); }
+.value{ color: var(--text); font-weight: 650; }
+.em{ color: var(--text); font-weight: 750; }
+
+/* Alerts */
+.alert{
+  margin-top: var(--v2);
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  padding: 10px 12px;
+  color: var(--muted);
+}
+.alert-error{ border-color: rgba(248,113,113,.35); background: rgba(248,113,113,.06); color: rgba(254,226,226,.95); }
+.alert-error-soft{ border-color: rgba(248,113,113,.28); background: rgba(248,113,113,.05); color: rgba(254,226,226,.95); }
+
+/* Times */
+.times{ margin-top: var(--v2); display:flex; flex-wrap:wrap; gap: var(--v2); }
+
+/* Controls */
+.controls{
+  padding-top: var(--v3);
+  border-top: 1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: var(--v3);
+}
+.controls-right{ display:flex; gap: var(--v2); }
+
+/* Summary */
+.summary-head{
+  padding-bottom: var(--v3);
+  border-bottom: 1px solid var(--border);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.summary-title{ font-weight: 750; color: var(--text); }
+.summary-meta{ font-size: 12px; color: var(--muted2); }
+
+.summary-block{ padding-top: var(--v3); padding-bottom: var(--v3); }
+
+.row{
+  display:flex;
+  justify-content:space-between;
+  align-items:baseline;
+  gap: var(--v3);
+  padding: 10px 0;
+}
+
+.services-list{
+  margin-top: 8px;
+}
+
+.truncate{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+
+.divider{ height: 1px; background: var(--border); }
+
+.total-row{
+  padding-top: 12px;
+}
+
+/* Step 4 */
+.done-wrap{ padding-top: var(--v4); padding-bottom: var(--v4); text-align: center; }
+.done-title{ margin: 0 0 var(--v2) 0; font-size: 22px; font-weight: 800; color: var(--text); }
+.done-sub{ margin: 0 0 var(--v3) 0; color: var(--muted); }
+
+.confirm{
+  text-align: left;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+  padding: 12px 14px;
+  margin-bottom: var(--v3);
+}
+</style>

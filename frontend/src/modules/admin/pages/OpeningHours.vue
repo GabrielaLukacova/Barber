@@ -1,16 +1,16 @@
 <template>
-  <div class="space-y-6">
-    <header class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+  <div class="admin-page">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Opening Hours</h1>
-        <p class="text-sm text-gray-500">
+        <h1 class="admin-title">Opening Hours</h1>
+        <p class="admin-subtitle">
           Edit when the shop is open. Use the checkbox to mark days as closed.
         </p>
       </div>
 
       <button
         type="button"
-        class="inline-flex items-center justify-center rounded-md border border-gray-300 bg-black px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-zinc-900 disabled:opacity-60 disabled:cursor-not-allowed"
+        class="admin-btn admin-btn--accent"
         :disabled="savingAll || loading || rows.length === 0"
         @click="onSaveAll"
       >
@@ -19,69 +19,68 @@
       </button>
     </header>
 
-    <div v-if="error" class="rounded-md bg-red-50 text-red-700 px-4 py-2 text-sm">
-      {{ error }}
-    </div>
+    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
+    <div v-if="loading" class="admin-alert">Loading opening hours…</div>
 
-    <div v-if="loading" class="text-sm text-gray-500">Loading opening hours…</div>
-
-    <div v-else class="overflow-x-auto border rounded-lg bg-white">
-      <table class="min-w-full text-sm">
-        <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase">
+    <div v-else class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="px-4 py-2">Day</th>
-            <th class="px-4 py-2">Opens</th>
-            <th class="px-4 py-2">Closes</th>
-            <th class="px-4 py-2">Closed</th>
+            <th class="text-left">Day</th>
+            <th class="text-left">Opens</th>
+            <th class="text-left">Closes</th>
+            <th class="text-left">Closed</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr
-            v-for="row in rows"
-            :key="row.openingHoursID"
-            class="border-t last:border-b"
-          >
-            <td class="px-4 py-2 font-medium text-gray-900">
-              {{ row.dayOfWeek }}
-            </td>
-            <td class="px-4 py-2">
+          <tr v-for="row in rows" :key="row.openingHoursID">
+            <td class="font-semibold text-zinc-900">{{ row.dayOfWeek }}</td>
+
+            <td>
               <input
                 v-model="row.openLocal"
                 type="time"
-                class="w-28 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-black"
+                class="admin-input"
+                style="max-width: 9rem;"
                 :disabled="row.isClosed || savingAll"
               />
             </td>
-            <td class="px-4 py-2">
+
+            <td>
               <input
                 v-model="row.closeLocal"
                 type="time"
-                class="w-28 rounded-md border border-gray-300 bg-white px-2 py-1 text-sm text-gray-900 focus:outline-none focus:ring-1 focus:ring-black"
+                class="admin-input"
+                style="max-width: 9rem;"
                 :disabled="row.isClosed || savingAll"
               />
             </td>
-            <td class="px-4 py-2">
-              <label class="inline-flex items-center gap-2 text-xs text-gray-700">
+
+            <td>
+              <label class="inline-flex items-center gap-2 text-sm text-zinc-800">
                 <input
                   type="checkbox"
                   v-model="row.isClosed"
-                  class="rounded border-gray-300 text-black focus:ring-black"
+                  class="h-4 w-4"
                   :disabled="savingAll"
                 />
                 <span>Closed</span>
               </label>
             </td>
           </tr>
+
           <tr v-if="rows.length === 0">
-            <td colspan="4" class="px-4 py-4 text-center text-gray-400 text-sm">
-              No opening hours configured.
-            </td>
+            <td colspan="4" class="text-center text-zinc-600">No opening hours configured.</td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
 </template>
+
+
+
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';

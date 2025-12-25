@@ -35,22 +35,20 @@ async function load() {
 
 onMounted(load);
 </script>
-
 <template>
   <section id="gallery" class="section-block">
-    <div class="flex items-end justify-between gap-4 mb-4">
-      <div>
-        <h2 class="text-3xl font-semibold text-zinc-900">Gallery</h2>
-        <p class="text-zinc-600">A few looks from the shop.</p>
+    <div class="flex items-end justify-center gap-4 mb-4">
+      <div class="section-head">
+        <p class="section-kicker">Gallery</p>
       </div>
     </div>
 
-    <p v-if="error" class="text-red-600 mb-3">{{ error }}</p>
-    <p v-else-if="loading" class="text-zinc-500 mb-3">Loading…</p>
+    <p v-if="error" class="text-red-500 mb-3">{{ error }}</p>
+    <p v-else-if="loading" class="text-zinc-400 mb-3">Loading…</p>
 
     <div
       v-if="sorted.length"
-      class="grid grid-cols-2 sm:grid-cols-4 gap-4"
+      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"
     >
       <a
         v-for="img in sorted"
@@ -59,9 +57,8 @@ onMounted(load);
         target="_blank"
         rel="noreferrer"
         class="block overflow-hidden"
-        title="Open image"
       >
-        <div class="aspect-square bg-zinc-100">
+        <div class="aspect-square bg-black/20">
           <img
             :src="fullSrc(img.filePath)"
             class="w-full h-full object-cover block"
@@ -72,6 +69,21 @@ onMounted(load);
       </a>
     </div>
 
-    <p v-else-if="!loading" class="text-zinc-500">No images yet.</p>
+    <p v-else-if="!loading" class="text-zinc-400">No images yet.</p>
   </section>
 </template>
+
+<style scoped>
+  .section-head{
+  text-align: center;
+  margin: 0 0 24px 0;  
+  padding: 0;          
+}
+  .section-kicker{
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(161,161,170,0.9);
+}
+</style>

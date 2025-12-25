@@ -1,22 +1,19 @@
 <template>
-  <section id="hero" class="relative -mt-16 h-[92vh] w-full overflow-hidden bg-zinc-950">
+  <section
+    id="hero"
+    class="relative -mt-16 w-full overflow-hidden bg-[#0f1216] min-h-[100svh]"
+  >
     <img
-      src="https://images.unsplash.com/photo-1599351431202-1e0f0137899a?q=80&w=1920&auto=format&fit=crop"
-      alt="Barber working on a men's haircut"
+      :src="heroImage"
+      alt="Man getting a haircut at a barber shop"
       class="absolute inset-0 h-full w-full object-cover opacity-60"
     />
 
-    <!-- cinematic dark overlay (keeps text readable) -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/40 to-black/10"></div>
+    <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/45 to-black/15"></div>
 
-    <!-- NATURAL FADE TO WHITE (starts around mid image, very smooth) -->
-    <!-- NATURAL FADE (light -> white, dark -> zinc-950) -->
-    <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-white/20 to-white dark:via-zinc-950/15 dark:to-zinc-950"></div>
-    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-white/35 blur-3xl dark:bg-zinc-950/55"></div>
-
-    <div class="relative z-10 h-full w-full flex items-center justify-center">
-      <div class="section-block w-full text-center text-white">
-        <p class="text-[11px] sm:text-xs uppercase tracking-[0.42em] text-white/75">
+    <div class="relative z-10 min-h-[100svh] flex items-center justify-center">
+      <div class="w-full max-w-4xl px-6 text-center text-white">
+        <p class="text-[11px] sm:text-l uppercase tracking-[0.42em] text-white/75">
           {{ cityLabel }}
         </p>
 
@@ -24,7 +21,7 @@
           {{ shopName }}
         </h1>
 
-        <p class="mt-4 mx-auto max-w-2xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed">
+        <p class="mt-4 mx-auto max-w-4xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed">
           {{ heroDescription }}
         </p>
 
@@ -42,11 +39,13 @@
 import { RouterLink } from 'vue-router';
 import { computed, onMounted, ref } from 'vue';
 import axios from 'axios';
+import heroImage from '@/assets/hero.jpg';
 
 interface BarberShopDto {
   barberShopID: number;
   name: string;
   city: string | null;
+  description: string | null; // ✅ add this
 }
 
 const shop = ref<BarberShopDto | null>(null);
@@ -55,7 +54,8 @@ const shopName = computed(() => shop.value?.name ?? "Kim's Frisør");
 const cityLabel = computed(() => shop.value?.city?.trim() || 'Esbjerg');
 
 const heroDescription = computed(() => {
-  return "Looking your best never goes out of style.";
+  const d = shop.value?.description?.trim();
+  return d && d.length > 0 ? d : 'Looking your best never goes out of style.';
 });
 
 async function loadShop() {

@@ -1,3 +1,56 @@
+<template>
+  <div class="admin-page">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="admin-title">Gallery</h1>
+        <p class="admin-subtitle">Upload, reorder, delete</p>
+      </div>
+
+      <input
+        ref="fileInput"
+        type="file"
+        multiple
+        accept="image/*"
+        class="admin-input sm:max-w-xs"
+        @change="onPickFiles"
+      />
+    </header>
+
+    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
+    <div v-if="loading" class="admin-alert">Working…</div>
+
+    <div v-if="sorted.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div
+        v-for="(img, idx) in sorted"
+        :key="img.imageID"
+        class="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm"
+      >
+        <div class="aspect-square bg-zinc-100">
+          <img :src="fullSrc(img.filePath)" class="w-full h-full object-cover" alt="" />
+        </div>
+
+        <div class="p-3 flex items-center justify-between gap-2">
+          <div class="text-xs text-zinc-600 font-semibold">#{{ img.sortOrder }}</div>
+
+          <div class="flex items-center gap-2">
+            <button class="admin-btn admin-btn--accent" :disabled="idx===0 || loading" @click="swap(idx, idx-1)">
+              Up
+            </button>
+            <button class="admin-btn admin-btn--accent" :disabled="idx===sorted.length-1 || loading" @click="swap(idx, idx+1)">
+              Down
+            </button>
+            <button class="admin-btn admin-btn--danger" :disabled="loading" @click="del(img.imageID)">
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p v-else class="admin-subtitle">No images yet. Choose files to upload.</p>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { AdminGalleryApi, type GalleryImageDto } from '@/modules/admin/api/AdminGalleryApi';
@@ -72,47 +125,3 @@ async function del(id: number) {
 
 onMounted(refresh);
 </script>
-
-
-<template>
-  <div class="space-y-4">
-    <div class="flex items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-bold">Gallery</h1>
-        <p class="text-slate-500">Upload, reorder, delete</p>
-      </div>
-
-      <input
-        ref="fileInput"
-        type="file"
-        multiple
-        accept="image/*"
-        class="block"
-        @change="onPickFiles"
-      />
-    </div>
-
-    <p v-if="error" class="text-red-600">{{ error }}</p>
-    <p v-if="loading" class="text-slate-500">Working…</p>
-
-    <div v-if="sorted.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-      <div v-for="(img, idx) in sorted" :key="img.imageID" class="rounded-lg border bg-white overflow-hidden">
-        <div class="aspect-square bg-slate-100">
-          <img :src="fullSrc(img.filePath)" class="w-full h-full object-cover" alt="" />
-        </div>
-
-        <div class="p-2 flex items-center justify-between gap-2">
-          <div class="text-xs text-slate-500">#{{ img.sortOrder }}</div>
-
-          <div class="flex items-center gap-1">
-            <button class="px-2 py-1 border rounded" :disabled="idx===0 || loading" @click="swap(idx, idx-1)">Up</button>
-            <button class="px-2 py-1 border rounded" :disabled="idx===sorted.length-1 || loading" @click="swap(idx, idx+1)">Down</button>
-            <button class="px-2 py-1 border rounded text-red-600" :disabled="loading" @click="del(img.imageID)">Delete</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p v-else class="text-slate-500">No images yet. Choose files to upload.</p>
-  </div>
-</template>

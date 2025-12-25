@@ -28,77 +28,129 @@ const error = computed(() => servicesStore.error);
 </script>
 
 <template>
-  <section id="services" class="section-block mx-auto max-w-6xl px-4 py-12 space-y-8">
-    <header class="space-y-2 text-center">
-      <h2 class="text-3xl font-semibold text-slate-900">Services & Prices</h2>
-      <p class="text-sm text-slate-500">
-        Choose from our most popular cuts and treatments.
-      </p>
-    </header>
+  <section
+    id="services"
+    class="relative z-30 overflow-visible"
+    style="margin-top: calc(-1 * var(--services-overlap)); --services-overlap: 15vh;"
+  >
+    <div class="section-block">
+      <!-- cancel ONLY the TOP padding of section-block locally -->
+      <div style="margin-top: calc(-1 * clamp(48px, 5vw, 64px));">
+        <!-- semi-transparent glass plate -->
+        <div
+          class="relative border-zinc-800/70 backdrop-blur-md
+                 shadow-[0_-26px_70px_rgba(0,0,0,0.60),0_26px_90px_rgba(0,0,0,0.35)]"
+          style="background: rgba(15,18,22,0.58);"
+        >
+          <!-- 3D lip -->
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#C7A47D]/55"></div>
+          <div class="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent"></div>
 
-    <p v-if="error" class="text-sm text-red-500 text-center">
-      {{ error }}
-    </p>
+          <!-- subtle inner glass highlight -->
+          <div class="pointer-events-none absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"></div>
 
-    <p v-else-if="loading" class="text-sm text-slate-500 text-center">
-      Loading services…
-    </p>
+          <div class="p-6 sm:p-8">
+            <!-- ✅ HEADER INSIDE GLASS, ABOVE CARDS (VISIBLE) -->
+            <div class="section-head">
+              <p class="section-kicker">Services</p>
+            </div>
 
-    <div
-      v-else
-      class="grid gap-5 md:grid-cols-2"
-    >
-      <article
-        v-for="svc in services"
-        :key="svc.serviceID"
-        class="flex gap-4 rounded-xl border border-slate-200 bg-white p-4 shadow-sm hover:shadow-md transition-shadow"
-      >
-        <div class="flex-shrink-0">
-          <div
-            class="w-20 h-20 rounded-lg overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center"
-          >
-            <img
-              v-if="svc.imagePath"
-              :src="getImageUrl(svc.imagePath)"
-              alt=""
-              class="w-full h-full object-cover"
-            />
-            <span
-              v-else
-              class="text-xs text-slate-400"
-            >
-              No image
-            </span>
+            <p v-if="error" class="text-sm text-red-400 text-center">
+              {{ error }}
+            </p>
+
+            <p v-else-if="loading" class="text-sm text-zinc-200 text-center">
+              Loading services…
+            </p>
+
+            <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+              <article
+                v-for="svc in services"
+                :key="svc.serviceID"
+                class="border border-zinc-800/80 bg-black/20"
+              >
+                <!-- Image: poster style + subtle overlay -->
+                <div class="relative border-b border-zinc-800/80 bg-black/30">
+                  <div class="aspect-[4/3] w-full overflow-hidden">
+                    <img
+                      v-if="svc.imagePath"
+                      :src="getImageUrl(svc.imagePath)"
+                      alt=""
+                      class="h-full w-full object-cover"
+                    />
+                    <div v-else class="h-full w-full flex items-center justify-center">
+                      <span class="text-[11px] text-zinc-400 uppercase tracking-wider">
+                        No image
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+                  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[#C7A47D]/40"></div>
+
+                  <!-- Small brass label strip (barber vibe) -->
+                  <div class="pointer-events-none absolute left-0 top-0 border-r border-b border-zinc-800/80 bg-black/35 px-3 py-2">
+                    <span class="text-[10px] uppercase tracking-[0.22em] text-[#C7A47D]">
+                      Service
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Content -->
+                <div class="p-5 space-y-3">
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-[15px] font-semibold text-zinc-100 leading-snug">
+                      {{ svc.name }}
+                    </h3>
+
+                    <div class="text-right flex-shrink-0">
+                      <div class="text-[15px] font-semibold text-zinc-100 whitespace-nowrap">
+                        {{ formatPrice(svc.price) }}
+                      </div>
+                      <div class="mt-1 text-xs text-zinc-300/80 whitespace-nowrap">
+                        {{ svc.duration }} min
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="h-px w-full bg-zinc-800/70"></div>
+
+                  <p
+                    v-if="svc.isBooked"
+                    class="inline-flex items-center gap-2 border border-[#C7A47D]/35 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#C7A47D]"
+                  >
+                    <span class="h-1.5 w-1.5 bg-[#C7A47D]"></span>
+                    Not bookable
+                  </p>
+                </div>
+              </article>
+
+              <p
+                v-if="services.length === 0"
+                class="col-span-full text-center text-sm text-zinc-300/80"
+              >
+                No services are available yet. Please check back later.
+              </p>
+            </div>
           </div>
         </div>
-
-        <div class="flex-1 space-y-1">
-          <div class="flex items-center justify-between gap-2">
-            <h3 class="text-base font-semibold text-slate-900">
-              {{ svc.name }}
-            </h3>
-            <span class="text-sm font-medium text-slate-800">
-              {{ formatPrice(svc.price) }}
-            </span>
-          </div>
-          <p class="text-xs text-slate-500">
-            {{ svc.duration }} min
-          </p>
-          <p
-            v-if="svc.isBooked"
-            class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800"
-          >
-            Currently not bookable
-          </p>
-        </div>
-      </article>
-
-      <p
-        v-if="services.length === 0"
-        class="col-span-full text-center text-sm text-slate-400 mt-4"
-      >
-        No services are available yet. Please check back later.
-      </p>
+      </div>
     </div>
   </section>
 </template>
+
+<style scoped>
+  .section-head{
+  text-align: center;
+  margin: 0 0 24px 0; 
+  padding: 0;           
+}
+
+.section-kicker{
+  margin: 0 0 10px 0;
+  font-size: 14px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(161,161,170,0.9);
+}
+</style>

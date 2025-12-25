@@ -1,189 +1,117 @@
 <template>
-  <div class="space-y-6">
-    <header class="flex items-center justify-between">
+  <div class="admin-page">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
-        <h1 class="text-2xl font-semibold text-gray-900">Services</h1>
-        <p class="text-sm text-gray-500">
-          Manage services (name, image, duration, price).
-        </p>
+        <h1 class="admin-title">Services</h1>
+        <p class="admin-subtitle">Manage services (name, image, duration, price).</p>
       </div>
-      <button
-        type="button"
-        class="px-4 py-2 rounded-md bg-black text-white text-sm font-medium hover:bg-gray-800"
-        @click="openCreate"
-      >
+
+      <button type="button" class="admin-btn admin-btn--accent" @click="openCreate">
         + New service
       </button>
     </header>
 
-    <div v-if="error" class="rounded-md bg-red-50 text-red-700 px-4 py-2 text-sm">
-      {{ error }}
-    </div>
+    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
+    <div v-if="loading" class="admin-alert">Loading services…</div>
 
-    <div v-if="loading" class="text-sm text-gray-500">Loading services…</div>
-
-    <div v-else class="overflow-x-auto border rounded-lg bg-white">
-      <table class="min-w-full text-sm">
-        <thead class="bg-gray-50 text-left text-xs font-semibold text-gray-500 uppercase">
+    <div v-else class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
           <tr>
-            <th class="px-4 py-2">Image</th>
-            <th class="px-4 py-2">Name</th>
-            <th class="px-4 py-2">Duration (min)</th>
-            <th class="px-4 py-2">Price (DKK)</th>
-            <th class="px-4 py-2 text-right">Actions</th>
+            <th class="text-left">Image</th>
+            <th class="text-left">Name</th>
+            <th class="text-left">Duration (min)</th>
+            <th class="text-left">Price (DKK)</th>
+            <th class="text-right">Actions</th>
           </tr>
         </thead>
+
         <tbody>
-          <tr
-            v-for="svc in services"
-            :key="svc.serviceID"
-            class="border-t last:border-b"
-          >
-            <td class="px-4 py-2">
-              <div class="flex items-center gap-2">
-                <div class="w-16 h-16 rounded-md overflow-hidden bg-gray-100 border flex items-center justify-center">
-                  <img
-                    v-if="svc.imagePath"
-                    :src="getImageUrl(svc.imagePath)"
-                    alt="Service image"
-                    class="w-full h-full object-cover"
-                  />
-                  <span v-else class="text-[10px] text-gray-400 italic">No image</span>
-                </div>
+          <tr v-for="svc in services" :key="svc.serviceID">
+            <td>
+              <div class="w-16 h-16 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200 flex items-center justify-center">
+                <img
+                  v-if="svc.imagePath"
+                  :src="getImageUrl(svc.imagePath)"
+                  alt="Service image"
+                  class="w-full h-full object-cover"
+                />
+                <span v-else class="text-[11px] text-zinc-500">No image</span>
               </div>
             </td>
-            <td class="px-4 py-2 font-medium text-gray-900">
-              {{ svc.name }}
-            </td>
-            <td class="px-4 py-2 text-gray-700">
-              {{ svc.duration }}
-            </td>
-            <td class="px-4 py-2 text-gray-700">
-              {{ formatPrice(svc.price) }}
-            </td>
-            <td class="px-4 py-2 text-right space-x-2">
-              <button
-                type="button"
-                class="px-3 py-1 text-xs rounded-md border border-gray-300 hover:bg-gray-50"
-                @click="openEdit(svc)"
-              >
-                Edit
-              </button>
-              <button
-                type="button"
-                class="px-3 py-1 text-xs rounded-md border border-red-300 text-red-700 hover:bg-red-50"
-                @click="onDelete(svc)"
-              >
-                Delete
-              </button>
+
+            <td class="font-semibold text-zinc-900">{{ svc.name }}</td>
+            <td class="text-zinc-800">{{ svc.duration }}</td>
+            <td class="text-zinc-800">{{ formatPrice(svc.price) }}</td>
+
+            <td class="text-right">
+              <div class="inline-flex gap-2">
+                <button type="button" class="admin-btn admin-btn--accent" @click="openEdit(svc)">
+                  Edit
+                </button>
+                <button type="button" class="admin-btn admin-btn--danger" @click="onDelete(svc)">
+                  Delete
+                </button>
+              </div>
             </td>
           </tr>
+
           <tr v-if="services.length === 0">
-            <td colspan="5" class="px-4 py-4 text-center text-gray-400 text-sm">
-              No services yet. Click "New service" to add one.
-            </td>
+            <td colspan="5" class="text-center text-zinc-600">No services yet. Click “New service” to add one.</td>
           </tr>
         </tbody>
       </table>
     </div>
 
-    <!-- Modal form -->
-    <div
-      v-if="formVisible"
-      class="fixed inset-0 bg-black/30 flex items-center justify-center z-50"
-    >
-      <div class="bg-white text-gray-900 rounded-xl shadow-xl w-full max-w-lg p-6 space-y-4">
+    <!-- Modal kept same functionality, only style -->
+    <div v-if="formVisible" class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4">
+      <div class="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white shadow-xl p-6 space-y-4">
         <header class="flex items-center justify-between">
-          <h2 class="text-lg font-semibold">
+          <h2 class="text-lg font-bold text-black">
             {{ formMode === 'create' ? 'Add service' : 'Edit service' }}
           </h2>
-          <button
-            type="button"
-            class="text-gray-400 hover:text-gray-600"
-            @click="closeForm"
-          >
-            ✕
-          </button>
+          <button type="button" class="text-zinc-600 hover:text-zinc-900" @click="closeForm">✕</button>
         </header>
 
         <form class="space-y-4" @submit.prevent="onSubmit">
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-gray-600">Name</label>
-            <input
-              v-model="form.name"
-              type="text"
-              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-              required
-            />
+          <div class="space-y-2">
+            <label class="admin-label">Name</label>
+            <input v-model="form.name" type="text" class="admin-input" required />
           </div>
 
-          <div class="space-y-1">
-            <label class="block text-xs font-medium text-gray-600">Image</label>
+          <div class="space-y-2">
+            <label class="admin-label">Image</label>
             <input
               type="file"
               accept="image/*"
               :required="formMode === 'create'"
               @change="onImageChange"
-              class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black bg-white text-gray-900"
+              class="admin-input"
             />
-            <p class="text-[11px] text-gray-400">
-              {{ formMode === 'create'
-                ? 'Image is required.'
-                : 'Leave empty to keep the current image.' }}
+            <p class="admin-help">
+              {{ formMode === 'create' ? 'Image is required.' : 'Leave empty to keep the current image.' }}
             </p>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-1">
-              <label class="block text-xs font-medium text-gray-600">
-                Duration (minutes)
-              </label>
-              <input
-                v-model.number="form.duration"
-                type="number"
-                min="5"
-                class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                required
-              />
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="space-y-2">
+              <label class="admin-label">Duration (minutes)</label>
+              <input v-model.number="form.duration" type="number" min="5" class="admin-input" required />
             </div>
-            <div class="space-y-1">
-              <label class="block text-xs font-medium text-gray-600">
-                Price (DKK)
-              </label>
-              <input
-                v-model.number="form.price"
-                type="number"
-                min="0"
-                class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                required
-              />
+            <div class="space-y-2">
+              <label class="admin-label">Price (DKK)</label>
+              <input v-model.number="form.price" type="number" min="0" class="admin-input" required />
             </div>
           </div>
 
-          <div class="flex items-center justify-between pt-2">
-            <label class="inline-flex items-center gap-2 text-xs text-gray-700">
-              <input
-                v-model="form.isBooked"
-                type="checkbox"
-                class="rounded border-gray-300 text-black focus:ring-black"
-              />
-              <span>Marked as booked by default</span>
-            </label>
-          </div>
+          <label class="inline-flex items-center gap-2 text-sm text-zinc-800">
+            <input v-model="form.isBooked" type="checkbox" class="h-4 w-4" />
+            <span>Marked as booked by default</span>
+          </label>
 
-          <div class="flex justify-end space-x-2 pt-2">
-            <button
-              type="button"
-              class="px-4 py-2 text-sm rounded-md border border-gray-300 hover:bg-gray-50"
-              @click="closeForm"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              class="px-4 py-2 text-sm rounded-md bg-black text-white hover:bg-gray-800 disabled:opacity-60"
-              :disabled="saving"
-            >
+          <div class="flex justify-end gap-2 pt-2">
+            <button type="button" class="admin-btn" @click="closeForm">Cancel</button>
+            <button type="submit" class="admin-btn admin-btn--accent" :disabled="saving">
               {{ saving ? 'Saving…' : formMode === 'create' ? 'Create' : 'Save changes' }}
             </button>
           </div>
@@ -192,6 +120,8 @@
     </div>
   </div>
 </template>
+
+
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';

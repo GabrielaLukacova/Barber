@@ -1,3 +1,122 @@
+<template>
+  <div class="admin-page">
+    <header class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+      <div>
+        <h1 class="admin-title">Appointments</h1>
+        <p class="admin-subtitle">
+          Booked (upcoming) shown by default. Past bookings appear under Completed.
+        </p>
+      </div>
+
+      <div class="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+        <input
+          v-model="q"
+          class="admin-input w-full sm:w-80"
+          placeholder="Search name, email, phone, service, date…"
+        />
+        <select v-model="statusFilter" class="admin-select w-full sm:w-48">
+          <option value="BOOKED">Booked</option>
+          <option value="COMPLETED">Completed</option>
+          <option value="CANCELLED">Cancelled</option>
+        </select>
+      </div>
+    </header>
+
+    <div v-if="error" class="admin-alert admin-alert--error">
+      {{ error }}
+    </div>
+
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th class="text-left">Date</th>
+            <th class="text-left">Time</th>
+            <th class="text-left">Client</th>
+            <th class="text-left">Contact</th>
+            <th class="text-left">Services</th>
+            <th class="text-left">Duration</th>
+            <th class="text-left">Total</th>
+            <th class="text-left">Status</th>
+            <th class="text-right">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr v-if="loading">
+            <td colspan="9" class="text-zinc-700">Loading…</td>
+          </tr>
+
+          <tr v-else-if="filtered.length === 0">
+            <td colspan="9" class="text-zinc-700">No appointments found.</td>
+          </tr>
+
+          <tr v-else v-for="a in filtered" :key="a.appointmentID">
+            <td class="whitespace-nowrap text-zinc-900 font-semibold">
+              {{ a.appointmentDate }}
+            </td>
+
+            <td class="whitespace-nowrap text-zinc-800">
+              {{ fmtTime(a.startTime) }}–{{ fmtTime(a.endTime) }}
+            </td>
+
+            <td>
+              <div class="font-semibold text-zinc-950">{{ fullName(a) }}</div>
+              <div class="text-xs text-zinc-600">#{{ a.appointmentID }}</div>
+            </td>
+
+            <td class="text-zinc-800">
+              {{ contactText(a) }}
+            </td>
+
+            <td class="text-zinc-800 max-w-[340px]">
+              <div class="truncate" :title="servicesText(a)">
+                {{ servicesText(a) }}
+              </div>
+            </td>
+
+            <td class="whitespace-nowrap text-zinc-800">
+              {{ totalDuration(a) }}
+            </td>
+
+            <td class="whitespace-nowrap text-zinc-800">
+              {{ fmtPrice(a.totalPriceCents) }}
+            </td>
+
+            <td>
+              <span
+                class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border"
+                :class="effectiveStatus(a)==='BOOKED'
+                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                  : effectiveStatus(a)==='COMPLETED'
+                    ? 'bg-sky-50 text-sky-800 border-sky-200'
+                    : 'bg-amber-50 text-amber-800 border-amber-200'"
+              >
+                {{ effectiveStatus(a) }}
+              </span>
+            </td>
+
+            <td class="text-right">
+              <div class="inline-flex justify-end">
+                <button
+                  v-if="effectiveStatus(a)==='BOOKED'"
+                  type="button"
+                  class="admin-btn admin-btn--accent"
+                  @click="cancel(a)"
+                >
+                  Cancel
+                </button>
+                <span v-else class="text-xs text-zinc-500">—</span>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { fetchAppointmentsWithDetails, updateAppointmentStatus, type AdminAppointmentRow } from '@/modules/admin/services/appointmentsApi';
@@ -103,108 +222,3 @@ function contactText(a: AdminAppointmentRow) {
 
 onMounted(load);
 </script>
-
-<template>
-  <div class="p-8 bg-slate-50 min-h-screen text-slate-900">
-    <div class="flex flex-wrap items-end justify-between gap-4 mb-6">
-      <div>
-        <h1 class="text-2xl font-bold">Appointments</h1>
-        <p class="text-slate-600">Booked (upcoming) shown by default. Past bookings appear under Completed.</p>
-      </div>
-
-      <div class="flex flex-wrap gap-3">
-        <input
-          v-model="q"
-          class="w-full md:w-80 rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-200"
-          placeholder="Search name, email, phone, service, date…"
-        />
-        <select
-          v-model="statusFilter"
-          class="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-200"
-        >
-          <option value="BOOKED">Booked</option>
-          <option value="COMPLETED">Completed</option>
-          <option value="CANCELLED">Cancelled</option>
-        </select>
-      </div>
-    </div>
-
-    <div v-if="error" class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-      {{ error }}
-    </div>
-
-    <div class="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
-      <table class="min-w-full text-sm">
-        <thead class="bg-slate-50 text-slate-700">
-          <tr>
-            <th class="text-left px-4 py-3 font-semibold">Date</th>
-            <th class="text-left px-4 py-3 font-semibold">Time</th>
-            <th class="text-left px-4 py-3 font-semibold">Client</th>
-            <th class="text-left px-4 py-3 font-semibold">Contact</th>
-            <th class="text-left px-4 py-3 font-semibold">Services</th>
-            <th class="text-left px-4 py-3 font-semibold">Duration</th>
-            <th class="text-left px-4 py-3 font-semibold">Total</th>
-            <th class="text-left px-4 py-3 font-semibold">Status</th>
-            <th class="text-right px-4 py-3 font-semibold">Actions</th>
-          </tr>
-        </thead>
-
-        <tbody class="divide-y divide-slate-200">
-          <tr v-if="loading">
-            <td colspan="9" class="px-4 py-6 text-slate-600">Loading…</td>
-          </tr>
-
-          <tr v-else-if="filtered.length === 0">
-            <td colspan="9" class="px-4 py-6 text-slate-600">No appointments found.</td>
-          </tr>
-
-          <tr v-else v-for="a in filtered" :key="a.appointmentID" class="hover:bg-slate-50">
-            <td class="px-4 py-3 whitespace-nowrap">{{ a.appointmentDate }}</td>
-            <td class="px-4 py-3 whitespace-nowrap">{{ fmtTime(a.startTime) }}–{{ fmtTime(a.endTime) }}</td>
-
-            <td class="px-4 py-3">
-              <div class="font-medium text-slate-900">{{ fullName(a) }}</div>
-              <div class="text-xs text-slate-500">#{{ a.appointmentID }}</div>
-            </td>
-
-            <td class="px-4 py-3 text-slate-700">{{ contactText(a) }}</td>
-
-            <td class="px-4 py-3 text-slate-700 max-w-[320px]">
-              <div class="truncate" :title="servicesText(a)">{{ servicesText(a) }}</div>
-            </td>
-
-            <td class="px-4 py-3 whitespace-nowrap text-slate-700">{{ totalDuration(a) }}</td>
-            <td class="px-4 py-3 whitespace-nowrap text-slate-700">{{ fmtPrice(a.totalPriceCents) }}</td>
-
-            <td class="px-4 py-3">
-              <span
-                class="inline-flex items-center rounded-full px-3 py-1 text-xs border"
-                :class="effectiveStatus(a)==='BOOKED'
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
-                  : effectiveStatus(a)==='COMPLETED'
-                    ? 'bg-sky-50 text-sky-700 border-sky-200'
-                    : 'bg-amber-50 text-amber-700 border-amber-200'"
-              >
-                {{ effectiveStatus(a) }}
-              </span>
-            </td>
-
-            <td class="px-4 py-3 text-right">
-              <div class="inline-flex justify-end">
-                <button
-                  v-if="effectiveStatus(a)==='BOOKED'"
-                  type="button"
-                  class="rounded-lg border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-100"
-                  @click="cancel(a)"
-                >
-                  Cancel
-                </button>
-                <span v-else class="text-xs text-slate-400">—</span>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</template>
