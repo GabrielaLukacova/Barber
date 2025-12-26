@@ -1,41 +1,22 @@
 import type { Request, Response, NextFunction } from 'express';
-import { eq } from 'drizzle-orm';
+import { asc, eq, gte } from 'drizzle-orm';
 import { db, schema } from '../db/db';
-import {
-  createTimeOffSchema,
-  updateTimeOffSchema,
-} from '../validation/timeOffSchemas';
+import { createTimeOffSchema, updateTimeOffSchema } from '../validation/timeOffSchemas';
 
 export class TimeOffController {
-  static async getAll(_req: Request, res: Response, next: NextFunction) {
+  static async getAllFuture(_req: Request, res: Response, next: NextFunction) {
     try {
-      const list = await db.select().from(schema.TimeOff);
-      res.json(list);
-    } catch (err) {
-      console.error('TimeOffController.getAll error:', err);
-      next(err);
-    }
-  }
+      const nowIso = new Date().toISOString();
 
-  static async getOne(req: Request, res: Response, next: NextFunction) {
-    try {
-      const id = Number(req.params.id);
-      if (Number.isNaN(id)) {
-        return res.status(400).json({ error: 'Invalid timeOffID' });
-      }
-
-      const [row] = await db
+      const list = await db
         .select()
         .from(schema.TimeOff)
-        .where(eq(schema.TimeOff.timeOffID, id));
+        .where(gte(schema.TimeOff.start, nowIso))
+        .orderBy(asc(schema.TimeOff.start));
 
-      if (!row) {
-        return res.status(404).json({ error: 'Time off not found' });
-      }
-
-      res.json(row);
+      res.json(list);
     } catch (err) {
-      console.error('TimeOffController.getOne error:', err);
+      console.error('TimeOffController.getAllFuture error:', err);
       next(err);
     }
   }
@@ -47,8 +28,8 @@ export class TimeOffController {
       const result = await db
         .insert(schema.TimeOff)
         .values({
-          start: parsed.start,
-          end: parsed.end,
+          start: new Date(parsed.start).toISOString(),
+          end: new Date(parsed.end).toISOString(),
           reason: parsed.reason ?? null,
         })
         .execute();
@@ -78,9 +59,9 @@ export class TimeOffController {
       await db
         .update(schema.TimeOff)
         .set({
-          start: parsed.start,
-          end: parsed.end,
-          reason: parsed.reason ?? null,
+          start: parsed.start ? new Date(parsed.start).toISOString() : undefined,
+          end: parsed.end ? new Date(parsed.end).toISOString() : undefined,
+          reason: parsed.reason === undefined ? undefined : parsed.reason ?? null,
         })
         .where(eq(schema.TimeOff.timeOffID, id))
         .execute();

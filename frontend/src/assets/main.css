@@ -29,7 +29,7 @@ html, body{
 .section-block{
   padding-top:clamp(48px,5vw,64px);
   padding-bottom:clamp(48px,5vw,64px);
- padding-left: clamp(24px, 8vw, 320px);
+  padding-left: clamp(24px, 8vw, 320px);
   padding-right: clamp(24px, 8vw, 320px);
 }
 
