@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import type { AppointmentInput, Service, Barber } from '@/types';
 
 type State = {
   step: number; // 1..4
