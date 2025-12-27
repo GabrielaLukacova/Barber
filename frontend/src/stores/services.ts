@@ -24,7 +24,7 @@ export const useServicesStore = defineStore('public-services', {
       try {
         const res = await api.get('/services');
         this.services = res.data;
-      } catch (_err: any) {
+      } catch {
         this.error = 'Failed to load services';
       } finally {
         this.loading = false;
