@@ -9,3 +9,5 @@ coverage
 
 /generated/prisma
 node_modules
+
+*.tgz
