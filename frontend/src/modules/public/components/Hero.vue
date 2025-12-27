@@ -64,8 +64,8 @@ async function loadShop() {
     const apiBase = import.meta.env.VITE_API_URL;
     const res = await axios.get<BarberShopDto[]>(`${apiBase}/api/barber-shops`);
     shop.value = res.data?.[0] ?? null;
-  } catch (err) {
-    console.error('Failed to load barber shop for hero:', err);
+  } catch (_err) {
+    console.error('Failed to load barber shop for hero:', _err);
   }
 }
 

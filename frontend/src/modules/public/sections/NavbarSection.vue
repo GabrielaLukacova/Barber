@@ -166,8 +166,8 @@ async function loadShopName() {
     const apiBase = import.meta.env.VITE_API_URL;
     const res = await axios.get<BarberShopDto[]>(`${apiBase}/api/barber-shops`);
     shop.value = res.data?.[0] ?? null;
-  } catch (err) {
-    console.error('Failed to load barber shop name for navbar:', err);
+  } catch (_err) {
+    console.error('Failed to load barber shop name for navbar:', _err);
   }
 }
 
