@@ -76,6 +76,9 @@ The system focuses on clean UX, maintainable architecture, and real-world usabil
 - Code linting with ESLint
 - Continuous Integration and Deployment (CI/CD) using GitHub Actions
 
+[![CI Status](https://github.com/GabrielaLukacova/Barber/actions/workflows/frontend-ci.yml/badge.svg)](https://github.com/GabrielaLukacova/Barber/actions/workflows/frontend-ci.yml)
+
+
 ---
 
 ## Architecture
