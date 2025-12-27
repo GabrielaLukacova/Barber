@@ -7,7 +7,9 @@
             {{ shopName }}
           </div>
 
-          <div class="flex flex-wrap items-center justify-center gap-6 text-[12px] font-semibold uppercase tracking-[0.22em] text-zinc-300/80">
+          <div
+            class="flex flex-wrap items-center justify-center gap-6 text-[12px] font-semibold uppercase tracking-[0.22em] text-zinc-300/80"
+          >
             <span class="inline-flex items-center gap-2">
               <span class="h-px w-8 bg-[#C7A47D]/70"></span><span>Fades</span>
             </span>

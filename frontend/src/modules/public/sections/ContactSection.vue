@@ -1,8 +1,6 @@
 <template>
   <div id="contact" class="w-full">
-    <p class="text-[14px] uppercase tracking-[0.18em] text-zinc-400 text-center">
-      Contact
-    </p>
+    <p class="text-[14px] uppercase tracking-[0.18em] text-zinc-400 text-center">Contact</p>
 
     <!-- 3 vertical cards -->
     <div class="mt-10 grid gap-6">
@@ -28,9 +26,7 @@
           </svg>
 
           <div class="min-w-0">
-            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">
-              Call us
-            </div>
+            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">Call us</div>
             <div class="mt-2 text-base sm:text-lg font-semibold text-zinc-50 break-words">
               {{ phoneLabel }}
             </div>
@@ -61,9 +57,7 @@
           </svg>
 
           <div class="min-w-0">
-            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">
-              Email
-            </div>
+            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">Email</div>
             <div class="mt-2 text-base sm:text-lg font-semibold text-zinc-50 break-words">
               {{ emailLabel }}
             </div>
@@ -94,9 +88,7 @@
           </svg>
 
           <div class="min-w-0">
-            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">
-              Visit
-            </div>
+            <div class="text-[11px] uppercase tracking-[0.22em] text-zinc-400">Visit</div>
             <div class="mt-2 text-base sm:text-lg font-semibold text-zinc-50 break-words">
               {{ addressLine || 'Address not set yet' }}
             </div>
@@ -106,7 +98,9 @@
     </div>
 
     <!-- subtle barber accent -->
-    <div class="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[#C7A47D]/55 to-transparent"></div>
+    <div
+      class="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[#C7A47D]/55 to-transparent"
+    ></div>
   </div>
 </template>
 
@@ -150,8 +144,6 @@ async function loadShop() {
 }
 
 onMounted(() => {
-  loadShop().catch((err) =>
-    console.error('Failed to load barber shop for contact section:', err),
-  );
+  loadShop().catch((err) => console.error('Failed to load barber shop for contact section:', err));
 });
 </script>

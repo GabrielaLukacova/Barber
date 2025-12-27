@@ -31,23 +31,26 @@ const error = computed(() => servicesStore.error);
   <section
     id="services"
     class="relative z-30 overflow-visible"
-    style="margin-top: calc(-1 * var(--services-overlap)); --services-overlap: 15vh;"
+    style="margin-top: calc(-1 * var(--services-overlap)); --services-overlap: 15vh"
   >
     <div class="section-block">
       <!-- cancel ONLY the TOP padding of section-block locally -->
-      <div style="margin-top: calc(-1 * clamp(48px, 5vw, 64px));">
+      <div style="margin-top: calc(-1 * clamp(48px, 5vw, 64px))">
         <!-- semi-transparent glass plate -->
         <div
-          class="relative border-zinc-800/70 backdrop-blur-md
-                 shadow-[0_-26px_70px_rgba(0,0,0,0.60),0_26px_90px_rgba(0,0,0,0.35)]"
-          style="background: rgba(15,18,22,0.58);"
+          class="relative border-zinc-800/70 backdrop-blur-md shadow-[0_-26px_70px_rgba(0,0,0,0.60),0_26px_90px_rgba(0,0,0,0.35)]"
+          style="background: rgba(15, 18, 22, 0.58)"
         >
           <!-- 3D lip -->
           <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#C7A47D]/55"></div>
-          <div class="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent"></div>
+          <div
+            class="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent"
+          ></div>
 
           <!-- subtle inner glass highlight -->
-          <div class="pointer-events-none absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"></div>
+          <div
+            class="pointer-events-none absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
+          ></div>
 
           <div class="p-6 sm:p-8">
             <!-- ✅ HEADER INSIDE GLASS, ABOVE CARDS (VISIBLE) -->
@@ -59,9 +62,7 @@ const error = computed(() => servicesStore.error);
               {{ error }}
             </p>
 
-            <p v-else-if="loading" class="text-sm text-zinc-200 text-center">
-              Loading services…
-            </p>
+            <p v-else-if="loading" class="text-sm text-zinc-200 text-center">Loading services…</p>
 
             <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               <article
@@ -85,11 +86,17 @@ const error = computed(() => servicesStore.error);
                     </div>
                   </div>
 
-                  <div class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
-                  <div class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[#C7A47D]/40"></div>
+                  <div
+                    class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
+                  ></div>
+                  <div
+                    class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[#C7A47D]/40"
+                  ></div>
 
                   <!-- Small brass label strip (barber vibe) -->
-                  <div class="pointer-events-none absolute left-0 top-0 border-r border-b border-zinc-800/80 bg-black/35 px-3 py-2">
+                  <div
+                    class="pointer-events-none absolute left-0 top-0 border-r border-b border-zinc-800/80 bg-black/35 px-3 py-2"
+                  >
                     <span class="text-[10px] uppercase tracking-[0.22em] text-[#C7A47D]">
                       Service
                     </span>
@@ -140,17 +147,17 @@ const error = computed(() => servicesStore.error);
 </template>
 
 <style scoped>
-  .section-head{
+.section-head {
   text-align: center;
-  margin: 0 0 24px 0; 
-  padding: 0;           
+  margin: 0 0 24px 0;
+  padding: 0;
 }
 
-.section-kicker{
+.section-kicker {
   margin: 0 0 10px 0;
   font-size: 14px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(161,161,170,0.9);
+  color: rgba(161, 161, 170, 0.9);
 }
 </style>

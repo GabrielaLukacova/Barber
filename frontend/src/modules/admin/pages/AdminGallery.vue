@@ -33,13 +33,25 @@
           <div class="text-xs text-zinc-600 font-semibold">#{{ img.sortOrder }}</div>
 
           <div class="flex items-center gap-2">
-            <button class="admin-btn admin-btn--accent" :disabled="idx===0 || loading" @click="swap(idx, idx-1)">
+            <button
+              class="admin-btn admin-btn--accent"
+              :disabled="idx === 0 || loading"
+              @click="swap(idx, idx - 1)"
+            >
               Up
             </button>
-            <button class="admin-btn admin-btn--accent" :disabled="idx===sorted.length-1 || loading" @click="swap(idx, idx+1)">
+            <button
+              class="admin-btn admin-btn--accent"
+              :disabled="idx === sorted.length - 1 || loading"
+              @click="swap(idx, idx + 1)"
+            >
               Down
             </button>
-            <button class="admin-btn admin-btn--danger" :disabled="loading" @click="del(img.imageID)">
+            <button
+              class="admin-btn admin-btn--danger"
+              :disabled="loading"
+              @click="del(img.imageID)"
+            >
               Delete
             </button>
           </div>

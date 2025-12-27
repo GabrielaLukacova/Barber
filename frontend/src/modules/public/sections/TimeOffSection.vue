@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import closedImg from "@/assets/barber-closed.jpg";
+import { computed, onMounted, ref } from 'vue';
+import closedImg from '@/assets/barber-closed.jpg';
 
 type TimeOffRow = {
   timeOffID: number;
@@ -13,24 +13,23 @@ const items = ref<TimeOffRow[]>([]);
 const loading = ref(false);
 
 const backendBase =
-  (import.meta.env.VITE_API_URL as string) ||
-  "https://barber-backend-b77j.onrender.com";
+  (import.meta.env.VITE_API_URL as string) || 'https://barber-backend-b77j.onrender.com';
 
 const hasItems = computed(() => items.value.length > 0);
 
 function fmtDate(d: Date) {
   return new Intl.DateTimeFormat(undefined, {
-    weekday: "short",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
   }).format(d);
 }
 
 function fmtTime(d: Date) {
   return new Intl.DateTimeFormat(undefined, {
-    hour: "2-digit",
-    minute: "2-digit",
+    hour: '2-digit',
+    minute: '2-digit',
   }).format(d);
 }
 
@@ -42,17 +41,14 @@ function formatLabel(startIso: string, endIso: string) {
   const startTime = fmtTime(s);
   const endTime = fmtTime(e);
 
-  const startIsMidnight = startTime === "00:00";
-  const endIsEod = endTime === "23:59" || endTime === "23:58";
+  const startIsMidnight = startTime === '00:00';
+  const endIsEod = endTime === '23:59' || endTime === '23:58';
 
-  if (sameDay && startIsMidnight && endIsEod)
-    return `${fmtDate(s)} — closed`;
+  if (sameDay && startIsMidnight && endIsEod) return `${fmtDate(s)} — closed`;
 
-  if (!sameDay && startIsMidnight && endIsEod)
-    return `${fmtDate(s)} → ${fmtDate(e)}`;
+  if (!sameDay && startIsMidnight && endIsEod) return `${fmtDate(s)} → ${fmtDate(e)}`;
 
-  if (sameDay)
-    return `${fmtDate(s)} · ${startTime}–${endTime}`;
+  if (sameDay) return `${fmtDate(s)} · ${startTime}–${endTime}`;
 
   return `${fmtDate(s)} ${startTime} → ${fmtDate(e)} ${endTime}`;
 }
@@ -77,21 +73,16 @@ onMounted(load);
 
 <template>
   <section v-if="hasItems" class="section-block">
-    <div
-      class="rounded-2xl overflow-hidden bg-[#0b0e12]
-             shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
-    >
+    <div class="rounded-2xl overflow-hidden bg-[#0b0e12] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
       <!-- Left flexible, right fixed but bigger -->
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_700px]">
         <!-- LEFT -->
         <div class="p-6 sm:p-8">
-          <p class="text-xs uppercase tracking-[0.22em] text-[#C7A47D]/80">
-            Special hours
-          </p>
+          <p class="text-xs uppercase tracking-[0.22em] text-[#C7A47D]/80">Special hours</p>
 
           <p class="mt-3 text-sm sm:text-[15px] leading-relaxed text-[#C7A47D]/85 max-w-prose">
-            Closed on the dates below — even barbers need a break.
-            We’ll be back before your hair gets too long.
+            Closed on the dates below — even barbers need a break. We’ll be back before your hair
+            gets too long.
           </p>
 
           <div class="mt-6 space-y-3">
@@ -110,9 +101,7 @@ onMounted(load);
             </div>
           </div>
 
-          <p v-if="loading" class="mt-4 text-xs text-[#C7A47D]/60">
-            Updating…
-          </p>
+          <p v-if="loading" class="mt-4 text-xs text-[#C7A47D]/60">Updating…</p>
         </div>
 
         <!-- RIGHT IMAGE: bigger, no padding, fully visible -->
@@ -123,8 +112,7 @@ onMounted(load);
             class="w-full max-h-[3000px] object-contain"
           />
           <div
-            class="absolute inset-0 bg-gradient-to-l
-                   from-black/10 via-black/30 to-[#0b0e12]"
+            class="absolute inset-0 bg-gradient-to-l from-black/10 via-black/30 to-[#0b0e12]"
           ></div>
         </div>
       </div>

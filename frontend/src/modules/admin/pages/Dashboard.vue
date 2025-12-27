@@ -2,9 +2,7 @@
   <div class="admin-page">
     <header>
       <h1 class="admin-title">Dashboard</h1>
-      <p class="admin-subtitle">
-        Quick access to the most important admin tools.
-      </p>
+      <p class="admin-subtitle">Quick access to the most important admin tools.</p>
     </header>
 
     <section class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -67,7 +65,7 @@
 
 <style scoped>
 /* Dashboard cards match the admin surfaces + brass accent (no dark fills). */
-.dash-card{
+.dash-card {
   display: block;
   text-decoration: none;
   background: #fff;
@@ -75,46 +73,48 @@
   border-radius: 1rem;
   padding: 1.1rem 1.1rem;
   box-shadow: 0 8px 30px rgba(16, 24, 40, 0.06);
-  transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
   color: inherit;
 }
-.dash-card:hover{
+.dash-card:hover {
   transform: translateY(-1px);
   border-color: color-mix(in srgb, var(--admin-accent) 55%, var(--admin-border));
-  box-shadow: 0 14px 38px rgba(16, 24, 40, 0.10);
+  box-shadow: 0 14px 38px rgba(16, 24, 40, 0.1);
 }
-.dash-card__top{
-  display:flex;
-  align-items:center;
-  gap:0.6rem;
+.dash-card__top {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
 }
-.dash-card__icon{
+.dash-card__icon {
   font-size: 18px;
   color: var(--admin-accent);
 }
-.dash-card__title{
+.dash-card__title {
   margin: 0;
   font-size: 1.05rem;
   font-weight: 800;
   color: #000; /* titles black */
 }
-.dash-card__desc{
+.dash-card__desc {
   margin-top: 0.6rem;
   font-size: 0.9rem;
   color: #3f3f46;
   line-height: 1.35rem;
 }
-.dash-card__cta{
+.dash-card__cta {
   margin-top: 0.9rem;
-  display:inline-flex;
-  align-items:center;
-  gap:0.35rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
   font-size: 0.85rem;
   font-weight: 800;
   color: var(--admin-accent);
 }
 </style>
-
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router';

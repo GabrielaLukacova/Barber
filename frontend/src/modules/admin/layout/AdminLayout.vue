@@ -26,7 +26,7 @@
       <!-- Logout (CSS) -->
       <div class="admin-logout">
         <button type="button" @click="onLogout" class="admin-logout__btn">
-          <span class="material-icons-outlined" style="font-size: 16px;">logout</span>
+          <span class="material-icons-outlined" style="font-size: 16px">logout</span>
           <span>Logout</span>
         </button>
       </div>
@@ -53,13 +53,43 @@ const router = useRouter();
 const auth = useAuthStore();
 
 const navItems = [
-  { namePrefix: 'admin-dashboard', label: 'Dashboard', to: { name: 'admin-dashboard' }, icon: 'dashboard' },
-  { namePrefix: 'admin-appointments', label: 'Appointments', to: { name: 'admin-appointments' }, icon: 'event' },
-  { namePrefix: 'admin-services', label: 'Services', to: { name: 'admin-services' }, icon: 'content_cut' },
-  { namePrefix: 'admin-gallery', label: 'Gallery', to: { name: 'admin-gallery' }, icon: 'photo_library' },
+  {
+    namePrefix: 'admin-dashboard',
+    label: 'Dashboard',
+    to: { name: 'admin-dashboard' },
+    icon: 'dashboard',
+  },
+  {
+    namePrefix: 'admin-appointments',
+    label: 'Appointments',
+    to: { name: 'admin-appointments' },
+    icon: 'event',
+  },
+  {
+    namePrefix: 'admin-services',
+    label: 'Services',
+    to: { name: 'admin-services' },
+    icon: 'content_cut',
+  },
+  {
+    namePrefix: 'admin-gallery',
+    label: 'Gallery',
+    to: { name: 'admin-gallery' },
+    icon: 'photo_library',
+  },
   { namePrefix: 'admin-shop', label: 'Barber Shop', to: { name: 'admin-shop' }, icon: 'store' },
-  { namePrefix: 'admin-hours', label: 'Opening Hours', to: { name: 'admin-hours' }, icon: 'schedule' },
-  { namePrefix: 'admin-timeoff', label: 'Time Off', to: { name: 'admin-timeoff' }, icon: 'beach_access' },
+  {
+    namePrefix: 'admin-hours',
+    label: 'Opening Hours',
+    to: { name: 'admin-hours' },
+    icon: 'schedule',
+  },
+  {
+    namePrefix: 'admin-timeoff',
+    label: 'Time Off',
+    to: { name: 'admin-timeoff' },
+    icon: 'beach_access',
+  },
 ];
 
 async function onLogout() {

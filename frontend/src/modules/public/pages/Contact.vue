@@ -8,7 +8,7 @@
     <div class="card p-6">
       <h2 class="text-xl font-semibold mb-2">Contact</h2>
       <p class="text-zinc-600">
-        Phone: +45 00 00 00 00<br/>
+        Phone: +45 00 00 00 00<br />
         Email: hello@kimsfrisor.dk
       </p>
       <RouterLink to="/booking" class="btn btn-primary mt-6">Book now</RouterLink>

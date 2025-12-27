@@ -29,7 +29,9 @@
         <tbody>
           <tr v-for="svc in services" :key="svc.serviceID">
             <td>
-              <div class="w-16 h-16 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200 flex items-center justify-center">
+              <div
+                class="w-16 h-16 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-200 flex items-center justify-center"
+              >
                 <img
                   v-if="svc.imagePath"
                   :src="getImageUrl(svc.imagePath)"
@@ -57,20 +59,29 @@
           </tr>
 
           <tr v-if="services.length === 0">
-            <td colspan="5" class="text-center text-zinc-600">No services yet. Click “New service” to add one.</td>
+            <td colspan="5" class="text-center text-zinc-600">
+              No services yet. Click “New service” to add one.
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
     <!-- Modal kept same functionality, only style -->
-    <div v-if="formVisible" class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4">
-      <div class="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white shadow-xl p-6 space-y-4">
+    <div
+      v-if="formVisible"
+      class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4"
+    >
+      <div
+        class="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white shadow-xl p-6 space-y-4"
+      >
         <header class="flex items-center justify-between">
           <h2 class="text-lg font-bold text-black">
             {{ formMode === 'create' ? 'Add service' : 'Edit service' }}
           </h2>
-          <button type="button" class="text-zinc-600 hover:text-zinc-900" @click="closeForm">✕</button>
+          <button type="button" class="text-zinc-600 hover:text-zinc-900" @click="closeForm">
+            ✕
+          </button>
         </header>
 
         <form class="space-y-4" @submit.prevent="onSubmit">
@@ -89,18 +100,34 @@
               class="admin-input"
             />
             <p class="admin-help">
-              {{ formMode === 'create' ? 'Image is required.' : 'Leave empty to keep the current image.' }}
+              {{
+                formMode === 'create'
+                  ? 'Image is required.'
+                  : 'Leave empty to keep the current image.'
+              }}
             </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
               <label class="admin-label">Duration (minutes)</label>
-              <input v-model.number="form.duration" type="number" min="5" class="admin-input" required />
+              <input
+                v-model.number="form.duration"
+                type="number"
+                min="5"
+                class="admin-input"
+                required
+              />
             </div>
             <div class="space-y-2">
               <label class="admin-label">Price (DKK)</label>
-              <input v-model.number="form.price" type="number" min="0" class="admin-input" required />
+              <input
+                v-model.number="form.price"
+                type="number"
+                min="0"
+                class="admin-input"
+                required
+              />
             </div>
           </div>
 
@@ -120,8 +147,6 @@
     </div>
   </div>
 </template>
-
-
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';

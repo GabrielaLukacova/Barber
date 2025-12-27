@@ -20,7 +20,10 @@ export async function fetchAppointmentsWithDetails(): Promise<AdminAppointmentRo
   return (data ?? []) as AdminAppointmentRow[];
 }
 
-export async function updateAppointmentStatus(id: number, status: 'BOOKED' | 'CANCELLED' | 'COMPLETED') {
+export async function updateAppointmentStatus(
+  id: number,
+  status: 'BOOKED' | 'CANCELLED' | 'COMPLETED',
+) {
   const { data } = await api.put(`/appointments/${id}`, { status });
   return data;
 }

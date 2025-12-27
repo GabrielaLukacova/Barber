@@ -1,0 +1,6 @@
+dist
+node_modules
+
+tailwind.config.ts
+
+test-results

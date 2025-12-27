@@ -1,8 +1,5 @@
 <template>
-  <section
-    id="hero"
-    class="relative -mt-16 w-full overflow-hidden bg-[#0f1216] min-h-[100svh]"
-  >
+  <section id="hero" class="relative -mt-16 w-full overflow-hidden bg-[#0f1216] min-h-[100svh]">
     <img
       :src="heroImage"
       alt="Man getting a haircut at a barber shop"
@@ -17,11 +14,15 @@
           {{ cityLabel }}
         </p>
 
-        <h1 class="font-barber mt-3 text-6xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-0.02em]">
+        <h1
+          class="font-barber mt-3 text-6xl sm:text-7xl md:text-8xl leading-[0.92] tracking-[-0.02em]"
+        >
           {{ shopName }}
         </h1>
 
-        <p class="mt-4 mx-auto max-w-4xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed">
+        <p
+          class="mt-4 mx-auto max-w-4xl text-base sm:text-lg md:text-xl text-white/85 leading-relaxed"
+        >
           {{ heroDescription }}
         </p>
 

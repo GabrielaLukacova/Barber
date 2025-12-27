@@ -42,7 +42,7 @@
                 v-model="row.openLocal"
                 type="time"
                 class="admin-input"
-                style="max-width: 9rem;"
+                style="max-width: 9rem"
                 :disabled="row.isClosed || savingAll"
               />
             </td>
@@ -52,7 +52,7 @@
                 v-model="row.closeLocal"
                 type="time"
                 class="admin-input"
-                style="max-width: 9rem;"
+                style="max-width: 9rem"
                 :disabled="row.isClosed || savingAll"
               />
             </td>
@@ -78,9 +78,6 @@
     </div>
   </div>
 </template>
-
-
-
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
@@ -142,12 +139,8 @@ async function onSaveAll() {
   try {
     await Promise.all(
       rows.value.map((row) => {
-        const openingTime = row.isClosed
-          ? null
-          : toBackendTime(row.openLocal || null);
-        const closingTime = row.isClosed
-          ? null
-          : toBackendTime(row.closeLocal || null);
+        const openingTime = row.isClosed ? null : toBackendTime(row.openLocal || null);
+        const closingTime = row.isClosed ? null : toBackendTime(row.closeLocal || null);
 
         return updateOpeningHour(row, openingTime, closingTime);
       }),

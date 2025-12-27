@@ -38,7 +38,7 @@ const selectedServiceIDs = computed<number[]>(() =>
 );
 
 const totalPriceDKK = computed(() =>
-  (bookingAny.services ?? []).reduce((sum: number, s: any) => sum + ((s?.priceCents ?? 0) / 100), 0),
+  (bookingAny.services ?? []).reduce((sum: number, s: any) => sum + (s?.priceCents ?? 0) / 100, 0),
 );
 
 function isSelected(id?: number) {
@@ -114,7 +114,9 @@ const stepLabels = [
   { n: 4, title: 'Done' },
 ];
 
-const stepTitle = computed(() => stepLabels.find((s) => s.n === bookingAny.step)?.title ?? 'Booking');
+const stepTitle = computed(
+  () => stepLabels.find((s) => s.n === bookingAny.step)?.title ?? 'Booking',
+);
 
 const nameOk = computed(() => !!bookingAny.customerName?.trim());
 const emailOk = computed(() => !!bookingAny.customerEmail?.trim());
@@ -128,7 +130,8 @@ const showContactError = computed(
 
 const canNext = computed(() => {
   if (bookingAny.step === 1) return selectedServiceIDs.value.length > 0;
-  if (bookingAny.step === 2) return !!bookingAny.dateISO && !!bookingAny.slot && dayStatus.value === 'open';
+  if (bookingAny.step === 2)
+    return !!bookingAny.dateISO && !!bookingAny.slot && dayStatus.value === 'open';
   if (bookingAny.step === 3) return nameOk.value && contactOk.value;
   return true;
 });
@@ -158,7 +161,8 @@ async function submit() {
   } catch (e: any) {
     const status = e?.response?.status;
     if (status === 409) {
-      errorMsg.value = e?.response?.data?.error ?? 'That time was just taken. Please choose another slot.';
+      errorMsg.value =
+        e?.response?.data?.error ?? 'That time was just taken. Please choose another slot.';
       await loadSlots();
       bookingAny.step = 2;
       return;
@@ -203,7 +207,11 @@ function fmtPrettyDate(iso?: string | null) {
   if (!Number.isFinite(y) || !Number.isFinite(m) || !Number.isFinite(d)) return iso;
 
   const date = new Date(y, m - 1, d);
-  return new Intl.DateTimeFormat(undefined, { weekday: 'short', day: '2-digit', month: 'short' }).format(date);
+  return new Intl.DateTimeFormat(undefined, {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  }).format(date);
 }
 
 function resetAllUX() {
@@ -227,7 +235,9 @@ function resetAllUX() {
               <div v-for="s in stepLabels" :key="s.n">
                 <div
                   class="step-dot"
-                  :class="bookingAny.step === s.n ? 'is-active' : bookingAny.step > s.n ? 'is-done' : ''"
+                  :class="
+                    bookingAny.step === s.n ? 'is-active' : bookingAny.step > s.n ? 'is-done' : ''
+                  "
                 >
                   {{ s.n }}
                 </div>
@@ -237,7 +247,7 @@ function resetAllUX() {
             <div class="stepper-bar">
               <div
                 class="stepper-bar-fill"
-                :style="{ width: `${(Math.max(1, bookingAny.step) - 1) / 3 * 100}%` }"
+                :style="{ width: `${((Math.max(1, bookingAny.step) - 1) / 3) * 100}%` }"
               />
             </div>
           </div>
@@ -267,8 +277,12 @@ function resetAllUX() {
           </div>
 
           <div class="inline-summary">
-            <div><span class="em">{{ selectedServiceIDs.length }}</span> selected</div>
-            <div>Estimated total: <span class="em">{{ totalPriceDKK.toFixed(0) }} DKK</span></div>
+            <div>
+              <span class="em">{{ selectedServiceIDs.length }}</span> selected
+            </div>
+            <div>
+              Estimated total: <span class="em">{{ totalPriceDKK.toFixed(0) }} DKK</span>
+            </div>
           </div>
         </div>
 
@@ -281,7 +295,13 @@ function resetAllUX() {
                 <div class="pane-meta">{{ fmtPrettyDate(bookingAny.dateISO) }}</div>
               </div>
 
-              <input class="input" type="date" :min="todayISO" v-model="bookingAny.dateISO" :disabled="submitting" />
+              <input
+                class="input"
+                type="date"
+                :min="todayISO"
+                v-model="bookingAny.dateISO"
+                :disabled="submitting"
+              />
             </div>
 
             <div class="pane">
@@ -358,7 +378,9 @@ function resetAllUX() {
               />
             </div>
 
-            <div v-if="showContactError" class="alert alert-error-soft col-span-2">Email or phone required</div>
+            <div v-if="showContactError" class="alert alert-error-soft col-span-2">
+              Email or phone required
+            </div>
           </div>
         </div>
 
@@ -370,7 +392,9 @@ function resetAllUX() {
             <div class="confirm">
               <div class="row">
                 <span class="muted">When</span>
-                <span class="em">{{ fmtPrettyDate(bookingAny.dateISO) }} · {{ bookingAny.slot || '—' }}</span>
+                <span class="em"
+                  >{{ fmtPrettyDate(bookingAny.dateISO) }} · {{ bookingAny.slot || '—' }}</span
+                >
               </div>
 
               <div class="row">
@@ -379,7 +403,14 @@ function resetAllUX() {
               </div>
             </div>
 
-            <button class="btn btn-ghost" type="button" @click="booking.reset(); resetAllUX()">
+            <button
+              class="btn btn-ghost"
+              type="button"
+              @click="
+                booking.reset();
+                resetAllUX();
+              "
+            >
               Book another
             </button>
           </div>
@@ -387,7 +418,12 @@ function resetAllUX() {
 
         <!-- Controls -->
         <div class="controls">
-          <button class="btn btn-ghost" type="button" :disabled="bookingAny.step === 1 || submitting" @click="goBack()">
+          <button
+            class="btn btn-ghost"
+            type="button"
+            :disabled="bookingAny.step === 1 || submitting"
+            @click="goBack()"
+          >
             Back
           </button>
 
@@ -435,7 +471,9 @@ function resetAllUX() {
         <div class="summary-block">
           <div class="row">
             <span class="muted">Date</span>
-            <span class="value">{{ bookingAny.dateISO ? fmtPrettyDate(bookingAny.dateISO) : '—' }}</span>
+            <span class="value">{{
+              bookingAny.dateISO ? fmtPrettyDate(bookingAny.dateISO) : '—'
+            }}</span>
           </div>
           <div class="row">
             <span class="muted">Time</span>
@@ -458,9 +496,8 @@ function resetAllUX() {
   </div>
 </template>
 
-
 <style scoped>
-.booking-root{
+.booking-root {
   color: var(--text);
 
   --v1: 8px;
@@ -475,53 +512,59 @@ function resetAllUX() {
 
 /* no radius */
 .booking-root,
-.booking-root *{
+.booking-root * {
   border-radius: 0 !important;
 }
 
 /* Layout */
-.layout{
+.layout {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--v4);
 }
-@media (min-width: 1024px){
-  .layout{ grid-template-columns: 1.2fr .8fr; align-items: start; }
+@media (min-width: 1024px) {
+  .layout {
+    grid-template-columns: 1.2fr 0.8fr;
+    align-items: start;
+  }
 }
 
 /* Panels */
-.panel{
+.panel {
   border: 1px solid var(--border);
-  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.015));
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
   padding: var(--innerY) var(--innerX);
 }
 
 /* Header row */
-.header-row{
+.header-row {
   display: grid;
   grid-template-columns: 1fr;
   gap: var(--v3);
   padding-bottom: var(--v3);
   border-bottom: 1px solid var(--border);
 }
-@media (min-width: 640px){
-  .header-row{ grid-template-columns: 1fr auto; align-items: start; }
+@media (min-width: 640px) {
+  .header-row {
+    grid-template-columns: 1fr auto;
+    align-items: start;
+  }
 }
 
-.step-meta{
+.step-meta {
   margin: 0 0 var(--v1) 0;
   font-size: 11px;
-  letter-spacing:.18em;
-  text-transform:uppercase;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
   color: var(--muted2);
 }
-.step-title{
+.step-title {
   margin: 0 0 var(--v1) 0;
   font-size: 22px;
   font-weight: 750;
   color: var(--text);
 }
-.step-desc{
+.step-desc {
   margin: 0;
   font-size: 14px;
   line-height: 1.6;
@@ -529,167 +572,312 @@ function resetAllUX() {
 }
 
 /* Stepper */
-.stepper{ width: 220px; }
-.stepper-row{ display:flex; gap: 10px; justify-content:flex-end; }
-.step-dot{
-  width: 36px; height: 36px;
-  display:flex; align-items:center; justify-content:center;
+.stepper {
+  width: 220px;
+}
+.stepper-row {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.step-dot {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 1px solid var(--border);
   color: var(--muted2);
 }
-.step-dot.is-active{ background: var(--gold); color: #0f1216; border-color: var(--gold); }
-.step-dot.is-done{ background: rgba(242,244,247,.92); color: #0f1216; border-color: rgba(242,244,247,.92); }
+.step-dot.is-active {
+  background: var(--gold);
+  color: #0f1216;
+  border-color: var(--gold);
+}
+.step-dot.is-done {
+  background: rgba(242, 244, 247, 0.92);
+  color: #0f1216;
+  border-color: rgba(242, 244, 247, 0.92);
+}
 
-.stepper-bar{ margin-top: var(--v2); height: 2px; background: rgba(255,255,255,.07); }
-.stepper-bar-fill{ height: 2px; background: var(--gold); width: 0; }
+.stepper-bar {
+  margin-top: var(--v2);
+  height: 2px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.stepper-bar-fill {
+  height: 2px;
+  background: var(--gold);
+  width: 0;
+}
 
 /* Steps spacing */
-.step{ padding-top: var(--v4); padding-bottom: var(--v4); }
+.step {
+  padding-top: var(--v4);
+  padding-bottom: var(--v4);
+}
 
 /* Services */
-.services-grid{ display:grid; grid-template-columns: 1fr; gap: var(--v2); }
-@media (min-width: 768px){ .services-grid{ grid-template-columns: 1fr 1fr; } }
+.services-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--v2);
+}
+@media (min-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 
-.service-tile{
+.service-tile {
   border: 1px solid var(--border);
-  background: rgba(255,255,255,.02);
+  background: rgba(255, 255, 255, 0.02);
   padding: 14px 14px;
   text-align: left;
   cursor: pointer;
-  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    transform 180ms ease;
 }
-.service-tile:hover{
-  border-color: rgba(199,164,125,.55);
-  background: rgba(255,255,255,.03);
+.service-tile:hover {
+  border-color: rgba(199, 164, 125, 0.55);
+  background: rgba(255, 255, 255, 0.03);
   transform: translateY(-1px);
 }
-.service-tile.is-selected{
-  border-color: rgba(199,164,125,.65);
-  background: rgba(199,164,125,.06);
+.service-tile.is-selected {
+  border-color: rgba(199, 164, 125, 0.65);
+  background: rgba(199, 164, 125, 0.06);
 }
 
-.tile-row{ display:flex; justify-content:space-between; align-items:flex-start; gap: var(--v2); }
-.tile-main{ min-width: 0; }
-.tile-name{ font-weight: 750; color: var(--text); }
-.tile-meta{ margin-top: 6px; font-size: 13px; color: var(--muted2); }
-.tile-price{ font-weight: 750; color: var(--text); }
+.tile-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--v2);
+}
+.tile-main {
+  min-width: 0;
+}
+.tile-name {
+  font-weight: 750;
+  color: var(--text);
+}
+.tile-meta {
+  margin-top: 6px;
+  font-size: 13px;
+  color: var(--muted2);
+}
+.tile-price {
+  font-weight: 750;
+  color: var(--text);
+}
 
 /* Inline summary */
-.inline-summary{
+.inline-summary {
   margin-top: var(--v4);
   padding-top: var(--v3);
   border-top: 1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
+  display: flex;
+  justify-content: space-between;
   gap: var(--v3);
   color: var(--muted);
 }
 
 /* Two-col panes */
-.two-col{ display:grid; grid-template-columns: 1fr; gap: var(--v3); }
-@media (min-width: 768px){ .two-col{ grid-template-columns: 1fr 1fr; } }
-.col-span-2{ grid-column: 1 / -1; }
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--v3);
+}
+@media (min-width: 768px) {
+  .two-col {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+.col-span-2 {
+  grid-column: 1 / -1;
+}
 
-.pane{
+.pane {
   border: 1px solid var(--border);
-  background: rgba(255,255,255,.015);
+  background: rgba(255, 255, 255, 0.015);
   padding: 14px 14px;
 }
 
-.pane-head{ display:flex; justify-content:space-between; align-items:center; margin-bottom: var(--v2); }
-.pane-title{ font-weight: 750; color: var(--text); }
-.pane-meta{ font-size: 12px; color: var(--muted2); }
+.pane-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--v2);
+}
+.pane-title {
+  font-weight: 750;
+  color: var(--text);
+}
+.pane-meta {
+  font-size: 12px;
+  color: var(--muted2);
+}
 
 /* Inputs */
-.label{ display:block; margin-bottom: 6px; font-size: 13px; color: var(--muted2); }
-.input{
+.label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 13px;
+  color: var(--muted2);
+}
+.input {
   width: 100%;
   border: 1px solid var(--border2);
-  background: rgba(15,18,22,.35);
+  background: rgba(15, 18, 22, 0.35);
   color: var(--text);
   padding: 10px 12px;
 }
-.input:focus{
-  border-color: rgba(199,164,125,.65);
-  box-shadow: 0 0 0 4px rgba(199,164,125,.12);
+.input:focus {
+  border-color: rgba(199, 164, 125, 0.65);
+  box-shadow: 0 0 0 4px rgba(199, 164, 125, 0.12);
   outline: none;
 }
-.input-error{ border-color: rgba(248,113,113,.55); }
-.error-text{ margin-top: 6px; font-size: 12px; color: rgba(252,165,165,.95); }
+.input-error {
+  border-color: rgba(248, 113, 113, 0.55);
+}
+.error-text {
+  margin-top: 6px;
+  font-size: 12px;
+  color: rgba(252, 165, 165, 0.95);
+}
 
 /* Text helpers */
-.hint{ margin-top: var(--v2); font-size: 12px; color: var(--muted2); }
-.muted{ color: var(--muted2); }
-.value{ color: var(--text); font-weight: 650; }
-.em{ color: var(--text); font-weight: 750; }
+.hint {
+  margin-top: var(--v2);
+  font-size: 12px;
+  color: var(--muted2);
+}
+.muted {
+  color: var(--muted2);
+}
+.value {
+  color: var(--text);
+  font-weight: 650;
+}
+.em {
+  color: var(--text);
+  font-weight: 750;
+}
 
 /* Alerts */
-.alert{
+.alert {
   margin-top: var(--v2);
   border: 1px solid var(--border);
-  background: rgba(255,255,255,.02);
+  background: rgba(255, 255, 255, 0.02);
   padding: 10px 12px;
   color: var(--muted);
 }
-.alert-error{ border-color: rgba(248,113,113,.35); background: rgba(248,113,113,.06); color: rgba(254,226,226,.95); }
-.alert-error-soft{ border-color: rgba(248,113,113,.28); background: rgba(248,113,113,.05); color: rgba(254,226,226,.95); }
+.alert-error {
+  border-color: rgba(248, 113, 113, 0.35);
+  background: rgba(248, 113, 113, 0.06);
+  color: rgba(254, 226, 226, 0.95);
+}
+.alert-error-soft {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(248, 113, 113, 0.05);
+  color: rgba(254, 226, 226, 0.95);
+}
 
 /* Times */
-.times{ margin-top: var(--v2); display:flex; flex-wrap:wrap; gap: var(--v2); }
+.times {
+  margin-top: var(--v2);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--v2);
+}
 
 /* Controls */
-.controls{
+.controls {
   padding-top: var(--v3);
   border-top: 1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: var(--v3);
 }
-.controls-right{ display:flex; gap: var(--v2); }
+.controls-right {
+  display: flex;
+  gap: var(--v2);
+}
 
 /* Summary */
-.summary-head{
+.summary-head {
   padding-bottom: var(--v3);
   border-bottom: 1px solid var(--border);
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-.summary-title{ font-weight: 750; color: var(--text); }
-.summary-meta{ font-size: 12px; color: var(--muted2); }
+.summary-title {
+  font-weight: 750;
+  color: var(--text);
+}
+.summary-meta {
+  font-size: 12px;
+  color: var(--muted2);
+}
 
-.summary-block{ padding-top: var(--v3); padding-bottom: var(--v3); }
+.summary-block {
+  padding-top: var(--v3);
+  padding-bottom: var(--v3);
+}
 
-.row{
-  display:flex;
-  justify-content:space-between;
-  align-items:baseline;
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
   gap: var(--v3);
   padding: 10px 0;
 }
 
-.services-list{
+.services-list {
   margin-top: 8px;
 }
 
-.truncate{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
 
-.divider{ height: 1px; background: var(--border); }
+.divider {
+  height: 1px;
+  background: var(--border);
+}
 
-.total-row{
+.total-row {
   padding-top: 12px;
 }
 
 /* Step 4 */
-.done-wrap{ padding-top: var(--v4); padding-bottom: var(--v4); text-align: center; }
-.done-title{ margin: 0 0 var(--v2) 0; font-size: 22px; font-weight: 800; color: var(--text); }
-.done-sub{ margin: 0 0 var(--v3) 0; color: var(--muted); }
+.done-wrap {
+  padding-top: var(--v4);
+  padding-bottom: var(--v4);
+  text-align: center;
+}
+.done-title {
+  margin: 0 0 var(--v2) 0;
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--text);
+}
+.done-sub {
+  margin: 0 0 var(--v3) 0;
+  color: var(--muted);
+}
 
-.confirm{
+.confirm {
   text-align: left;
   border: 1px solid var(--border);
-  background: rgba(255,255,255,.02);
+  background: rgba(255, 255, 255, 0.02);
   padding: 12px 14px;
   margin-bottom: var(--v3);
 }

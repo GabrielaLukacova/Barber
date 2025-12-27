@@ -89,10 +89,7 @@ export async function createService(payload: ServicePayload): Promise<void> {
   return adminServiceApi.create(payload);
 }
 
-export async function updateService(
-  id: number,
-  payload: ServicePayload,
-): Promise<void> {
+export async function updateService(id: number, payload: ServicePayload): Promise<void> {
   const fullPayload: UpdateServicePayload = { ...payload, serviceID: id };
   return adminServiceApi.update(fullPayload);
 }

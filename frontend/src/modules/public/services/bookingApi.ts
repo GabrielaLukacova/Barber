@@ -6,7 +6,10 @@ export async function fetchAvailableSlots(params: { date: string; serviceIDs: nu
   const { data } = await api.get('/public/available-slots', {
     params: { date: params.date, serviceIDs: params.serviceIDs.join(',') },
   });
-  return { slots: (data?.slots ?? []) as string[], durationMin: (data?.durationMin ?? 0) as number };
+  return {
+    slots: (data?.slots ?? []) as string[],
+    durationMin: (data?.durationMin ?? 0) as number,
+  };
 }
 
 export async function publicBook(payload: {

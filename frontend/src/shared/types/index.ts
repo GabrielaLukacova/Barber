@@ -24,5 +24,5 @@ export type AppointmentInput = {
   customerEmail: string;
   customerPhone?: string;
   start: string; // ISO
-  end: string;   // ISO
+  end: string; // ISO
 };

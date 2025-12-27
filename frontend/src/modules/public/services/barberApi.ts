@@ -1,10 +1,5 @@
 import { api } from './api';
-import type {
-  Service,
-  Barber,
-  AvailabilityResponse,
-  AppointmentInput,
-} from '@/types';
+import type { Service, Barber, AvailabilityResponse, AppointmentInput } from '@/types';
 
 // /services -> map backend DTO to public Service type
 export async function fetchServices(): Promise<Service[]> {
@@ -35,9 +30,11 @@ export async function fetchBarbers(): Promise<Barber[]> {
 }
 
 // Allow numeric or string IDs here
-export async function fetchAvailability(
-  params: { serviceId: string | number; barberId?: string | number; date?: string },
-): Promise<AvailabilityResponse> {
+export async function fetchAvailability(params: {
+  serviceId: string | number;
+  barberId?: string | number;
+  date?: string;
+}): Promise<AvailabilityResponse> {
   const { data } = await api.get<any>('/availability', { params });
   return {
     slots: data.slots ?? [],

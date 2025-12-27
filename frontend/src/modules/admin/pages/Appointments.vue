@@ -86,11 +86,13 @@
             <td>
               <span
                 class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold border"
-                :class="effectiveStatus(a)==='BOOKED'
-                  ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
-                  : effectiveStatus(a)==='COMPLETED'
-                    ? 'bg-sky-50 text-sky-800 border-sky-200'
-                    : 'bg-amber-50 text-amber-800 border-amber-200'"
+                :class="
+                  effectiveStatus(a) === 'BOOKED'
+                    ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+                    : effectiveStatus(a) === 'COMPLETED'
+                      ? 'bg-sky-50 text-sky-800 border-sky-200'
+                      : 'bg-amber-50 text-amber-800 border-amber-200'
+                "
               >
                 {{ effectiveStatus(a) }}
               </span>
@@ -99,7 +101,7 @@
             <td class="text-right">
               <div class="inline-flex justify-end">
                 <button
-                  v-if="effectiveStatus(a)==='BOOKED'"
+                  v-if="effectiveStatus(a) === 'BOOKED'"
                   type="button"
                   class="admin-btn admin-btn--accent"
                   @click="cancel(a)"
@@ -116,10 +118,13 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
-import { fetchAppointmentsWithDetails, updateAppointmentStatus, type AdminAppointmentRow } from '@/modules/admin/services/appointmentsApi';
+import {
+  fetchAppointmentsWithDetails,
+  updateAppointmentStatus,
+  type AdminAppointmentRow,
+} from '@/modules/admin/services/appointmentsApi';
 
 const items = ref<AdminAppointmentRow[]>([]);
 const loading = ref(false);

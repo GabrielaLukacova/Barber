@@ -7,11 +7,11 @@
       </div>
       <div>
         <div class="font-semibold mb-2">Opening Hours</div>
-        <p class="text-zinc-600">Mon–Fri 09:00–18:00<br/>Sat 09:00–14:00</p>
+        <p class="text-zinc-600">Mon–Fri 09:00–18:00<br />Sat 09:00–14:00</p>
       </div>
       <div>
         <div class="font-semibold mb-2">Contact</div>
-        <p class="text-zinc-600">+45 00 00 00 00<br/>Street 1, Esbjerg</p>
+        <p class="text-zinc-600">+45 00 00 00 00<br />Street 1, Esbjerg</p>
       </div>
     </div>
     <div class="text-center text-xs text-zinc-500 py-4 border-t border-zinc-100">

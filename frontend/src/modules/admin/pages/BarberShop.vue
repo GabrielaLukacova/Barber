@@ -25,7 +25,13 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="admin-label">Postal code</label>
-          <input v-model="form.postalCode" type="text" maxlength="4" class="admin-input" placeholder="6700" />
+          <input
+            v-model="form.postalCode"
+            type="text"
+            maxlength="4"
+            class="admin-input"
+            placeholder="6700"
+          />
         </div>
         <div>
           <label class="admin-label">City</label>
@@ -36,11 +42,21 @@
       <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label class="admin-label">Phone</label>
-          <input v-model="form.phoneNumber" type="text" class="admin-input" placeholder="+45 00 00 00 00" />
+          <input
+            v-model="form.phoneNumber"
+            type="text"
+            class="admin-input"
+            placeholder="+45 00 00 00 00"
+          />
         </div>
         <div>
           <label class="admin-label">Email</label>
-          <input v-model="form.email" type="email" class="admin-input" placeholder="hello@kimsfrisor.dk" />
+          <input
+            v-model="form.email"
+            type="email"
+            class="admin-input"
+            placeholder="hello@kimsfrisor.dk"
+          />
         </div>
       </div>
 
@@ -152,9 +168,7 @@ async function onSave() {
   } catch (e: any) {
     console.error(e);
     error.value =
-      e?.response?.data?.message ||
-      e?.response?.data?.error ||
-      'Failed to save barber shop.';
+      e?.response?.data?.message || e?.response?.data?.error || 'Failed to save barber shop.';
   } finally {
     saving.value = false;
   }

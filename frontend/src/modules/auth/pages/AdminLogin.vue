@@ -1,9 +1,7 @@
 <template>
   <div class="min-h-screen flex items-center justify-center bg-slate-900">
     <div class="w-full max-w-md bg-slate-800 rounded-2xl shadow-lg p-8 border border-slate-700">
-      <h1 class="text-2xl font-semibold text-center mb-6 text-slate-50">
-        Barber Admin Login
-      </h1>
+      <h1 class="text-2xl font-semibold text-center mb-6 text-slate-50">Barber Admin Login</h1>
 
       <form @submit.prevent="onSubmit" class="space-y-4">
         <div>
@@ -15,8 +13,7 @@
             v-model.trim="form.username"
             type="text"
             required
-            class="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-50
-                   focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            class="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           />
         </div>
 
@@ -29,8 +26,7 @@
             v-model="form.password"
             type="password"
             required
-            class="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-50
-                   focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
+            class="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-slate-50 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500"
           />
         </div>
 
@@ -41,9 +37,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full mt-2 inline-flex justify-center rounded-lg bg-emerald-500 px-4 py-2
-                 text-sm font-semibold text-slate-900 hover:bg-emerald-400
-                 disabled:opacity-60 disabled:cursor-not-allowed transition"
+          class="w-full mt-2 inline-flex justify-center rounded-lg bg-emerald-500 px-4 py-2 text-sm font-semibold text-slate-900 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed transition"
         >
           <span v-if="!loading">Login</span>
           <span v-else>Logging in…</span>

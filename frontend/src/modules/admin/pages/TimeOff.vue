@@ -1,14 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from 'vue';
 import {
   getFutureTimeOff,
   createTimeOff,
   updateTimeOff,
   deleteTimeOff,
   type TimeOffRow,
-} from "@/modules/admin/services/timeOffApi";
+} from '@/modules/admin/services/timeOffApi';
 
-type Mode = "DAY" | "RANGE" | "HOURS";
+type Mode = 'DAY' | 'RANGE' | 'HOURS';
 
 type UiRow = {
   timeOffID: number | null;
@@ -20,12 +20,12 @@ type UiRow = {
 
   // RANGE: date range -> start/end derived
   startDate: string; // YYYY-MM-DD
-  endDate: string;   // YYYY-MM-DD
+  endDate: string; // YYYY-MM-DD
 
   // HOURS: date + times -> start/end derived
   hoursDate: string; // YYYY-MM-DD
   startTime: string; // HH:MM
-  endTime: string;   // HH:MM
+  endTime: string; // HH:MM
 
   reason: string;
 
@@ -46,7 +46,7 @@ function setSuccess() {
 }
 
 function pad2(n: number) {
-  return String(n).padStart(2, "0");
+  return String(n).padStart(2, '0');
 }
 
 function toDateInput(d: Date) {
@@ -68,11 +68,11 @@ function localDateTimeToIso(date: string, time: string) {
 }
 
 function dateOnlyToIsoStart(date: string) {
-  return localDateTimeToIso(date, "00:00");
+  return localDateTimeToIso(date, '00:00');
 }
 function dateOnlyToIsoEnd(date: string) {
   // end of day
-  return localDateTimeToIso(date, "23:59");
+  return localDateTimeToIso(date, '23:59');
 }
 
 function inferModeFromRow(r: TimeOffRow): Mode {
@@ -80,20 +80,20 @@ function inferModeFromRow(r: TimeOffRow): Mode {
   const e = isoToLocalParts(r.end);
 
   // If exactly same day and looks like full day (00:00..23:59) -> DAY
-  if (s.date === e.date && s.time === "00:00" && (e.time === "23:59" || e.time === "23:58")) {
-    return "DAY";
+  if (s.date === e.date && s.time === '00:00' && (e.time === '23:59' || e.time === '23:58')) {
+    return 'DAY';
   }
 
   // If both look like full-day boundaries across multiple days -> RANGE
-  if ((s.time === "00:00") && (e.time === "23:59" || e.time === "23:58")) {
-    return s.date === e.date ? "DAY" : "RANGE";
+  if (s.time === '00:00' && (e.time === '23:59' || e.time === '23:58')) {
+    return s.date === e.date ? 'DAY' : 'RANGE';
   }
 
-  return "HOURS";
+  return 'HOURS';
 }
 
 function rowToPayload(r: UiRow) {
-  if (r.mode === "DAY") {
+  if (r.mode === 'DAY') {
     return {
       start: dateOnlyToIsoStart(r.date),
       end: dateOnlyToIsoEnd(r.date),
@@ -101,7 +101,7 @@ function rowToPayload(r: UiRow) {
     };
   }
 
-  if (r.mode === "RANGE") {
+  if (r.mode === 'RANGE') {
     return {
       start: dateOnlyToIsoStart(r.startDate),
       end: dateOnlyToIsoEnd(r.endDate),
@@ -118,29 +118,29 @@ function rowToPayload(r: UiRow) {
 }
 
 function validateRow(r: UiRow): string | null {
-  if (r.reason.length > 500) return "Reason is too long (max 500)";
+  if (r.reason.length > 500) return 'Reason is too long (max 500)';
 
-  if (r.mode === "DAY") {
-    if (!r.date) return "Date is required";
+  if (r.mode === 'DAY') {
+    if (!r.date) return 'Date is required';
     return null;
   }
 
-  if (r.mode === "RANGE") {
-    if (!r.startDate || !r.endDate) return "Start and end date are required";
+  if (r.mode === 'RANGE') {
+    if (!r.startDate || !r.endDate) return 'Start and end date are required';
     const s = new Date(`${r.startDate}T00:00`).getTime();
     const e = new Date(`${r.endDate}T00:00`).getTime();
-    if (!Number.isFinite(s) || !Number.isFinite(e)) return "Invalid date";
-    if (e < s) return "End date must be after start date";
+    if (!Number.isFinite(s) || !Number.isFinite(e)) return 'Invalid date';
+    if (e < s) return 'End date must be after start date';
     return null;
   }
 
   // HOURS
-  if (!r.hoursDate) return "Date is required";
-  if (!r.startTime || !r.endTime) return "Start and end time are required";
+  if (!r.hoursDate) return 'Date is required';
+  if (!r.startTime || !r.endTime) return 'Start and end time are required';
   const s = new Date(`${r.hoursDate}T${r.startTime}`).getTime();
   const e = new Date(`${r.hoursDate}T${r.endTime}`).getTime();
-  if (!Number.isFinite(s) || !Number.isFinite(e)) return "Invalid date/time";
-  if (e <= s) return "End time must be after start time";
+  if (!Number.isFinite(s) || !Number.isFinite(e)) return 'Invalid date/time';
+  if (e <= s) return 'End time must be after start time';
   return null;
 }
 
@@ -157,7 +157,7 @@ function makeEmptyRow(): UiRow {
 
   return {
     timeOffID: null,
-    mode: "DAY",
+    mode: 'DAY',
 
     date,
 
@@ -168,7 +168,7 @@ function makeEmptyRow(): UiRow {
     startTime: toTimeInput(start),
     endTime: toTimeInput(end),
 
-    reason: "",
+    reason: '',
     dirty: true,
     saving: false,
     deleting: false,
@@ -186,14 +186,19 @@ function formatPreview(r: UiRow) {
     const s = new Date(p.start);
     const e = new Date(p.end);
 
-    const dateFmt = new Intl.DateTimeFormat(undefined, { weekday: "short", year: "numeric", month: "short", day: "2-digit" });
-    const timeFmt = new Intl.DateTimeFormat(undefined, { hour: "2-digit", minute: "2-digit" });
+    const dateFmt = new Intl.DateTimeFormat(undefined, {
+      weekday: 'short',
+      year: 'numeric',
+      month: 'short',
+      day: '2-digit',
+    });
+    const timeFmt = new Intl.DateTimeFormat(undefined, { hour: '2-digit', minute: '2-digit' });
 
-    if (r.mode === "DAY") return `${dateFmt.format(s)} (all day)`;
-    if (r.mode === "RANGE") return `${dateFmt.format(s)} → ${dateFmt.format(e)} (all day)`;
+    if (r.mode === 'DAY') return `${dateFmt.format(s)} (all day)`;
+    if (r.mode === 'RANGE') return `${dateFmt.format(s)} → ${dateFmt.format(e)} (all day)`;
     return `${dateFmt.format(s)} · ${timeFmt.format(s)}–${timeFmt.format(e)}`;
   } catch {
-    return "";
+    return '';
   }
 }
 
@@ -222,7 +227,7 @@ async function load() {
         startTime: s.time,
         endTime: e.time,
 
-        reason: r.reason ?? "",
+        reason: r.reason ?? '',
         dirty: false,
         saving: false,
         deleting: false,
@@ -230,7 +235,7 @@ async function load() {
       });
     }
   } catch (e: any) {
-    globalError.value = e?.response?.data?.message ?? e?.message ?? "Failed to load time off";
+    globalError.value = e?.response?.data?.message ?? e?.message ?? 'Failed to load time off';
   } finally {
     loading.value = false;
   }
@@ -266,17 +271,16 @@ async function saveRow(r: UiRow) {
     r.hoursDate = s.date;
     r.startTime = s.time;
     r.endTime = e.time;
-    r.reason = saved.reason ?? "";
+    r.reason = saved.reason ?? '';
     r.dirty = false;
 
     setSuccess();
   } catch (e: any) {
-    const msg =
-      e?.response?.data?.errors?.fieldErrors
-        ? Object.entries(e.response.data.errors.fieldErrors)
-            .map(([k, v]: any) => `${k}: ${Array.isArray(v) ? v.join(", ") : v}`)
-            .join(" | ")
-        : e?.response?.data?.message ?? e?.message ?? "Save failed";
+    const msg = e?.response?.data?.errors?.fieldErrors
+      ? Object.entries(e.response.data.errors.fieldErrors)
+          .map(([k, v]: any) => `${k}: ${Array.isArray(v) ? v.join(', ') : v}`)
+          .join(' | ')
+      : (e?.response?.data?.message ?? e?.message ?? 'Save failed');
     r.error = msg;
   } finally {
     r.saving = false;
@@ -298,7 +302,7 @@ async function removeRow(r: UiRow, idx: number) {
     rows.splice(idx, 1);
     setSuccess();
   } catch (e: any) {
-    r.error = e?.response?.data?.message ?? e?.message ?? "Delete failed";
+    r.error = e?.response?.data?.message ?? e?.message ?? 'Delete failed';
   } finally {
     r.deleting = false;
   }
@@ -314,7 +318,8 @@ onMounted(load);
     <header>
       <h1 class="admin-title">Special hours</h1>
       <p class="admin-subtitle">
-        Create announcements like holiday closures or adjusted hours. These show on the public site only when added.
+        Create announcements like holiday closures or adjusted hours. These show on the public site
+        only when added.
       </p>
     </header>
 
@@ -328,9 +333,7 @@ onMounted(load);
           Add special hours
         </button>
 
-        <button type="button" class="admin-btn" :disabled="loading" @click="load">
-          Refresh
-        </button>
+        <button type="button" class="admin-btn" :disabled="loading" @click="load">Refresh</button>
       </div>
 
       <div v-if="!hasAny" class="admin-card">
@@ -366,32 +369,62 @@ onMounted(load);
               <td class="py-3 pr-3 align-top">
                 <div v-if="r.mode === 'DAY'" class="space-y-2">
                   <label class="block text-xs text-zinc-400">Date</label>
-                  <input v-model="r.date" type="date" class="admin-input w-full" @input="markDirty(r)" />
+                  <input
+                    v-model="r.date"
+                    type="date"
+                    class="admin-input w-full"
+                    @input="markDirty(r)"
+                  />
                 </div>
 
                 <div v-else-if="r.mode === 'RANGE'" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div class="space-y-2">
                     <label class="block text-xs text-zinc-400">Start date</label>
-                    <input v-model="r.startDate" type="date" class="admin-input w-full" @input="markDirty(r)" />
+                    <input
+                      v-model="r.startDate"
+                      type="date"
+                      class="admin-input w-full"
+                      @input="markDirty(r)"
+                    />
                   </div>
                   <div class="space-y-2">
                     <label class="block text-xs text-zinc-400">End date</label>
-                    <input v-model="r.endDate" type="date" class="admin-input w-full" @input="markDirty(r)" />
+                    <input
+                      v-model="r.endDate"
+                      type="date"
+                      class="admin-input w-full"
+                      @input="markDirty(r)"
+                    />
                   </div>
                 </div>
 
                 <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div class="space-y-2">
                     <label class="block text-xs text-zinc-400">Date</label>
-                    <input v-model="r.hoursDate" type="date" class="admin-input w-full" @input="markDirty(r)" />
+                    <input
+                      v-model="r.hoursDate"
+                      type="date"
+                      class="admin-input w-full"
+                      @input="markDirty(r)"
+                    />
                   </div>
                   <div class="space-y-2">
                     <label class="block text-xs text-zinc-400">From</label>
-                    <input v-model="r.startTime" type="time" class="admin-input w-full" @input="markDirty(r)" />
+                    <input
+                      v-model="r.startTime"
+                      type="time"
+                      class="admin-input w-full"
+                      @input="markDirty(r)"
+                    />
                   </div>
                   <div class="space-y-2">
                     <label class="block text-xs text-zinc-400">To</label>
-                    <input v-model="r.endTime" type="time" class="admin-input w-full" @input="markDirty(r)" />
+                    <input
+                      v-model="r.endTime"
+                      type="time"
+                      class="admin-input w-full"
+                      @input="markDirty(r)"
+                    />
                   </div>
                 </div>
 
@@ -406,7 +439,9 @@ onMounted(load);
                   placeholder="Optional (e.g. Christmas holiday)"
                   @input="markDirty(r)"
                 />
-                <p class="mt-2 text-xs text-zinc-400">Optional. If empty, only the dates will show.</p>
+                <p class="mt-2 text-xs text-zinc-400">
+                  Optional. If empty, only the dates will show.
+                </p>
               </td>
 
               <td class="py-3 pr-3 align-top">
@@ -421,7 +456,7 @@ onMounted(load);
                     :disabled="r.saving || r.deleting || !r.dirty"
                     @click="saveRow(r)"
                   >
-                    {{ r.saving ? "Saving…" : "Save" }}
+                    {{ r.saving ? 'Saving…' : 'Save' }}
                   </button>
 
                   <button
@@ -430,7 +465,7 @@ onMounted(load);
                     :disabled="r.saving || r.deleting"
                     @click="removeRow(r, idx)"
                   >
-                    {{ r.deleting ? "Deleting…" : "Delete" }}
+                    {{ r.deleting ? 'Deleting…' : 'Delete' }}
                   </button>
                 </div>
               </td>

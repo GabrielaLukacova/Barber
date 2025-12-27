@@ -46,10 +46,7 @@ onMounted(load);
     <p v-if="error" class="text-red-500 mb-3">{{ error }}</p>
     <p v-else-if="loading" class="text-zinc-400 mb-3">Loading…</p>
 
-    <div
-      v-if="sorted.length"
-      class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4"
-    >
+    <div v-if="sorted.length" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
       <a
         v-for="img in sorted"
         :key="img.imageID"
@@ -74,16 +71,16 @@ onMounted(load);
 </template>
 
 <style scoped>
-  .section-head{
+.section-head {
   text-align: center;
-  margin: 0 0 24px 0;  
-  padding: 0;          
+  margin: 0 0 24px 0;
+  padding: 0;
 }
-  .section-kicker{
+.section-kicker {
   margin: 0 0 10px 0;
   font-size: 14px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(161,161,170,0.9);
+  color: rgba(161, 161, 170, 0.9);
 }
 </style>

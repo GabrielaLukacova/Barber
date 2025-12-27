@@ -6,7 +6,7 @@ type State = {
   service?: Service;
   barber?: Barber;
   dateISO?: string; // YYYY-MM-DD
-  slot?: string;    // "HH:mm"
+  slot?: string; // "HH:mm"
   customerName: string;
   customerEmail: string;
   customerPhone?: string;

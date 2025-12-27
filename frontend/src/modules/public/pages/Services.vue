@@ -30,23 +30,16 @@ const error = computed(() => servicesStore.error);
   <section class="mx-auto max-w-5xl px-4 py-10 space-y-6">
     <header class="space-y-2">
       <h1 class="text-3xl font-semibold text-slate-900">Services & Prices</h1>
-      <p class="text-sm text-slate-500">
-        Choose from our most popular cuts and treatments.
-      </p>
+      <p class="text-sm text-slate-500">Choose from our most popular cuts and treatments.</p>
     </header>
 
     <p v-if="error" class="text-sm text-red-500">
       {{ error }}
     </p>
 
-    <p v-else-if="loading" class="text-sm text-slate-500">
-      Loading services…
-    </p>
+    <p v-else-if="loading" class="text-sm text-slate-500">Loading services…</p>
 
-    <div
-      v-else
-      class="grid gap-5 md:grid-cols-2"
-    >
+    <div v-else class="grid gap-5 md:grid-cols-2">
       <article
         v-for="svc in services"
         :key="svc.serviceID"
@@ -62,12 +55,7 @@ const error = computed(() => servicesStore.error);
               alt=""
               class="w-full h-full object-cover"
             />
-            <span
-              v-else
-              class="text-xs text-slate-400"
-            >
-              No image
-            </span>
+            <span v-else class="text-xs text-slate-400"> No image </span>
           </div>
         </div>
 
@@ -80,9 +68,7 @@ const error = computed(() => servicesStore.error);
               {{ formatPrice(svc.price) }}
             </span>
           </div>
-          <p class="text-xs text-slate-500">
-            {{ svc.duration }} min
-          </p>
+          <p class="text-xs text-slate-500">{{ svc.duration }} min</p>
           <p
             v-if="svc.isBooked"
             class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800"
@@ -92,10 +78,7 @@ const error = computed(() => servicesStore.error);
         </div>
       </article>
 
-      <p
-        v-if="services.length === 0"
-        class="col-span-full text-center text-sm text-slate-400 mt-4"
-      >
+      <p v-if="services.length === 0" class="col-span-full text-center text-sm text-slate-400 mt-4">
         No services are available yet. Please check back later.
       </p>
     </div>

@@ -3,10 +3,7 @@
   <header :class="headerClass">
     <nav
       class="section-block flex items-center"
-      style="
-        padding-top: clamp(24px, 3vw, 32px);
-        padding-bottom: clamp(24px, 3vw, 32px);
-      "
+      style="padding-top: clamp(24px, 3vw, 32px); padding-bottom: clamp(24px, 3vw, 32px)"
     >
       <!-- LEFT: Brand -->
       <button
@@ -23,19 +20,44 @@
         class="ml-auto hidden items-center gap-12 text-[15px] font-semibold uppercase tracking-[0.14em] md:flex"
         :class="navTextClass"
       >
-        <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="onNavClick('services')">
+        <button
+          type="button"
+          class="transition-colors hover:opacity-100"
+          :class="linkClass"
+          @click="onNavClick('services')"
+        >
           Services
         </button>
-        <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="onNavClick('booking')">
+        <button
+          type="button"
+          class="transition-colors hover:opacity-100"
+          :class="linkClass"
+          @click="onNavClick('booking')"
+        >
           Booking
         </button>
-        <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="onNavClick('gallery')">
+        <button
+          type="button"
+          class="transition-colors hover:opacity-100"
+          :class="linkClass"
+          @click="onNavClick('gallery')"
+        >
           Gallery
         </button>
-        <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="onNavClick('opening-hours')">
+        <button
+          type="button"
+          class="transition-colors hover:opacity-100"
+          :class="linkClass"
+          @click="onNavClick('opening-hours')"
+        >
           Opening hours
         </button>
-        <button type="button" class="transition-colors hover:opacity-100" :class="linkClass" @click="onNavClick('contact')">
+        <button
+          type="button"
+          class="transition-colors hover:opacity-100"
+          :class="linkClass"
+          @click="onNavClick('contact')"
+        >
           Contact
         </button>
       </div>
@@ -72,7 +94,7 @@
       :class="panelClass"
       :style="panelStyle"
     >
-      <div class="section-block" style="padding-top: 0; padding-bottom: 0;">
+      <div class="section-block" style="padding-top: 0; padding-bottom: 0">
         <div
           class="border border-white/10 backdrop-blur-md"
           :style="afterHero ? 'background: rgba(0,0,0,0.60);' : 'background: rgba(15,18,22,0.55);'"
@@ -121,8 +143,6 @@
           </div>
 
           <div class="h-px bg-[#C7A47D]/40"></div>
-
-
         </div>
       </div>
     </div>
@@ -199,11 +219,12 @@ function onResize() {
   if (window.innerWidth >= 768) closeMenu();
 }
 
-const headerClass = computed(() =>
-  (afterHero.value
-    ? 'fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55'
-    : 'fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent'
-  ) + ' transition-colors duration-300',
+const headerClass = computed(
+  () =>
+    (afterHero.value
+      ? 'fixed top-0 left-0 right-0 z-50 border-b border-white/10 bg-black/70 backdrop-blur supports-[backdrop-filter]:bg-black/55'
+      : 'fixed top-0 left-0 right-0 z-50 border-b border-transparent bg-transparent') +
+    ' transition-colors duration-300',
 );
 
 const brandClass = computed(() => 'text-white');
@@ -227,9 +248,7 @@ const panelStyle = computed(() => ({
 }));
 
 const mobileLinkClass = computed(() =>
-  afterHero.value
-    ? 'text-zinc-200 hover:text-white'
-    : 'text-white/90 hover:text-white'
+  afterHero.value ? 'text-zinc-200 hover:text-white' : 'text-white/90 hover:text-white',
 );
 
 // Close menu if hero state changes (prevents weird look during scroll)
