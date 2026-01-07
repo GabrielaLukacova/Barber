@@ -49,6 +49,7 @@ export class TimeOffController {
 
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
+
       const id = Number(req.params.id);
       if (Number.isNaN(id)) {
         return res.status(400).json({ error: 'Invalid timeOffID' });
@@ -68,6 +69,7 @@ export class TimeOffController {
 
       res.json({ success: true });
     } catch (err: any) {
+      
       if (err?.name === 'ZodError') {
         return res.status(400).json({
           error: 'Validation error',

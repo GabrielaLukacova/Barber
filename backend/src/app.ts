@@ -34,8 +34,9 @@ app.use('/api', routes);
 
 // Centralized error handler
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-  console.error('💥 Unhandled error:', err);
+  console.error('Unhandled error:', err);
 
   const status =
     err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;

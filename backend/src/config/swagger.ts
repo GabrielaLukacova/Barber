@@ -16,7 +16,6 @@ const swaggerDefinition = {
       },
     },
   },
-  // 👇 Global security: all operations use BearerAuth unless overridden
   security: [
     {
       BearerAuth: [],

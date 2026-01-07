@@ -157,7 +157,8 @@ SELECT
     oh.openingTime,
     oh.closingTime
 FROM OpeningHours oh
-ORDER BY FIELD(oh.dayOfWeek, 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
+ORDER BY FIELD(oh.dayOfWeek, 'Monday', 'Tuesday', 
+'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday');
 
 CREATE OR REPLACE VIEW appointment_details_view AS
 SELECT 

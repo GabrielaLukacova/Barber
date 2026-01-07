@@ -58,6 +58,7 @@ export class OpeningHoursController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
+      
       const parsed = createOpeningHoursSchema.parse(req.body);
 
       const result = await db
