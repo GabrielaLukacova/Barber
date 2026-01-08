@@ -16,3 +16,18 @@ node_modules
 *.sqlite
 *.db
 *.sqlite3
+
+# build/test artifacts
+**/dist/
+**/node_modules/
+**/coverage/
+**/.vite/
+**/.vitest/
+**/test-results/
+**/playwright-report/
+**/*.tsbuildinfo
+
+# local db
+**/*.sqlite
+**/*.db
+**/*.sqlite3
