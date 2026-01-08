@@ -1,5 +1,5 @@
 // backend/src/services/serviceService.ts
-import { serviceModel, type ServiceRow } from '../models/serviceModel';
+import { serviceModel, type ServiceRow } from '../repositories/serviceModel';
 
 export interface ServiceInput {
   name: string;
