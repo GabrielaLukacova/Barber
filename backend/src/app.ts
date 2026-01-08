@@ -5,6 +5,7 @@ import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index';
 import { swaggerSpec } from './config/swagger';
 import path from 'node:path';
+import fs from 'node:fs/promises';
 
 const app = express();
 
@@ -13,12 +14,86 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+const SERVICES_DIR = path.join(UPLOADS_DIR, 'services');
+const GALLERY_DIR = path.join(UPLOADS_DIR, 'gallery');
+
+async function detectMime(filePath: string): Promise<string> {
+  const fh = await fs.open(filePath, 'r');
+  try {
+    const buf = Buffer.alloc(12);
+    await fh.read(buf, 0, 12, 0);
+
+    // JPEG: FF D8 FF
+    if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
+
+    // PNG: 89 50 4E 47 0D 0A 1A 0A
+    if (
+      buf[0] === 0x89 &&
+      buf[1] === 0x50 &&
+      buf[2] === 0x4e &&
+      buf[3] === 0x47 &&
+      buf[4] === 0x0d &&
+      buf[5] === 0x0a &&
+      buf[6] === 0x1a &&
+      buf[7] === 0x0a
+    )
+      return 'image/png';
+
+    // WEBP: "RIFF....WEBP"
+    if (
+      buf[0] === 0x52 && // R
+      buf[1] === 0x49 && // I
+      buf[2] === 0x46 && // F
+      buf[3] === 0x46 && // F
+      buf[8] === 0x57 && // W
+      buf[9] === 0x45 && // E
+      buf[10] === 0x42 && // B
+      buf[11] === 0x50 // P
+    )
+      return 'image/webp';
+
+    return 'application/octet-stream';
+  } finally {
+    await fh.close();
+  }
+}
+
+/**
+ * ✅ IMPORTANT:
+ * Uploaded service/gallery images have no extension => express.static sets octet-stream.
+ * These routes force correct Content-Type so <img> renders.
+ */
+app.get('/uploads/services/:file', async (req, res, next) => {
+  try {
+    const abs = path.join(SERVICES_DIR, req.params.file);
+    const mime = await detectMime(abs);
+    res.setHeader('Cache-Control', 'public, max-age=0');
+    res.type(mime);
+    return res.sendFile(abs);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+app.get('/uploads/gallery/:file', async (req, res, next) => {
+  try {
+    const abs = path.join(GALLERY_DIR, req.params.file);
+    const mime = await detectMime(abs);
+    res.setHeader('Cache-Control', 'public, max-age=0');
+    res.type(mime);
+    return res.sendFile(abs);
+  } catch (err) {
+    return next(err);
+  }
+});
+
+// keep static for everything else under /uploads
 app.use('/uploads', express.static(UPLOADS_DIR));
 
 // Swagger docs (UI)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// ✅ NOVÉ: raw OpenAPI JSON (už nebude "Cannot GET /docs-json")
+// raw OpenAPI JSON
 app.get('/docs-json', (_req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(200).send(swaggerSpec);
@@ -42,7 +117,6 @@ app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled error:', err);
 
   const status = err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
-
   const message = status === 500 ? 'Internal server error' : err.message || 'Something went wrong';
 
   res.status(status).json({
