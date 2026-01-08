@@ -8,6 +8,8 @@ import MainNav from '../../shared/components/MainNav.vue';
 import SiteFooter from '../../shared/components/SiteFooter.vue';
 import BookingSection from '../../modules/public/sections/BookingSection.vue';
 import OpeningHoursSection from '../../modules/public/sections/OpeningHoursSection.vue';
+import TimeOffSection from '../../modules/public/sections/TimeOffSection.vue';
+
 
 vi.mock('../../shared/api/barberApi', () => ({
   fetchServices: vi.fn(async () => []),
