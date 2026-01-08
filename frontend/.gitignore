@@ -45,3 +45,9 @@ node_modules/
 
 # TS build info
 *.tsbuildinfo
+
+# test artifacts
+.vite/
+.vitest/
+test-results/
+playwright-report/
