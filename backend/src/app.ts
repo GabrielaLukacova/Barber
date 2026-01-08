@@ -4,7 +4,7 @@ import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
 import routes from './routes/index';
 import { swaggerSpec } from './config/swagger';
-import path from 'node:path'; // ✅ len presunuté hore (namiesto importu uprostred)
+import path from 'node:path';
 
 const app = express();
 
