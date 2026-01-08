@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { mount } from '@vue/test-utils';
+import router from '../../router';
 import { createTestingPinia } from '@pinia/testing';
 
 import MainNav from '../../shared/components/MainNav.vue';
@@ -12,6 +12,7 @@ function mountWithPinia(component: any) {
   return mount(component, {
     global: {
       plugins: [
+        router,
         createTestingPinia({
           stubActions: true,
         }),
