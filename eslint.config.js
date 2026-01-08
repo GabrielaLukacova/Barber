@@ -1,0 +1,15 @@
+const js = require('@eslint/js');
+const tseslint = require('typescript-eslint');
+const prettierConfig = require('eslint-config-prettier');
+
+module.exports = [
+  {
+    ignores: ['dist/**', 'build/**', 'node_modules/**'],
+  },
+
+  js.configs.recommended,
+
+  ...tseslint.configs.recommended,
+
+  prettierConfig,
+];
