@@ -1,10 +1,10 @@
-import { api } from './api';
+import api from './api';
 import type { Service, Barber, AvailabilityResponse, AppointmentInput } from '@/types';
 
 // /services -> map backend DTO to public Service type
 export async function fetchServices(): Promise<Service[]> {
   const { data } = await api.get<any[]>('/services');
-  return data.map((row) => ({
+  return data.map((row: any) => ({
     id: row.serviceID ?? row.id,
     name: row.name,
     durationMin: row.duration ?? row.durationMin ?? 0,
@@ -21,7 +21,7 @@ export async function fetchServices(): Promise<Service[]> {
 // /barbers -> map to simple Barber type (best-effort)
 export async function fetchBarbers(): Promise<Barber[]> {
   const { data } = await api.get<any[]>('/barbers');
-  return data.map((row) => ({
+  return data.map((row: any) => ({
     id: row.barberID ?? row.id,
     displayName: row.displayName ?? row.name ?? 'Barber',
     avatarUrl: row.avatarUrl ?? null,
