@@ -1,6 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import router from '../../router';
+import { mount } from '@vue/test-utils';
 import { createTestingPinia } from '@pinia/testing';
+
+import router from '../../router';
 
 import MainNav from '../../shared/components/MainNav.vue';
 import SiteFooter from '../../shared/components/SiteFooter.vue';
