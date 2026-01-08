@@ -80,7 +80,7 @@
               <span class="text-sm text-zinc-600">Current image:</span>
               <img
                 v-if="service?.imagePath"
-                :src="service.imagePath"
+                :src="getImageUrl(service.imagePath)"
                 alt="Service"
                 class="h-12 w-12 object-cover rounded-xl border border-zinc-200"
               />
