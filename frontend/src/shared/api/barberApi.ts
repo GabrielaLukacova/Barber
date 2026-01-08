@@ -1,4 +1,5 @@
 import api from './api';
+import { getImageUrl } from "../utils/getImageUrl";
 import type { Service, Barber, AvailabilityResponse, AppointmentInput } from '@/types';
 
 // /services -> map backend DTO to public Service type
@@ -14,7 +15,7 @@ export async function fetchServices(): Promise<Service[]> {
         : typeof row.price === 'number'
           ? row.price * 100
           : 0,
-    imagePath: row.imagePath ?? null,
+    imagePath: getImageUrl(row.imagePath ?? null),
   }));
 }
 
