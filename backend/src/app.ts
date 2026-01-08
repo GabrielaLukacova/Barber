@@ -1,4 +1,3 @@
-// backend/src/app.ts
 import express, { Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import swaggerUi from 'swagger-ui-express';
@@ -23,10 +22,9 @@ async function detectMime(filePath: string): Promise<string> {
     const buf = Buffer.alloc(12);
     await fh.read(buf, 0, 12, 0);
 
-    // JPEG: FF D8 FF
+    // sniff image type
     if (buf[0] === 0xff && buf[1] === 0xd8 && buf[2] === 0xff) return 'image/jpeg';
 
-    // PNG: 89 50 4E 47 0D 0A 1A 0A
     if (
       buf[0] === 0x89 &&
       buf[1] === 0x50 &&
@@ -39,7 +37,6 @@ async function detectMime(filePath: string): Promise<string> {
     )
       return 'image/png';
 
-    // WEBP: "RIFF....WEBP"
     if (
       buf[0] === 0x52 && // R
       buf[1] === 0x49 && // I
@@ -58,11 +55,7 @@ async function detectMime(filePath: string): Promise<string> {
   }
 }
 
-/**
- * ✅ IMPORTANT:
- * Uploaded service/gallery images have no extension => express.static sets octet-stream.
- * These routes force correct Content-Type so <img> renders.
- */
+/* files have no extension */
 app.get('/uploads/services/:file', async (req, res, next) => {
   try {
     const abs = path.join(SERVICES_DIR, req.params.file);
@@ -87,19 +80,16 @@ app.get('/uploads/gallery/:file', async (req, res, next) => {
   }
 });
 
-// keep static for everything else under /uploads
+// static uploads fallback
 app.use('/uploads', express.static(UPLOADS_DIR));
 
-// Swagger docs (UI)
 app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
-// raw OpenAPI JSON
 app.get('/docs-json', (_req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(200).send(swaggerSpec);
 });
 
-// Health check route
 app.get('/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
@@ -112,10 +102,10 @@ app.get('/health', (_req: Request, res: Response) => {
 
 app.use('/api', routes);
 
-// Centralized error handler
 app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
   console.error('Unhandled error:', err);
 
+  // normalize status
   const status = err.statusCode && Number.isInteger(err.statusCode) ? err.statusCode : 500;
   const message = status === 500 ? 'Internal server error' : err.message || 'Something went wrong';
 

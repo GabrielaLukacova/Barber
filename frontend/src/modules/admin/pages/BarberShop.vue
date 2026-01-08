@@ -63,7 +63,7 @@
       <div>
         <label class="admin-label">Description</label>
 
-        <!-- ✅ IMPORTANT: textarea MUST NOT be self-closing -->
+        <!-- textarea not self closing -->
         <textarea
           v-model="form.description"
           rows="4"
@@ -122,6 +122,7 @@ async function load() {
       form.description = data.description ?? null;
       form.city = data.city ?? null;
     } else {
+      // reset to defaults
       form.barberShopID = undefined;
       form.name = '';
       form.phoneNumber = null;
@@ -145,6 +146,7 @@ async function onSave() {
     error.value = null;
     success.value = false;
 
+    // normalize empty values
     const norm = (v: any) => {
       if (v === undefined || v === null) return null;
       const t = String(v).trim();

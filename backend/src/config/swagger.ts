@@ -28,10 +28,10 @@ const swaggerDefinition = {
 };
 
 const options = {
-  // ✅ dôležité: swagger-jsdoc používa "definition"
+  // swagger-jsdoc uses "definition"
   definition: swaggerDefinition,
 
-  // ✅ lokálne TS, na Render buildnuté JS
+  // include ts and built js
   apis: [
     path.join(process.cwd(), 'src/routes/**/*.ts'),
     path.join(process.cwd(), 'dist/routes/**/*.js'),

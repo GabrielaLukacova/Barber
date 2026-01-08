@@ -2,7 +2,6 @@
   <div id="contact" class="w-full">
     <p class="text-[14px] uppercase tracking-[0.18em] text-zinc-400 text-center">Contact</p>
 
-    <!-- 3 vertical cards -->
     <div class="mt-10 grid gap-6">
       <!-- PHONE -->
       <a
@@ -97,7 +96,6 @@
       </div>
     </div>
 
-    <!-- subtle barber accent -->
     <div
       class="mt-10 h-px w-full bg-gradient-to-r from-transparent via-[#C7A47D]/55 to-transparent"
     ></div>

@@ -1,5 +1,3 @@
-// frontend/src/modules/admin/auth/authApi.ts
-
 export interface LoginResponse {
   token: string;
 }
@@ -19,6 +17,6 @@ export async function login(username: string, password: string): Promise<void> {
   }
 
   const data: LoginResponse = await res.json();
-  // 🔴 THIS IS THE IMPORTANT PART
+
   localStorage.setItem('adminToken', data.token);
 }

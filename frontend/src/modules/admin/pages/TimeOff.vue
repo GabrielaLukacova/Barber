@@ -15,14 +15,14 @@ type UiRow = {
 
   mode: Mode;
 
-  // DAY: date only -> start/end derived
+  // day date
   date: string; // YYYY-MM-DD
 
-  // RANGE: date range -> start/end derived
+  // range dates
   startDate: string; // YYYY-MM-DD
   endDate: string; // YYYY-MM-DD
 
-  // HOURS: date + times -> start/end derived
+  // hours inputs
   hoursDate: string; // YYYY-MM-DD
   startTime: string; // HH:MM
   endTime: string; // HH:MM
@@ -63,7 +63,7 @@ function isoToLocalParts(iso: string) {
 }
 
 function localDateTimeToIso(date: string, time: string) {
-  // Interprets as local time, stores as ISO
+  // local input to iso
   return new Date(`${date}T${time}`).toISOString();
 }
 
@@ -79,12 +79,10 @@ function inferModeFromRow(r: TimeOffRow): Mode {
   const s = isoToLocalParts(r.start);
   const e = isoToLocalParts(r.end);
 
-  // If exactly same day and looks like full day (00:00..23:59) -> DAY
   if (s.date === e.date && s.time === '00:00' && (e.time === '23:59' || e.time === '23:58')) {
     return 'DAY';
   }
 
-  // If both look like full-day boundaries across multiple days -> RANGE
   if (s.time === '00:00' && (e.time === '23:59' || e.time === '23:58')) {
     return s.date === e.date ? 'DAY' : 'RANGE';
   }
@@ -109,7 +107,6 @@ function rowToPayload(r: UiRow) {
     };
   }
 
-  // HOURS
   return {
     start: localDateTimeToIso(r.hoursDate, r.startTime),
     end: localDateTimeToIso(r.hoursDate, r.endTime),
@@ -134,7 +131,6 @@ function validateRow(r: UiRow): string | null {
     return null;
   }
 
-  // HOURS
   if (!r.hoursDate) return 'Date is required';
   if (!r.startTime || !r.endTime) return 'Start and end time are required';
   const s = new Date(`${r.hoursDate}T${r.startTime}`).getTime();
@@ -259,7 +255,7 @@ async function saveRow(r: UiRow) {
       saved = await updateTimeOff(r.timeOffID, payload);
     }
 
-    // Normalize UI from saved row
+    // sync from response
     const mode = inferModeFromRow(saved);
     const s = isoToLocalParts(saved.start);
     const e = isoToLocalParts(saved.end);

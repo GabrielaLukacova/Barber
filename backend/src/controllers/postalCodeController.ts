@@ -17,6 +17,7 @@ export class PostalCodeController {
   static async getOne(req: Request, res: Response, next: NextFunction) {
     try {
       const code = req.params.code;
+      // require postal code param
       if (!code) return res.status(400).json({ error: 'postalCode is required' });
 
       const [row] = await db
@@ -63,6 +64,7 @@ export class PostalCodeController {
   static async update(req: Request, res: Response, next: NextFunction) {
     try {
       const code = req.params.code;
+      // require postal code param
       if (!code) return res.status(400).json({ error: 'postalCode is required' });
 
       const parsed = updatePostalCodeSchema.parse(req.body);
@@ -89,6 +91,7 @@ export class PostalCodeController {
   static async delete(req: Request, res: Response, next: NextFunction) {
     try {
       const code = req.params.code;
+      // require postal code param
       if (!code) return res.status(400).json({ error: 'postalCode is required' });
 
       await db.delete(schema.PostalCode).where(eq(schema.PostalCode.postalCode, code)).execute();

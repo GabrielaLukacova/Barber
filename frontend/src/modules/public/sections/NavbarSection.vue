@@ -88,7 +88,6 @@
       </button>
     </nav>
 
-    <!-- Mobile panel (animated dropdown) -->
     <div
       class="md:hidden overflow-hidden transition-[max-height,opacity] duration-300"
       :class="panelClass"
@@ -190,10 +189,7 @@ function onNavClick(id: string) {
   requestAnimationFrame(() => scrollToId(id));
 }
 
-/*
-  Navbar stays "hero style" while you scroll through the hero.
-  It ONLY changes once you are BELOW the hero section.
-*/
+
 const afterHero = ref(false);
 const heroEnd = ref(240);
 
@@ -251,7 +247,6 @@ const mobileLinkClass = computed(() =>
   afterHero.value ? 'text-zinc-200 hover:text-white' : 'text-white/90 hover:text-white',
 );
 
-// Close menu if hero state changes (prevents weird look during scroll)
 watch(afterHero, () => {
   if (menuOpen.value) closeMenu();
 });

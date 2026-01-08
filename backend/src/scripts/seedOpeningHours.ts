@@ -4,7 +4,6 @@ import { db, schema } from '../db/db';
 async function main() {
   const { OpeningHours } = schema;
 
-  // Clear existing rows (optional, so we start clean)
   await db.delete(OpeningHours);
 
   await db.insert(OpeningHours).values([
@@ -17,12 +16,12 @@ async function main() {
     { dayOfWeek: 'Sunday', openingTime: null, closingTime: null },
   ]);
 
-  console.log('✅ OpeningHours seeded');
+  console.log('OpeningHours seeded');
 }
 
 main()
   .then(() => process.exit(0))
   .catch((err) => {
-    console.error('❌ Seed failed', err);
+    console.error('Seed failed', err);
     process.exit(1);
   });

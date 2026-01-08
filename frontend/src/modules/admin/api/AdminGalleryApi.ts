@@ -15,6 +15,7 @@ export class AdminGalleryApi {
 
   static async upload(files: File[]): Promise<GalleryImageDto[]> {
     const form = new FormData();
+    // backend expects "images"
     for (const f of files) form.append('images', f);
 
     const res = await api.post('/gallery-images', form);
@@ -22,6 +23,7 @@ export class AdminGalleryApi {
   }
 
   static async setSortOrder(id: number, sortOrder: number): Promise<GalleryImageDto> {
+    // updates only sortOrder
     const res = await api.put(`/gallery-images/${id}`, { sortOrder });
     return res.data;
   }

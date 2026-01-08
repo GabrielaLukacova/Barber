@@ -23,6 +23,6 @@ export type AppointmentInput = {
   customerName: string;
   customerEmail: string;
   customerPhone?: string;
-  start: string; // ISO
-  end: string; // ISO
+  start: string; 
+  end: string; 
 };

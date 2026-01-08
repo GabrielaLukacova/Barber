@@ -14,7 +14,7 @@ export const createBarberShopSchema = z.object({
   email: optStr,
   street: optStr,
   postalCode: optStr,
-  city: optStr, // <-- used for PostalCode upsert
+  city: optStr,
   description: optStr,
 });
 

@@ -113,6 +113,7 @@ const route = useRoute();
 const router = useRouter();
 const serviceStore = useServiceStore();
 
+// route param id
 const id = Number(route.params.id);
 
 const loading = computed(() => serviceStore.loading);
@@ -132,6 +133,7 @@ onMounted(async () => {
     if (service.value) {
       name.value = service.value.name;
       duration.value = service.value.duration;
+      // store uses cents
       price.value = service.value.price / 100;
       isBooked.value = service.value.isBooked;
     }
@@ -143,6 +145,7 @@ onMounted(async () => {
 
 function onFileChange(event: Event) {
   const input = event.target as HTMLInputElement;
+  // keep selected file
   const file = input.files?.[0] ?? null;
   imageFile.value = file;
 }
@@ -162,7 +165,7 @@ async function onSubmit() {
 
     router.push({ name: 'admin-services' });
   } catch {
-    // error in store
+    // errors handled in store
   }
 }
 </script>

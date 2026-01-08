@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
-// Zod schema for appointments
+// zod payload schema
 const appointmentSchema = z.object({
   clientID: z
     .union([z.number().int().positive(), z.null()])
@@ -30,7 +30,7 @@ export class AppointmentController {
     }
   }
 
-  // ADMIN: show appointments with client + services (LEFT JOIN so guest bookings still appear)
+  // admin list with joins
   static async getAllWithDetails(_req: Request, res: Response, next: NextFunction) {
     try {
       const rows = await db
@@ -59,11 +59,9 @@ export class AppointmentController {
           schema.AppointmentService,
           eq(schema.AppointmentService.appointmentID, schema.Appointment.appointmentID),
         )
-        .leftJoin(
-          schema.Service,
-          eq(schema.Service.serviceID, schema.AppointmentService.serviceID),
-        );
+        .leftJoin(schema.Service, eq(schema.Service.serviceID, schema.AppointmentService.serviceID));
 
+      // group by appointment id
       const map = new Map<number, any>();
 
       for (const r of rows) {
@@ -100,6 +98,7 @@ export class AppointmentController {
         }
       }
 
+      // newest first
       const out = Array.from(map.values()).sort((a, b) => {
         const ad = String(a.appointmentDate || '');
         const bd = String(b.appointmentDate || '');
@@ -153,6 +152,7 @@ export class AppointmentController {
         })
         .execute();
 
+      // handle driver insert id
       const insertId = (
         Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
       ) as number | undefined;
@@ -185,6 +185,7 @@ export class AppointmentController {
         return res.status(400).json({ error: 'Invalid appointment ID' });
       }
 
+      // partial update
       const parsed = appointmentSchema.partial().parse(req.body);
 
       await db

@@ -1,4 +1,3 @@
-// backend/src/services/serviceService.ts
 import { serviceModel, type ServiceRow } from '../repositories/serviceModel';
 
 export interface ServiceInput {
@@ -34,8 +33,7 @@ export class ServiceService {
       throw new Error('Service not found');
     }
 
-    // If imagePath is provided (even null), use it.
-    // If it's undefined (no new file), keep existing.imagePath.
+    // keep existing image
     const imagePath =
       input.imagePath !== undefined ? (input.imagePath ?? null) : existing.imagePath;
 

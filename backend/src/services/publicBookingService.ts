@@ -12,15 +12,20 @@ const DAY_NAMES = [
 ] as const;
 
 function toMinutes(hhmm: string) {
+  // hh:mm -> minutes
   const [h, m] = hhmm.split(':').map((x) => Number(x));
   return h * 60 + m;
 }
+
 function fromMinutes(min: number) {
+  // minutes -> hh:mm
   const h = String(Math.floor(min / 60)).padStart(2, '0');
   const m = String(min % 60).padStart(2, '0');
   return `${h}:${m}`;
 }
+
 function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number) {
+  // half-open ranges
   return aStart < bEnd && bStart < aEnd;
 }
 
@@ -36,6 +41,7 @@ export async function getAvailableSlots(params: {
 
   if (!services.length) return { durationMin: 0, slots: [] as string[] };
 
+  // sum selected durations
   const durationMin = services.reduce((sum, s: any) => sum + (s.duration ?? 0), 0);
 
   const d = new Date(params.dateISO + 'T00:00:00');
@@ -67,6 +73,7 @@ export async function getAvailableSlots(params: {
     end: toMinutes(String(a.endTime).slice(0, 5)),
   }));
 
+  // utc day window
   const dayStart = params.dateISO + 'T00:00:00.000Z';
   const dayEnd = params.dateISO + 'T23:59:59.999Z';
 
@@ -89,6 +96,7 @@ export async function getAvailableSlots(params: {
     return { start: startMin, end: endMin };
   });
 
+  // 15 min grid
   const step = 15;
   const latestStart = closeMin - durationMin;
   if (latestStart < openMin) return { durationMin, slots: [] as string[] };
@@ -121,6 +129,7 @@ export async function createPublicBooking(params: {
 
   if (!services.length) throw new Error('Selected services not found');
 
+  // derive totals
   const durationMin = services.reduce((sum, s: any) => sum + (s.duration ?? 0), 0);
   const totalPriceCents = services.reduce((sum, s: any) => sum + (s.price ?? 0) * 100, 0);
 
@@ -144,6 +153,7 @@ export async function createPublicBooking(params: {
   const startTime = params.startTimeHHMM + ':00';
   const endTime = fromMinutes(endMin) + ':00';
 
+  // prevent double booking
   const overlapsCount = await db.execute(sql`
     SELECT COUNT(*)::int AS c
     FROM "Appointment"
@@ -163,6 +173,7 @@ export async function createPublicBooking(params: {
   let clientID: number | null = null;
 
   if (params.customerEmail) {
+    // reuse client by email
     const existing = await db
       .select()
       .from(schema.Client)
@@ -172,6 +183,7 @@ export async function createPublicBooking(params: {
   }
 
   if (!clientID) {
+    // create guest client
     const name = params.customerName.trim();
     const parts = name.split(/\s+/);
     const firstName = (parts[0] || 'Guest').slice(0, 15);

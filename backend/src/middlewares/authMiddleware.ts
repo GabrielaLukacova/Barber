@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 const JWT_SECRET: string = process.env.JWT_SECRET || 'dev_secret';
+
 export interface AuthRequest extends Request {
   user?: {
     sub: string;
@@ -12,6 +13,7 @@ export interface AuthRequest extends Request {
 export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
+  // validate bearer header
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
     return res.status(401).json({ message: 'Missing or invalid Authorization header.' });
   }
@@ -21,6 +23,7 @@ export function requireAdmin(req: AuthRequest, res: Response, next: NextFunction
   try {
     const payload = jwt.verify(token, JWT_SECRET) as any;
 
+    // enforce admin role
     if (!payload || payload.role !== 'admin') {
       return res.status(403).json({ message: 'Forbidden.' });
     }

@@ -3,7 +3,6 @@ import { eq, desc } from 'drizzle-orm';
 
 const { Service, AppointmentService } = schema;
 
-// Type inferred from Drizzle schema
 export type ServiceRow = typeof Service.$inferSelect;
 
 export interface ServiceCreateInput {
@@ -24,18 +23,18 @@ export interface ServiceUpdateInput {
 
 class ServiceModel {
   async findAll(): Promise<ServiceRow[]> {
+    // newest first
     const rows = await db.select().from(Service).orderBy(desc(Service.serviceID));
     return rows;
   }
 
   async findById(id: number): Promise<ServiceRow | undefined> {
     const rows = await db.select().from(Service).where(eq(Service.serviceID, id)).limit(1);
-
     return rows[0];
   }
 
   async create(input: ServiceCreateInput): Promise<ServiceRow> {
-    // Insert the new row
+    // insert service
     await db.insert(Service).values({
       name: input.name,
       imagePath: input.imagePath,
@@ -44,7 +43,7 @@ class ServiceModel {
       isBooked: input.isBooked,
     });
 
-    // Fetch the created row by unique name (UNIQUE(name))
+    // read back created row
     const rows = await db
       .select()
       .from(Service)
@@ -73,10 +72,10 @@ class ServiceModel {
   }
 
   async delete(id: number): Promise<void> {
-    // 1) delete dependent AppointmentService rows to avoid FK errors
+    // delete appointment links
     await db.delete(AppointmentService).where(eq(AppointmentService.serviceID, id));
 
-    // 2) delete the Service row
+    // delete service row
     await db.delete(Service).where(eq(Service.serviceID, id));
   }
 }

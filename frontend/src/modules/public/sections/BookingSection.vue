@@ -15,8 +15,8 @@ import BookingWizard from '@/modules/public/components/BookingWizard.vue';
 <style scoped>
 .section-head {
   text-align: center;
-  margin: 0 0 24px 0; /* only vertical spacing */
-  padding: 0; /* no extra section padding */
+  margin: 0 0 24px 0;
+  padding: 0; 
 }
 
 .section-kicker {

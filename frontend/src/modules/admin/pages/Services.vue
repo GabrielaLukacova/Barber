@@ -6,7 +6,11 @@
         <p class="admin-subtitle">Manage services (name, image, duration, price).</p>
       </div>
 
-      <button type="button" class="admin-btn admin-btn--accent admin-btn--accent-fix" @click="openCreate">
+      <button
+        type="button"
+        class="admin-btn admin-btn--accent admin-btn--accent-fix"
+        @click="openCreate"
+      >
         + New service
       </button>
     </header>
@@ -67,7 +71,6 @@
       </table>
     </div>
 
-    <!-- Modal kept same functionality, only style -->
     <div
       v-if="formVisible"
       class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4"
@@ -86,7 +89,7 @@
             style="color: rgba(242, 244, 247, 0.8)"
             @click="closeForm"
           >
-            ✕
+            x
           </button>
         </header>
 
@@ -141,12 +144,9 @@
             </div>
           </div>
 
-          <!-- removed: Marked as booked by default -->
-
           <div class="flex justify-end gap-2 pt-2">
             <button type="button" class="admin-btn" @click="closeForm">Cancel</button>
 
-            <!-- force readable hover + text -->
             <button
               type="submit"
               class="admin-btn admin-btn--accent"
@@ -173,9 +173,6 @@ import {
   type Service,
   type ServicePayload,
 } from '@/modules/admin/services/serviceApi';
-
-// Backend base for images (admin panel)
-const backendBase = 'https://barber-backend-b77j.onrender.com';
 
 const services = ref<Service[]>([]);
 const loading = ref(false);
@@ -223,12 +220,14 @@ function resetForm() {
 }
 
 function openCreate() {
+  // open create mode
   formMode.value = 'create';
   resetForm();
   formVisible.value = true;
 }
 
 function openEdit(svc: Service) {
+  // open edit mode
   formMode.value = 'edit';
   editingId.value = svc.serviceID;
   form.value = {
@@ -283,6 +282,7 @@ async function onSubmit() {
 }
 
 async function onDelete(svc: Service) {
+  // confirm delete
   if (!confirm(`Delete service "${svc.name}"?`)) return;
   try {
     await deleteService(svc.serviceID);

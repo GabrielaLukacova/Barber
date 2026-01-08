@@ -97,7 +97,6 @@ async function onLogout() {
   await router.push({ name: 'admin-login' });
 }
 
-/* keep admin light even if public site uses dark */
 onMounted(() => {
   document.documentElement.classList.remove('dark');
 });

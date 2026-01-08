@@ -8,21 +8,18 @@ export type TimeOffRow = typeof TimeOff.$inferSelect;
 export type BarberShopRow = typeof BarberShop.$inferSelect;
 export type PostalCodeRow = typeof PostalCode.$inferSelect;
 
-// OpeningHours
 export interface OpeningHoursInput {
   dayOfWeek: string;
   openingTime?: string | null;
   closingTime?: string | null;
 }
 
-// TimeOff
 export interface TimeOffInput {
   start: string;
   end: string;
   reason?: string | null;
 }
 
-// BarberShop
 export interface BarberShopInput {
   name: string;
   phoneNumber?: string | null;
@@ -31,15 +28,15 @@ export interface BarberShopInput {
   postalCode?: string | null;
   description?: string | null;
 }
-// PostalCode
+
 export interface PostalCodeInput {
   postalCode: string;
   city: string;
 }
 
 export class ConfigModels {
-  // --- OpeningHours ---
   async listOpeningHours(): Promise<OpeningHoursRow[]> {
+    // stable admin ordering
     return db.select().from(OpeningHours).orderBy(asc(OpeningHours.dayOfWeek));
   }
 
@@ -59,6 +56,7 @@ export class ConfigModels {
       closingTime: input.closingTime ?? null,
     });
 
+    // fetch by insert id
     const insertId = Number((result as any).insertId);
     const rows = await db
       .select()
@@ -88,8 +86,8 @@ export class ConfigModels {
     await db.delete(OpeningHours).where(eq(OpeningHours.openingHoursID, id));
   }
 
-  // --- TimeOff ---
   async listTimeOff(): Promise<TimeOffRow[]> {
+    // latest first
     return db.select().from(TimeOff).orderBy(desc(TimeOff.start));
   }
 
@@ -105,6 +103,7 @@ export class ConfigModels {
       reason: input.reason ?? null,
     });
 
+    // fetch by insert id
     const insertId = Number((result as any).insertId);
     const rows = await db.select().from(TimeOff).where(eq(TimeOff.timeOffID, insertId)).limit(1);
 
@@ -130,7 +129,6 @@ export class ConfigModels {
     await db.delete(TimeOff).where(eq(TimeOff.timeOffID, id));
   }
 
-  // --- BarberShop ---
   async listBarberShops(): Promise<BarberShopRow[]> {
     return db.select().from(BarberShop).orderBy(asc(BarberShop.barberShopID));
   }
@@ -150,6 +148,7 @@ export class ConfigModels {
       description: input.description ?? null,
     });
 
+    // fetch by insert id
     const insertId = Number((result as any).insertId);
     const rows = await db
       .select()
@@ -182,9 +181,6 @@ export class ConfigModels {
     await db.delete(BarberShop).where(eq(BarberShop.barberShopID, id));
   }
 
-  // --- PostalCode ---
-
-  // --- PostalCode ---
   async listPostalCodes(): Promise<PostalCodeRow[]> {
     return db.select().from(PostalCode).orderBy(asc(PostalCode.postalCode));
   }
@@ -200,6 +196,7 @@ export class ConfigModels {
       city: input.city,
     });
 
+    // fetch by primary key
     const rows = await db
       .select()
       .from(PostalCode)

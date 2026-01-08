@@ -10,16 +10,14 @@ export interface LoginResult {
   username: string;
 }
 
-/**
- * Calls the deployed backend /api/auth/login using the shared Axios client.
- * IMPORTANT: it does NOT touch localStorage – the Pinia auth store does that.
- */
+/* calls /auth/login via shared api client */
 export async function login(payload: LoginPayload): Promise<LoginResult> {
   const res = await api.post('/auth/login', {
     username: payload.username,
     password: payload.password,
   });
 
+  // backend returns token only
   const { token } = res.data as { token: string };
 
   return {

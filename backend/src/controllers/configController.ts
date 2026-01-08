@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
-// --- ZOD SCHEMAS ---
+// zod schemas
 
 const openingHoursSchema = z.object({
   dayOfWeek: z.string().min(1, 'dayOfWeek is required'),
@@ -25,15 +25,14 @@ const barberShopSchema = z.object({
   postalCode: z.string().optional().nullable(),
   description: z.string().optional().nullable(),
 });
+
 const postalCodeSchema = z.object({
   postalCode: z.string().min(1, 'postalCode is required'),
   city: z.string().min(1, 'city is required'),
 });
 
-// --- CONTROLLER IMPLEMENTATION ---
-
 export class ConfigController {
-  // OpeningHours ---------------------
+  // opening hours
 
   static async getOpeningHours(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -153,7 +152,7 @@ export class ConfigController {
     }
   }
 
-  // TimeOff --------------------------
+  // time off
 
   static async getTimeOff(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -267,7 +266,7 @@ export class ConfigController {
     }
   }
 
-  // BarberShop -----------------------
+  // barber shop
 
   static async getBarberShops(_req: Request, res: Response, next: NextFunction) {
     try {
@@ -390,7 +389,7 @@ export class ConfigController {
     }
   }
 
-  // PostalCode -----------------------
+  // postal code
 
   static async getPostalCodes(_req: Request, res: Response, next: NextFunction) {
     try {

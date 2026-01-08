@@ -2,7 +2,7 @@ import api from './api';
 import { getImageUrl } from '../utils/getImageUrl';
 import type { Service, Barber, AvailabilityResponse, AppointmentInput } from '@/types';
 
-// /services -> map backend DTO to public Service type
+// map dto to ui
 export async function fetchServices(): Promise<Service[]> {
   const { data } = await api.get<any[]>('/services');
   return data.map((row: any) => ({
@@ -19,7 +19,6 @@ export async function fetchServices(): Promise<Service[]> {
   }));
 }
 
-// /barbers -> map to simple Barber type (best-effort)
 export async function fetchBarbers(): Promise<Barber[]> {
   const { data } = await api.get<any[]>('/barbers');
   return data.map((row: any) => ({
@@ -30,7 +29,7 @@ export async function fetchBarbers(): Promise<Barber[]> {
   }));
 }
 
-// Allow numeric or string IDs here
+// accept id types
 export async function fetchAvailability(params: {
   serviceId: string | number;
   barberId?: string | number;

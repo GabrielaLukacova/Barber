@@ -2,14 +2,14 @@ import api from '@/shared/api/api';
 
 export type TimeOffRow = {
   timeOffID: number;
-  start: string; // ISO
-  end: string; // ISO
+  start: string; 
+  end: string; 
   reason: string | null;
 };
 
 export type TimeOffCreate = {
-  start: string; // ISO
-  end: string; // ISO
+  start: string;
+  end: string; 
   reason?: string | null;
 };
 

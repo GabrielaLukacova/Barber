@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
-// Zod schema for validating clients
+// zod client schema
 const clientSchema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
@@ -58,6 +58,7 @@ export class ClientController {
         })
         .execute();
 
+      // driver insert id
       const insertId = (
         Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
       ) as number | undefined;
@@ -90,6 +91,7 @@ export class ClientController {
         return res.status(400).json({ error: 'Invalid client ID' });
       }
 
+      // full update payload
       const parsed = clientSchema.parse(req.body);
 
       await db

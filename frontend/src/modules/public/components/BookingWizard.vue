@@ -8,7 +8,7 @@ const servicesStore = useServicesStore();
 const booking = useBookingStore();
 const bookingAny = booking as any;
 
-/** ✅ Timezone-safe local YYYY-MM-DD */
+// local yyyy-mm-dd
 function localISODate(d = new Date()) {
   const tzOffset = d.getTimezoneOffset() * 60000;
   return new Date(d.getTime() - tzOffset).toISOString().slice(0, 10);
@@ -21,10 +21,10 @@ const loadingSlots = ref(false);
 const submitting = ref(false);
 const errorMsg = ref<string | null>(null);
 
-/** Closed/no slots status (works even if API doesn't support isClosed) */
+// day availability state
 const dayStatus = ref<'idle' | 'open' | 'closed' | 'noSlots'>('idle');
 
-/** Step 3 UX */
+// step 3 validation
 const triedSubmit = ref(false);
 const touched = ref({ name: false, email: false, phone: false });
 
@@ -80,7 +80,8 @@ async function loadSlots() {
     slots.value = Array.isArray(data?.slots) ? data.slots : [];
     durationMin.value = Number(data?.durationMin ?? 0);
 
-    const isClosed = data?.isClosed === true; // optional if backend supports it
+    // optional api field
+    const isClosed = data?.isClosed === true;
     if (isClosed) {
       dayStatus.value = 'closed';
       bookingAny.slot = null;
@@ -516,7 +517,7 @@ function resetAllUX() {
   border-radius: 0 !important;
 }
 
-/* Layout */
+/* layout grid */
 .layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -529,14 +530,14 @@ function resetAllUX() {
   }
 }
 
-/* Panels */
+/* main panels */
 .panel {
   border: 1px solid var(--border);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015));
   padding: var(--innerY) var(--innerX);
 }
 
-/* Header row */
+/* header layout */
 .header-row {
   display: grid;
   grid-template-columns: 1fr;
@@ -571,7 +572,7 @@ function resetAllUX() {
   color: var(--muted);
 }
 
-/* Stepper */
+/* stepper ui */
 .stepper {
   width: 220px;
 }
@@ -611,13 +612,13 @@ function resetAllUX() {
   width: 0;
 }
 
-/* Steps spacing */
+/* step spacing */
 .step {
   padding-top: var(--v4);
   padding-bottom: var(--v4);
 }
 
-/* Services */
+/* service tiles */
 .services-grid {
   display: grid;
   grid-template-columns: 1fr;
@@ -673,7 +674,7 @@ function resetAllUX() {
   color: var(--text);
 }
 
-/* Inline summary */
+/* summary line */
 .inline-summary {
   margin-top: var(--v4);
   padding-top: var(--v3);
@@ -684,7 +685,7 @@ function resetAllUX() {
   color: var(--muted);
 }
 
-/* Two-col panes */
+/* two column */
 .two-col {
   display: grid;
   grid-template-columns: 1fr;
@@ -720,7 +721,7 @@ function resetAllUX() {
   color: var(--muted2);
 }
 
-/* Inputs */
+/* inputs */
 .label {
   display: block;
   margin-bottom: 6px;
@@ -748,7 +749,7 @@ function resetAllUX() {
   color: rgba(252, 165, 165, 0.95);
 }
 
-/* Text helpers */
+/* helpers */
 .hint {
   margin-top: var(--v2);
   font-size: 12px;
@@ -766,7 +767,7 @@ function resetAllUX() {
   font-weight: 750;
 }
 
-/* Alerts */
+/* alerts */
 .alert {
   margin-top: var(--v2);
   border: 1px solid var(--border);
@@ -785,7 +786,7 @@ function resetAllUX() {
   color: rgba(254, 226, 226, 0.95);
 }
 
-/* Times */
+/* slots list */
 .times {
   margin-top: var(--v2);
   display: flex;
@@ -793,7 +794,7 @@ function resetAllUX() {
   gap: var(--v2);
 }
 
-/* Controls */
+/* footer controls */
 .controls {
   padding-top: var(--v3);
   border-top: 1px solid var(--border);
@@ -807,7 +808,7 @@ function resetAllUX() {
   gap: var(--v2);
 }
 
-/* Summary */
+/* right summary */
 .summary-head {
   padding-bottom: var(--v3);
   border-bottom: 1px solid var(--border);
@@ -857,7 +858,7 @@ function resetAllUX() {
   padding-top: 12px;
 }
 
-/* Step 4 */
+/* success step */
 .done-wrap {
   padding-top: var(--v4);
   padding-bottom: var(--v4);

@@ -2,7 +2,6 @@ import type { Request, Response, NextFunction } from 'express';
 import { serviceService } from '../services/serviceService';
 import { createServiceSchema, updateServiceSchema } from '../validation/serviceSchemas';
 
-// Allow req.file (multer) on Request type
 declare module 'express-serve-static-core' {
   interface Request {
     file?: Express.Multer.File;
@@ -43,6 +42,7 @@ export class ServiceController {
     try {
       let imagePath: string | null = null;
       if (req.file) {
+        // derive image path
         imagePath = `/uploads/services/${req.file.filename}`;
       }
 
@@ -80,6 +80,7 @@ export class ServiceController {
 
       let imagePath: string | null | undefined;
       if (req.file) {
+        // derive image path
         imagePath = `/uploads/services/${req.file.filename}`;
       }
 
@@ -88,7 +89,6 @@ export class ServiceController {
         imagePath,
       });
 
-      // Build payload without forcing imagePath to null.
       const payload: any = {
         name: parsed.name,
         duration: parsed.duration,
@@ -96,7 +96,7 @@ export class ServiceController {
         isBooked: parsed.isBooked ?? false,
       };
 
-      // Only override imagePath if a new file was actually uploaded
+      // keep existing image
       if (imagePath !== undefined) {
         payload.imagePath = imagePath;
       }

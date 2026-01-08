@@ -74,7 +74,6 @@ onMounted(load);
 <template>
   <section v-if="hasItems" class="section-block">
     <div class="rounded-2xl overflow-hidden bg-[#0b0e12] shadow-[0_20px_60px_rgba(0,0,0,0.45)]">
-      <!-- Left flexible, right fixed but bigger -->
       <div class="grid grid-cols-1 lg:grid-cols-[1fr_700px]">
         <!-- LEFT -->
         <div class="p-6 sm:p-8">
@@ -104,7 +103,6 @@ onMounted(load);
           <p v-if="loading" class="mt-4 text-xs text-[#C7A47D]/60">Updating…</p>
         </div>
 
-        <!-- RIGHT IMAGE: bigger, no padding, fully visible -->
         <div class="relative hidden lg:flex items-center justify-center bg-black/30">
           <img
             :src="closedImg"
@@ -117,7 +115,6 @@ onMounted(load);
         </div>
       </div>
 
-      <!-- subtle accent -->
       <div class="h-[2px] bg-gradient-to-r from-transparent via-[#C7A47D]/30 to-transparent"></div>
     </div>
   </section>

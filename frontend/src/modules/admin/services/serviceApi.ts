@@ -4,7 +4,7 @@ import api from '@/shared/api/api';
 export interface ServiceDto {
   serviceID: number;
   name: string;
-  imagePath: string | null; // returned from backend
+  imagePath: string | null; 
   duration: number;
   price: number;
   isBooked: boolean;
@@ -27,7 +27,7 @@ export type ServicePayload = CreateServicePayload;
 
 // API CLIENT USING AXIOS + VITE_API_URL
 export class AdminServiceApi {
-  private baseUrl = '/services'; // api.ts adds /api prefix
+  private baseUrl = '/services';
 
   async getAll(): Promise<ServiceDto[]> {
     const res = await api.get<ServiceDto[]>(this.baseUrl);

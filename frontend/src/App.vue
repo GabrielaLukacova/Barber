@@ -22,11 +22,9 @@ const route = useRoute();
 
 /**
  * Hide public navbar/footer on admin pages.
- * Adjust if your admin base path is different.
  */
 const showPublicChrome = computed(() => !route.path.startsWith('/admin'));
 
-// --- Dark mode (class strategy) ---
 const isDark = ref(false);
 
 function applyTheme() {

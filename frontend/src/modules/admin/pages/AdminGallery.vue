@@ -68,6 +68,7 @@ import { computed, onMounted, ref } from 'vue';
 import { AdminGalleryApi, type GalleryImageDto } from '@/modules/admin/api/AdminGalleryApi';
 
 const API_URL = (import.meta.env.VITE_API_URL as string).replace(/\/+$/, '');
+// builds absolute image url
 const fullSrc = (p: string) => `${API_URL}${p.startsWith('/') ? '' : '/'}${p}`;
 
 const loading = ref(false);
@@ -75,6 +76,7 @@ const error = ref<string | null>(null);
 const images = ref<GalleryImageDto[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
+// stable sort by order
 const sorted = computed(() =>
   [...images.value].sort((a, b) => a.sortOrder - b.sortOrder || a.imageID - b.imageID),
 );
@@ -100,6 +102,7 @@ async function onPickFiles(ev: Event) {
   error.value = null;
   try {
     images.value = await AdminGalleryApi.upload(files);
+    // reset input value
     if (fileInput.value) fileInput.value.value = '';
   } catch (e: any) {
     error.value = e?.response?.data?.message ?? e?.message ?? 'Upload failed';
@@ -115,12 +118,14 @@ async function swap(idxA: number, idxB: number) {
   const a = arr[idxA];
   const b = arr[idxB];
 
+  // swap sortOrder values
   await AdminGalleryApi.setSortOrder(a.imageID, b.sortOrder);
   await AdminGalleryApi.setSortOrder(b.imageID, a.sortOrder);
   await refresh();
 }
 
 async function del(id: number) {
+  // confirm destructive action
   if (!confirm('Delete this image?')) return;
 
   loading.value = true;

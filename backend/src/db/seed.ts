@@ -77,12 +77,12 @@ async function main() {
     },
   ]);
 
-  console.log('✅ Seed completed.');
+  console.log('Seed completed.');
 }
 
 main()
   .catch((err) => {
-    console.error('❌ Seed failed:', err);
+    console.error('Seed failed:', err);
     process.exit(1);
   })
   .finally(() => process.exit(0));

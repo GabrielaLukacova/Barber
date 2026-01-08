@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { TimeOffController } from '../controllers/timeOffController';
-// NOTE: Auth temporarily disabled for exam/demo
-// import { requireAdmin } from '../middlewares/authMiddleware';
+import { requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 

@@ -134,6 +134,7 @@ const q = ref('');
 const statusFilter = ref<'BOOKED' | 'CANCELLED' | 'COMPLETED'>('BOOKED');
 
 function toISODateTime(dateISO: string, timeHHMMSS: string) {
+  // normalize time string
   const hhmm = (timeHHMMSS ?? '').slice(0, 5);
   return new Date(`${dateISO}T${hhmm}:00`);
 }
@@ -144,6 +145,7 @@ function isPast(a: AdminAppointmentRow) {
 }
 
 function effectiveStatus(a: AdminAppointmentRow) {
+  // treat past booked
   if (a.status === 'BOOKED' && isPast(a)) return 'COMPLETED';
   return a.status;
 }
@@ -152,7 +154,7 @@ const sorted = computed(() => {
   return [...items.value].sort((a, b) => {
     const ad = toISODateTime(a.appointmentDate, a.startTime).getTime();
     const bd = toISODateTime(b.appointmentDate, b.startTime).getTime();
-    return ad - bd; // earliest -> latest
+    return ad - bd; // earliest first
   });
 });
 
@@ -160,6 +162,7 @@ const filtered = computed(() => {
   const query = q.value.trim().toLowerCase();
 
   return sorted.value.filter((a) => {
+    // filter by status
     if (effectiveStatus(a) !== statusFilter.value) return false;
     if (!query) return true;
 
@@ -186,6 +189,7 @@ async function load() {
 }
 
 async function cancel(a: AdminAppointmentRow) {
+  // cancel then refresh
   try {
     await updateAppointmentStatus(a.appointmentID, 'CANCELLED');
     await load();

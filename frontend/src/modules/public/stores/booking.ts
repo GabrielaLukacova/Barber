@@ -1,11 +1,11 @@
 import { defineStore } from 'pinia';
 
 type State = {
-  step: number; // 1..4
+  step: number; 
   service?: Service;
   barber?: Barber;
-  dateISO?: string; // YYYY-MM-DD
-  slot?: string; // "HH:mm"
+  dateISO?: string; 
+  slot?: string; 
   customerName: string;
   customerEmail: string;
   customerPhone?: string;

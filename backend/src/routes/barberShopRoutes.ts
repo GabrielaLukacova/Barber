@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { BarberShopController } from '../controllers/barberShopController';
-// NOTE: Auth temporarily disabled for exam/demo
-// import { requireAdmin } from '../middlewares/authMiddleware';
+import { requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -33,7 +32,6 @@ router.post('/', BarberShopController.create);
  */
 router.get('/:id', BarberShopController.getOne);
 router.put('/:id', BarberShopController.update);
-// If you really want delete protected, you can re-add requireAdmin here later.
 // router.delete('/:id', requireAdmin, BarberShopController.delete);
 router.delete('/:id', BarberShopController.delete);
 

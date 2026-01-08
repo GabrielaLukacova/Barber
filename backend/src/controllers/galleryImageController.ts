@@ -14,12 +14,12 @@ const BARBER_SHOP_ID = (() => {
 const GALLERY_DIR = path.join(process.cwd(), 'uploads', 'gallery');
 
 function getFiles(req: Request): Express.Multer.File[] {
-  // upload.array('images') should set req.files to an array
+  // multer files array
   const files = (req.files ?? []) as unknown;
 
   if (Array.isArray(files)) return files as Express.Multer.File[];
 
-  // fallback if something ever changes
+  // multer fields shape
   if (files && typeof files === 'object') {
     const dict = files as Record<string, Express.Multer.File[]>;
     return dict.images ?? [];
@@ -29,8 +29,7 @@ function getFiles(req: Request): Express.Multer.File[] {
 }
 
 function getBarberShopId(req: Request): number {
-  // Keep your old behavior: default to env BARBER_SHOP_ID
-  // But if frontend sends barberShopID, accept it (doesn't break old logic).
+  // allow barberShopID override
   const raw = (req.body?.barberShopID ?? '').toString().trim();
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : BARBER_SHOP_ID;
@@ -63,7 +62,7 @@ export class GalleryImageController {
 
       const barberShopID = getBarberShopId(req);
 
-      // append at end (same logic)
+      // append after max sort
       const existing = await db
         .select({ sortOrder: schema.GalleryImage.sortOrder })
         .from(schema.GalleryImage)
@@ -153,6 +152,7 @@ export class GalleryImageController {
           ),
         );
 
+      // remove file from disk
       const filename = path.basename(row.filePath);
       await fs.unlink(path.join(GALLERY_DIR, filename)).catch(() => undefined);
 

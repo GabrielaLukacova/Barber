@@ -1,14 +1,12 @@
 import type { Request, Response, NextFunction } from 'express';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
-import {
-  createOpeningHoursSchema,
-  updateOpeningHoursSchema,
-} from '../validation/openingHoursSchemas';
+import { createOpeningHoursSchema, updateOpeningHoursSchema } from '../validation/openingHoursSchemas';
 
 const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function sortByDay(list: Array<{ dayOfWeek: string }>) {
+  // monday to sunday order
   return [...list].sort((a, b) => DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek));
 }
 

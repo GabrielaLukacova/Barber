@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { OpeningHoursController } from '../controllers/openingHoursController';
-// NOTE: Auth temporarily disabled for exam/demo
-// import { requireAdmin } from '../middlewares/authMiddleware';
+import { requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
@@ -16,7 +15,7 @@ const router = Router();
  *     tags: [OpeningHours]
  */
 router.get('/', OpeningHoursController.getAll);
-router.post('/', OpeningHoursController.create);
+router.post('/', requireAdmin, OpeningHoursController.create);
 
 /**
  * @openapi
@@ -32,7 +31,7 @@ router.post('/', OpeningHoursController.create);
  *     tags: [OpeningHours]
  */
 router.get('/:id', OpeningHoursController.getOne);
-router.put('/:id', OpeningHoursController.update);
-router.delete('/:id', OpeningHoursController.delete);
+router.put('/:id', requireAdmin, OpeningHoursController.update);
+router.delete('/:id', requireAdmin, OpeningHoursController.delete);
 
 export default router;

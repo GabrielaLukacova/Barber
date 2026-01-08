@@ -4,11 +4,10 @@ import { db, schema } from '../db/db';
 import { createBarberShopSchema, updateBarberShopSchema } from '../validation/barberShopSchemas';
 
 async function upsertPostalCode(postalCode: string, city: string) {
-  // Postgres upsert
+  // keep postal code city in sync
   await db
     .insert(schema.PostalCode)
     .values({ postalCode, city })
-    // drizzle pg supports onConflictDoUpdate
     .onConflictDoUpdate({
       target: schema.PostalCode.postalCode,
       set: { city },
@@ -31,10 +30,7 @@ export class BarberShopController {
           description: schema.BarberShop.description,
         })
         .from(schema.BarberShop)
-        .leftJoin(
-          schema.PostalCode,
-          eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode),
-        );
+        .leftJoin(schema.PostalCode, eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode));
 
       res.json(rows);
     } catch (err) {
@@ -78,7 +74,7 @@ export class BarberShopController {
     try {
       const parsed = createBarberShopSchema.parse(req.body);
 
-      // If both provided, update PostalCode table
+      // optional postal code upsert
       if (parsed.postalCode && parsed.city) {
         await upsertPostalCode(parsed.postalCode, parsed.city);
       }
@@ -117,6 +113,7 @@ export class BarberShopController {
 
       const parsed = updateBarberShopSchema.parse(req.body);
 
+      // optional postal code upsert
       if (parsed.postalCode && parsed.city) {
         await upsertPostalCode(parsed.postalCode, parsed.city);
       }

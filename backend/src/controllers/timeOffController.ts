@@ -6,6 +6,7 @@ import { createTimeOffSchema, updateTimeOffSchema } from '../validation/timeOffS
 export class TimeOffController {
   static async getAllFuture(_req: Request, res: Response, next: NextFunction) {
     try {
+      // filter by start >= now
       const nowIso = new Date().toISOString();
 
       const list = await db
@@ -28,6 +29,7 @@ export class TimeOffController {
       const result = await db
         .insert(schema.TimeOff)
         .values({
+          // normalize to iso
           start: new Date(parsed.start).toISOString(),
           end: new Date(parsed.end).toISOString(),
           reason: parsed.reason ?? null,
@@ -59,6 +61,7 @@ export class TimeOffController {
       await db
         .update(schema.TimeOff)
         .set({
+          // normalize to iso
           start: parsed.start ? new Date(parsed.start).toISOString() : undefined,
           end: parsed.end ? new Date(parsed.end).toISOString() : undefined,
           reason: parsed.reason === undefined ? undefined : (parsed.reason ?? null),

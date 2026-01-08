@@ -14,7 +14,6 @@ const AdminLayout = () => import('@/modules/admin/layout/AdminLayout.vue');
 const AdminDashboard = () => import('@/modules/admin/pages/Dashboard.vue');
 const AdminAppointments = () => import('@/modules/admin/pages/Appointments.vue');
 const AdminServices = () => import('@/modules/admin/pages/Services.vue');
-const AdminClients = () => import('@/modules/admin/pages/Clients.vue');
 const AdminGallery = () => import('@/modules/admin/pages/AdminGallery.vue');
 const AdminHours = () => import('@/modules/admin/pages/OpeningHours.vue');
 const AdminTimeOff = () => import('@/modules/admin/pages/TimeOff.vue');
@@ -33,7 +32,6 @@ const routes: RouteRecordRaw[] = [
       { path: '', name: 'admin-dashboard', component: AdminDashboard },
       { path: 'appointments', name: 'admin-appointments', component: AdminAppointments },
       { path: 'services', name: 'admin-services', component: AdminServices },
-      { path: 'clients', name: 'admin-clients', component: AdminClients },
       { path: 'gallery', name: 'admin-gallery', component: AdminGallery },
       { path: 'shop', name: 'admin-shop', component: AdminBarberShop },
       { path: 'hours', name: 'admin-hours', component: AdminHours },
@@ -50,7 +48,6 @@ const router = createRouter({
   scrollBehavior: () => ({ top: 0 }),
 });
 
-// Admin guard
 router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth) {
     const auth = useAuthStore();

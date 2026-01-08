@@ -17,10 +17,12 @@ export class AuthController {
     try {
       const { username, password } = req.body;
 
+      // payload guard
       if (!username || !password) {
         return res.status(400).json({ error: 'Username and password are required' });
       }
 
+      // admin account
       if (username !== ADMIN_USERNAME) {
         return res.status(401).json({ error: 'Invalid username or password' });
       }
@@ -30,6 +32,7 @@ export class AuthController {
         return res.status(401).json({ error: 'Invalid username or password' });
       }
 
+      // jwt subject and role
       const payload = { sub: username, role: 'admin' };
 
       const token = jwt.sign(payload, JWT_SECRET, {
