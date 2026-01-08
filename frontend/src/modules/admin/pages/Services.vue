@@ -6,7 +6,7 @@
         <p class="admin-subtitle">Manage services (name, image, duration, price).</p>
       </div>
 
-      <button type="button" class="admin-btn admin-btn--accent" @click="openCreate">
+      <button type="button" class="admin-btn admin-btn--accent admin-btn--accent-fix" @click="openCreate">
         + New service
       </button>
     </header>
@@ -73,25 +73,31 @@
       class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4"
     >
       <div
-        class="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white shadow-xl p-6 space-y-4"
+        class="w-full max-w-lg rounded-2xl border border-white/10 bg-[#141923] shadow-xl p-6 space-y-4"
+        style="color: var(--text)"
       >
         <header class="flex items-center justify-between">
-          <h2 class="text-lg font-bold text-black">
+          <h2 class="text-lg font-bold" style="color: var(--text)">
             {{ formMode === 'create' ? 'Add service' : 'Edit service' }}
           </h2>
-          <button type="button" class="text-zinc-600 hover:text-zinc-900" @click="closeForm">
+          <button
+            type="button"
+            class="hover:opacity-80"
+            style="color: rgba(242, 244, 247, 0.8)"
+            @click="closeForm"
+          >
             ✕
           </button>
         </header>
 
         <form class="space-y-4" @submit.prevent="onSubmit">
           <div class="space-y-2">
-            <label class="admin-label">Name</label>
+            <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)">Name</label>
             <input v-model="form.name" type="text" class="admin-input" required />
           </div>
 
           <div class="space-y-2">
-            <label class="admin-label">Image</label>
+            <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)">Image</label>
             <input
               type="file"
               accept="image/*"
@@ -99,7 +105,7 @@
               @change="onImageChange"
               class="admin-input"
             />
-            <p class="admin-help">
+            <p class="admin-help" style="color: rgba(242, 244, 247, 0.72)">
               {{
                 formMode === 'create'
                   ? 'Image is required.'
@@ -110,7 +116,9 @@
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div class="space-y-2">
-              <label class="admin-label">Duration (minutes)</label>
+              <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)"
+                >Duration (minutes)</label
+              >
               <input
                 v-model.number="form.duration"
                 type="number"
@@ -120,7 +128,9 @@
               />
             </div>
             <div class="space-y-2">
-              <label class="admin-label">Price (DKK)</label>
+              <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)"
+                >Price (DKK)</label
+              >
               <input
                 v-model.number="form.price"
                 type="number"
@@ -131,14 +141,18 @@
             </div>
           </div>
 
-          <label class="inline-flex items-center gap-2 text-sm text-zinc-800">
-            <input v-model="form.isBooked" type="checkbox" class="h-4 w-4" />
-            <span>Marked as booked by default</span>
-          </label>
+          <!-- removed: Marked as booked by default -->
 
           <div class="flex justify-end gap-2 pt-2">
             <button type="button" class="admin-btn" @click="closeForm">Cancel</button>
-            <button type="submit" class="admin-btn admin-btn--accent" :disabled="saving">
+
+            <!-- force readable hover + text -->
+            <button
+              type="submit"
+              class="admin-btn admin-btn--accent"
+              :disabled="saving"
+              style="color: #111827"
+            >
               {{ saving ? 'Saving…' : formMode === 'create' ? 'Create' : 'Save changes' }}
             </button>
           </div>

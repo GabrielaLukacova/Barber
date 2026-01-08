@@ -52,7 +52,7 @@
           </tr>
 
           <tr v-else v-for="a in filtered" :key="a.appointmentID">
-            <td class="whitespace-nowrap text-zinc-900 font-semibold">
+            <td class="whitespace-nowrap" style="color: #000">
               {{ a.appointmentDate }}
             </td>
 

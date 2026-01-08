@@ -23,9 +23,9 @@
       <div
         v-for="(img, idx) in sorted"
         :key="img.imageID"
-        class="rounded-2xl border border-zinc-200 bg-white overflow-hidden shadow-sm"
+        class="!rounded-none border border-zinc-200 bg-white overflow-hidden shadow-sm"
       >
-        <div class="aspect-square bg-zinc-100">
+        <div class="aspect-square bg-zinc-100 !rounded-none">
           <img :src="fullSrc(img.filePath)" class="w-full h-full object-cover" alt="" />
         </div>
 

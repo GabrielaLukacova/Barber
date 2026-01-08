@@ -275,6 +275,7 @@ async function saveRow(r: UiRow) {
     r.dirty = false;
 
     setSuccess();
+    await load();
   } catch (e: any) {
     const msg = e?.response?.data?.errors?.fieldErrors
       ? Object.entries(e.response.data.errors.fieldErrors)
@@ -315,12 +316,21 @@ onMounted(load);
 
 <template>
   <div class="admin-page">
-    <header>
-      <h1 class="admin-title">Special hours</h1>
-      <p class="admin-subtitle">
-        Create announcements like holiday closures or adjusted hours. These show on the public site
-        only when added.
-      </p>
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="admin-title">Special hours</h1>
+        <p class="admin-subtitle">
+          Create announcements like holiday closures or adjusted hours. These show on the public site only
+          when added.
+        </p>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button type="button" class="admin-btn admin-btn--accent" @click="addRow">
+          Add special hours
+        </button>
+        <button type="button" class="admin-btn" :disabled="loading" @click="load">Refresh</button>
+      </div>
     </header>
 
     <div v-if="globalError" class="admin-alert admin-alert--error">{{ globalError }}</div>
@@ -328,27 +338,19 @@ onMounted(load);
     <div v-if="loading" class="admin-alert">Loading…</div>
 
     <div v-else class="space-y-4">
-      <div class="flex items-center justify-between gap-3">
-        <button type="button" class="admin-btn admin-btn--primary" @click="addRow">
-          Add special hours
-        </button>
-
-        <button type="button" class="admin-btn" :disabled="loading" @click="load">Refresh</button>
+      <div v-if="!hasAny" class="admin-surface">
+        <p class="admin-help" style="color: var(--admin-muted)">No upcoming announcements.</p>
       </div>
 
-      <div v-if="!hasAny" class="admin-card">
-        <p class="text-sm text-zinc-300">No upcoming announcements.</p>
-      </div>
-
-      <div v-else class="admin-card overflow-x-auto">
-        <table class="min-w-[980px] w-full text-sm">
+      <div v-else class="admin-table-wrap">
+        <table class="admin-table" style="min-width: 980px">
           <thead>
-            <tr class="text-left text-zinc-300 border-b border-white/10">
-              <th class="py-3 pr-3 w-[180px]">Type</th>
-              <th class="py-3 pr-3">Details</th>
-              <th class="py-3 pr-3">Reason</th>
-              <th class="py-3 pr-3 w-[240px]">Preview</th>
-              <th class="py-3 w-[220px]">Actions</th>
+            <tr>
+              <th class="text-left w-[180px]">Type</th>
+              <th class="text-left">Details</th>
+              <th class="text-left">Reason</th>
+              <th class="text-left w-[240px]">Preview</th>
+              <th class="text-left w-[220px]">Actions</th>
             </tr>
           </thead>
 
@@ -356,43 +358,44 @@ onMounted(load);
             <tr
               v-for="(r, idx) in rows"
               :key="r.timeOffID ?? `new-${idx}`"
-              class="border-b border-white/10"
+              :style="r.dirty ? 'background: rgba(199,164,125,0.06)' : ''"
             >
-              <td class="py-3 pr-3 align-top">
-                <select v-model="r.mode" class="admin-input w-full" @change="markDirty(r)">
+              <td class="align-top">
+                <select v-model="r.mode" class="admin-select" @change="markDirty(r)">
                   <option value="DAY">Closed (1 day)</option>
                   <option value="RANGE">Holiday (multiple days)</option>
                   <option value="HOURS">Adjusted hours</option>
                 </select>
               </td>
 
-              <td class="py-3 pr-3 align-top">
+              <td class="align-top">
                 <div v-if="r.mode === 'DAY'" class="space-y-2">
-                  <label class="block text-xs text-zinc-400">Date</label>
-                  <input
-                    v-model="r.date"
-                    type="date"
-                    class="admin-input w-full"
-                    @input="markDirty(r)"
-                  />
+                  <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                    >Date</label
+                  >
+                  <input v-model="r.date" type="date" class="admin-input" @input="markDirty(r)" />
                 </div>
 
                 <div v-else-if="r.mode === 'RANGE'" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div class="space-y-2">
-                    <label class="block text-xs text-zinc-400">Start date</label>
+                    <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                      >Start date</label
+                    >
                     <input
                       v-model="r.startDate"
                       type="date"
-                      class="admin-input w-full"
+                      class="admin-input"
                       @input="markDirty(r)"
                     />
                   </div>
                   <div class="space-y-2">
-                    <label class="block text-xs text-zinc-400">End date</label>
+                    <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                      >End date</label
+                    >
                     <input
                       v-model="r.endDate"
                       type="date"
-                      class="admin-input w-full"
+                      class="admin-input"
                       @input="markDirty(r)"
                     />
                   </div>
@@ -400,59 +403,69 @@ onMounted(load);
 
                 <div v-else class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   <div class="space-y-2">
-                    <label class="block text-xs text-zinc-400">Date</label>
+                    <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                      >Date</label
+                    >
                     <input
                       v-model="r.hoursDate"
                       type="date"
-                      class="admin-input w-full"
+                      class="admin-input"
                       @input="markDirty(r)"
                     />
                   </div>
                   <div class="space-y-2">
-                    <label class="block text-xs text-zinc-400">From</label>
+                    <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                      >From</label
+                    >
                     <input
                       v-model="r.startTime"
                       type="time"
-                      class="admin-input w-full"
+                      class="admin-input"
                       @input="markDirty(r)"
                     />
                   </div>
                   <div class="space-y-2">
-                    <label class="block text-xs text-zinc-400">To</label>
+                    <label class="admin-label" style="font-size: 0.75rem; color: var(--admin-muted)"
+                      >To</label
+                    >
                     <input
                       v-model="r.endTime"
                       type="time"
-                      class="admin-input w-full"
+                      class="admin-input"
                       @input="markDirty(r)"
                     />
                   </div>
                 </div>
 
-                <p v-if="r.error" class="mt-2 text-xs text-red-300">{{ r.error }}</p>
+                <p v-if="r.error" class="mt-2" style="font-size: 0.75rem; color: #b91c1c">
+                  {{ r.error }}
+                </p>
               </td>
 
-              <td class="py-3 pr-3 align-top">
+              <td class="align-top">
                 <input
                   v-model="r.reason"
                   type="text"
-                  class="admin-input w-full"
+                  class="admin-input"
                   placeholder="Optional (e.g. Christmas holiday)"
                   @input="markDirty(r)"
                 />
-                <p class="mt-2 text-xs text-zinc-400">
+                <p class="admin-help mt-2" style="color: var(--admin-muted)">
                   Optional. If empty, only the dates will show.
                 </p>
               </td>
 
-              <td class="py-3 pr-3 align-top">
-                <p class="text-sm text-zinc-200">{{ formatPreview(r) }}</p>
+              <td class="align-top">
+                <p style="color: var(--admin-text); font-weight: 600">
+                  {{ formatPreview(r) }}
+                </p>
               </td>
 
-              <td class="py-3 align-top">
+              <td class="align-top">
                 <div class="flex items-center gap-2">
                   <button
                     type="button"
-                    class="admin-btn admin-btn--primary"
+                    class="admin-btn admin-btn--accent"
                     :disabled="r.saving || r.deleting || !r.dirty"
                     @click="saveRow(r)"
                   >
@@ -474,7 +487,7 @@ onMounted(load);
         </table>
       </div>
 
-      <p class="text-xs text-zinc-400">
+      <p class="admin-help" style="color: var(--admin-muted)">
         Dates/times are entered in your local timezone and stored as ISO timestamps.
       </p>
     </div>

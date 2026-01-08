@@ -27,9 +27,13 @@
         </p>
 
         <div class="mt-8 flex items-center justify-center">
-          <RouterLink to="/booking" class="btn btn-primary text-base sm:text-lg px-12 py-4">
+          <button
+            type="button"
+            class="btn btn-primary text-base sm:text-lg px-12 py-4"
+            @click="scrollToBooking"
+          >
             BOOK NOW
-          </RouterLink>
+          </button>
         </div>
       </div>
     </div>
@@ -37,7 +41,6 @@
 </template>
 
 <script setup lang="ts">
-import { RouterLink } from 'vue-router';
 import { computed, onMounted, ref } from 'vue';
 import axios from 'axios';
 import heroImage from '@/assets/hero.jpg';
@@ -46,7 +49,7 @@ interface BarberShopDto {
   barberShopID: number;
   name: string;
   city: string | null;
-  description: string | null; // ✅ add this
+  description: string | null;
 }
 
 const shop = ref<BarberShopDto | null>(null);
@@ -58,6 +61,10 @@ const heroDescription = computed(() => {
   const d = shop.value?.description?.trim();
   return d && d.length > 0 ? d : 'Looking your best never goes out of style.';
 });
+
+function scrollToBooking() {
+  document.getElementById('booking')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 async function loadShop() {
   try {
