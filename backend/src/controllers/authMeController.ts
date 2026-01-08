@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
 export const AuthMeController = {
