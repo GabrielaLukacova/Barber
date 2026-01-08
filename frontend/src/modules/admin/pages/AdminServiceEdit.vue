@@ -104,7 +104,7 @@
 </template>
 
 <script setup lang="ts">
-import { getImageUrl } from "../../../shared/utils/getImageUrl";
+import { getImageUrl } from '../../../shared/utils/getImageUrl';
 import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useServiceStore } from '../stores/serviceStore';

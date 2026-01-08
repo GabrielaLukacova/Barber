@@ -10,7 +10,6 @@ import BookingSection from '../../modules/public/sections/BookingSection.vue';
 import OpeningHoursSection from '../../modules/public/sections/OpeningHoursSection.vue';
 import TimeOffSection from '../../modules/public/sections/TimeOffSection.vue';
 
-
 vi.mock('../../shared/api/barberApi', () => ({
   fetchServices: vi.fn(async () => []),
   fetchBarbers: vi.fn(async () => []),

@@ -1,5 +1,5 @@
 import api from './api';
-import { getImageUrl } from "../utils/getImageUrl";
+import { getImageUrl } from '../utils/getImageUrl';
 import type { Service, Barber, AvailabilityResponse, AppointmentInput } from '@/types';
 
 // /services -> map backend DTO to public Service type

@@ -149,7 +149,7 @@
 </template>
 
 <script setup lang="ts">
-import { getImageUrl } from "../../../shared/utils/getImageUrl";
+import { getImageUrl } from '../../../shared/utils/getImageUrl';
 import { ref, onMounted } from 'vue';
 import {
   fetchServices,
@@ -162,7 +162,6 @@ import {
 
 // Backend base for images (admin panel)
 const backendBase = 'https://barber-backend-b77j.onrender.com';
-
 
 const services = ref<Service[]>([]);
 const loading = ref(false);

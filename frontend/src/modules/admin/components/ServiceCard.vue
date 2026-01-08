@@ -3,7 +3,11 @@
     class="border rounded-xl overflow-hidden bg-white shadow-sm hover:shadow-md transition-shadow flex flex-col"
   >
     <div v-if="service.imagePath" class="h-40 overflow-hidden bg-gray-100">
-      <img :src="getImageUrl(service.imagePath)" :alt="service.name" class="w-full h-full object-cover" />
+      <img
+        :src="getImageUrl(service.imagePath)"
+        :alt="service.name"
+        class="w-full h-full object-cover"
+      />
     </div>
     <div v-else class="h-40 flex items-center justify-center bg-gray-100 text-xs text-gray-400">
       No image
@@ -21,7 +25,7 @@
 </template>
 
 <script setup lang="ts">
-import { getImageUrl } from "../../../shared/utils/getImageUrl";
+import { getImageUrl } from '../../../shared/utils/getImageUrl';
 export interface PublicService {
   serviceID: number;
   name: string;

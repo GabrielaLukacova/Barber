@@ -1,12 +1,11 @@
 <script setup lang="ts">
-import { getImageUrl } from "../../../shared/utils/getImageUrl";
+import { getImageUrl } from '../../../shared/utils/getImageUrl';
 import { onMounted, computed } from 'vue';
 import { useServicesStore } from '@/stores/services';
 
 const servicesStore = useServicesStore();
 
 const apiBaseUrl = import.meta.env.VITE_API_URL;
-
 
 function formatPrice(price: number) {
   return `${price} kr`;
