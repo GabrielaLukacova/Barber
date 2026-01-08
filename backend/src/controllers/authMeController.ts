@@ -1,7 +1,7 @@
 import type { Response } from 'express';
 import { AuthRequest } from '../middlewares/authMiddleware';
 
-export const AuthMeController = {
+export const authMeController = {
   me(req: AuthRequest, res: Response) {
     if (!req.user) {
       return res.status(401).json({ message: 'Unauthorized' });
