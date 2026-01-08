@@ -1,4 +1,4 @@
-import api from '@/services/api';
+import api from '@/shared/api/api';
 
 export type AdminAppointmentRow = {
   appointmentID: number;

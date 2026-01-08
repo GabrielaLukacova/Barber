@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import type { Barber } from '@/types';
-import { fetchBarbers } from '@/services/barberApi';
+import { fetchBarbers } from '@/shared/api/barberApi';
 
 export const useBarbersStore = defineStore('barbers', {
   state: () => ({
