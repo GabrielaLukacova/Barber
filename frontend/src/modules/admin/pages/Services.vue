@@ -46,7 +46,7 @@
               </div>
             </td>
 
-            <td class="font-semibold text-zinc-900">{{ svc.name }}</td>
+            <td class="font-regular" style="color:#000 !important;">{{ svc.name }}</td>
             <td class="text-zinc-800">{{ svc.duration }}</td>
             <td class="text-zinc-800">{{ formatPrice(svc.price) }}</td>
 
