@@ -1,15 +1,9 @@
 // backend/src/app.ts
-import express, { Request, Response, NextFunction } from 'express';
 import { errorHandler } from './middlewares/errorHandler';
-import cors from 'cors';
 import { errorHandler } from './middlewares/errorHandler';
-import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './middlewares/errorHandler';
-import routes from './routes/index';
 import { errorHandler } from './middlewares/errorHandler';
-import { swaggerSpec } from './config/swagger';
 import { errorHandler } from './middlewares/errorHandler';
-import path from 'node:path'; // ✅ len presunuté hore (namiesto importu uprostred)
 import { errorHandler } from './middlewares/errorHandler';
 
 const app = express();
