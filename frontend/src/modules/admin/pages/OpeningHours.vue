@@ -35,7 +35,7 @@
 
         <tbody>
           <tr v-for="row in rows" :key="row.openingHoursID">
-            <td class="font-semibold text-zinc-900">{{ row.dayOfWeek }}</td>
+            <td class="font-semibold" style="color: var(--admin-text)">{{ row.dayOfWeek }}</td>
 
             <td>
               <input
