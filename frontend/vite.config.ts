@@ -10,10 +10,15 @@ export default defineConfig({
     },
   },
   server: {
-    port: 5178, // or whatever Vite is using, doesn't really matter
+    port: 5173,
+    strictPort: true,
     proxy: {
       '/api': {
-        target: 'http://localhost:3000', // your backend
+        target: 'http://localhost:5180',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://localhost:5180',
         changeOrigin: true,
       },
     },
