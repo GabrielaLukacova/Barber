@@ -251,4 +251,4 @@ export class ConfigModels {
   }
 }
 
-export const configModels = new ConfigModels();
+export const configModel = new ConfigModels();

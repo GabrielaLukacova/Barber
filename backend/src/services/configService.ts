@@ -1,79 +1,79 @@
 import {
-  configModels,
+  configModel,
   type OpeningHoursInput,
   type TimeOffInput,
   type BarberShopInput,
   type PostalCodeInput
-} from '../models/configModels';
+} from '../models/configModel';
 
 export class ConfigService {
   // OpeningHours
   listOpeningHours() {
-    return configModels.listOpeningHours();
+    return configModel.listOpeningHours();
   }
   getOpeningHours(id: number) {
-    return configModels.getOpeningHours(id);
+    return configModel.getOpeningHours(id);
   }
   createOpeningHours(input: OpeningHoursInput) {
-    return configModels.createOpeningHours(input);
+    return configModel.createOpeningHours(input);
   }
   updateOpeningHours(id: number, input: OpeningHoursInput) {
-    return configModels.updateOpeningHours(id, input);
+    return configModel.updateOpeningHours(id, input);
   }
   deleteOpeningHours(id: number) {
-    return configModels.deleteOpeningHours(id);
+    return configModel.deleteOpeningHours(id);
   }
 
   // TimeOff
   listTimeOff() {
-    return configModels.listTimeOff();
+    return configModel.listTimeOff();
   }
   getTimeOff(id: number) {
-    return configModels.getTimeOff(id);
+    return configModel.getTimeOff(id);
   }
   createTimeOff(input: TimeOffInput) {
-    return configModels.createTimeOff(input);
+    return configModel.createTimeOff(input);
   }
   updateTimeOff(id: number, input: TimeOffInput) {
-    return configModels.updateTimeOff(id, input);
+    return configModel.updateTimeOff(id, input);
   }
   deleteTimeOff(id: number) {
-    return configModels.deleteTimeOff(id);
+    return configModel.deleteTimeOff(id);
   }
 
   // BarberShop
   listBarberShops() {
-    return configModels.listBarberShops();
+    return configModel.listBarberShops();
   }
   getBarberShop(id: number) {
-    return configModels.getBarberShop(id);
+    return configModel.getBarberShop(id);
   }
   createBarberShop(input: BarberShopInput) {
-    return configModels.createBarberShop(input);
+    return configModel.createBarberShop(input);
   }
   updateBarberShop(id: number, input: BarberShopInput) {
-    return configModels.updateBarberShop(id, input);
+    return configModel.updateBarberShop(id, input);
   }
   deleteBarberShop(id: number) {
-    return configModels.deleteBarberShop(id);
+    return configModel.deleteBarberShop(id);
   }
 
 
   // PostalCode
   listPostalCodes() {
-    return configModels.listPostalCodes();
+    return configModel.listPostalCodes();
   }
   getPostalCode(code: string) {
-    return configModels.getPostalCode(code);
+    return configModel.getPostalCode(code);
   }
   createPostalCode(input: PostalCodeInput) {
-    return configModels.createPostalCode(input);
+    return configModel.createPostalCode(input);
   }
   updatePostalCode(code: string, input: PostalCodeInput) {
-    return configModels.updatePostalCode(code, input);
+    return configModel.updatePostalCode(code, input);
   }
   deletePostalCode(code: string) {
-    return configModels.deletePostalCode(code);
+    return configModel.deletePostalCode(code);
   }
 }
 
