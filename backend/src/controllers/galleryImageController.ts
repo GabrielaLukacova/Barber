@@ -10,7 +10,31 @@ const BARBER_SHOP_ID = (() => {
   const n = Number(raw);
   return Number.isFinite(n) && n > 0 ? n : 4;
 })();
+
 const GALLERY_DIR = path.join(process.cwd(), 'uploads', 'gallery');
+
+function getFiles(req: Request): Express.Multer.File[] {
+  // upload.array('images') should set req.files to an array
+  const files = (req.files ?? []) as unknown;
+
+  if (Array.isArray(files)) return files as Express.Multer.File[];
+
+  // fallback if something ever changes
+  if (files && typeof files === 'object') {
+    const dict = files as Record<string, Express.Multer.File[]>;
+    return dict.images ?? [];
+  }
+
+  return [];
+}
+
+function getBarberShopId(req: Request): number {
+  // Keep your old behavior: default to env BARBER_SHOP_ID
+  // But if frontend sends barberShopID, accept it (doesn't break old logic).
+  const raw = (req.body?.barberShopID ?? '').toString().trim();
+  const n = Number(raw);
+  return Number.isFinite(n) && n > 0 ? n : BARBER_SHOP_ID;
+}
 
 export class GalleryImageController {
   static async getAll(_req: Request, res: Response, next: NextFunction) {
@@ -29,20 +53,27 @@ export class GalleryImageController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      const files = (req.files as Express.Multer.File[]) ?? [];
-      if (!files.length) return res.status(400).json({ error: 'No files uploaded' });
+      const files = getFiles(req);
+      if (!files.length) {
+        return res.status(400).json({
+          error: 'No files uploaded',
+          message: "Expected multipart field name 'images' (upload.array('images', ...)).",
+        });
+      }
 
-      // append at end
+      const barberShopID = getBarberShopId(req);
+
+      // append at end (same logic)
       const existing = await db
         .select({ sortOrder: schema.GalleryImage.sortOrder })
         .from(schema.GalleryImage)
-        .where(eq(schema.GalleryImage.barberShopID, BARBER_SHOP_ID));
+        .where(eq(schema.GalleryImage.barberShopID, barberShopID));
 
       const maxSort = existing.reduce((m, r) => Math.max(m, r.sortOrder ?? 0), 0);
       let nextSort = maxSort + 1;
 
       const values = files.map((f) => ({
-        barberShopID: BARBER_SHOP_ID,
+        barberShopID,
         filePath: `/uploads/gallery/${f.filename}`,
         sortOrder: nextSort++,
       }));
@@ -52,7 +83,7 @@ export class GalleryImageController {
       const rows = await db
         .select()
         .from(schema.GalleryImage)
-        .where(eq(schema.GalleryImage.barberShopID, BARBER_SHOP_ID))
+        .where(eq(schema.GalleryImage.barberShopID, barberShopID))
         .orderBy(asc(schema.GalleryImage.sortOrder), asc(schema.GalleryImage.imageID));
 
       res.status(201).json(rows);
