@@ -1,7 +1,15 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 import { db, schema } from '../db/db';
 
-const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] as const;
+const DAY_NAMES = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+] as const;
 
 function toMinutes(hhmm: string) {
   const [h, m] = hhmm.split(':').map((x) => Number(x));
@@ -47,7 +55,12 @@ export async function getAvailableSlots(params: {
   const appts = await db
     .select({ startTime: schema.Appointment.startTime, endTime: schema.Appointment.endTime })
     .from(schema.Appointment)
-    .where(and(eq(schema.Appointment.appointmentDate, params.dateISO), eq(schema.Appointment.status, 'BOOKED')));
+    .where(
+      and(
+        eq(schema.Appointment.appointmentDate, params.dateISO),
+        eq(schema.Appointment.status, 'BOOKED'),
+      ),
+    );
 
   const busyRanges = appts.map((a: any) => ({
     start: toMinutes(String(a.startTime).slice(0, 5)),
@@ -65,8 +78,14 @@ export async function getAvailableSlots(params: {
   const offRanges = timeOff.map((t: any) => {
     const start = new Date(t.start);
     const end = new Date(t.end);
-    const startMin = start.toISOString().slice(0, 10) === params.dateISO ? toMinutes(start.toISOString().slice(11, 16)) : 0;
-    const endMin = end.toISOString().slice(0, 10) === params.dateISO ? toMinutes(end.toISOString().slice(11, 16)) : 24 * 60;
+    const startMin =
+      start.toISOString().slice(0, 10) === params.dateISO
+        ? toMinutes(start.toISOString().slice(11, 16))
+        : 0;
+    const endMin =
+      end.toISOString().slice(0, 10) === params.dateISO
+        ? toMinutes(end.toISOString().slice(11, 16))
+        : 24 * 60;
     return { start: startMin, end: endMin };
   });
 
@@ -103,7 +122,7 @@ export async function createPublicBooking(params: {
   if (!services.length) throw new Error('Selected services not found');
 
   const durationMin = services.reduce((sum, s: any) => sum + (s.duration ?? 0), 0);
-  const totalPriceCents = services.reduce((sum, s: any) => sum + ((s.price ?? 0) * 100), 0);
+  const totalPriceCents = services.reduce((sum, s: any) => sum + (s.price ?? 0) * 100, 0);
 
   const startMin = toMinutes(params.startTimeHHMM);
   const dayName = DAY_NAMES[new Date(params.dateISO + 'T00:00:00').getDay()];
@@ -119,7 +138,8 @@ export async function createPublicBooking(params: {
   const closeMin = toMinutes(String(oh.closingTime).slice(0, 5));
   const endMin = startMin + durationMin;
 
-  if (startMin < openMin || endMin > closeMin) throw new Error('Selected time is outside opening hours');
+  if (startMin < openMin || endMin > closeMin)
+    throw new Error('Selected time is outside opening hours');
 
   const startTime = params.startTimeHHMM + ':00';
   const endTime = fromMinutes(endMin) + ':00';
@@ -186,16 +206,14 @@ export async function createPublicBooking(params: {
 
   const appointmentID = (insertedAppt[0] as any)?.appointmentID as number;
 
-  await db
-    .insert(schema.AppointmentService)
-    .values(
-      services.map((s: any) => ({
-        appointmentID,
-        serviceID: s.serviceID,
-        price: s.price ?? 0,
-        duration: s.duration ?? 0,
-      })),
-    );
+  await db.insert(schema.AppointmentService).values(
+    services.map((s: any) => ({
+      appointmentID,
+      serviceID: s.serviceID,
+      price: s.price ?? 0,
+      duration: s.duration ?? 0,
+    })),
+  );
 
   return { appointmentID };
 }

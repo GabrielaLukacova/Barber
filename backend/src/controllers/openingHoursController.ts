@@ -6,20 +6,10 @@ import {
   updateOpeningHoursSchema,
 } from '../validation/openingHoursSchemas';
 
-const DAY_ORDER = [
-  'Monday',
-  'Tuesday',
-  'Wednesday',
-  'Thursday',
-  'Friday',
-  'Saturday',
-  'Sunday',
-];
+const DAY_ORDER = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 function sortByDay(list: Array<{ dayOfWeek: string }>) {
-  return [...list].sort(
-    (a, b) => DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek),
-  );
+  return [...list].sort((a, b) => DAY_ORDER.indexOf(a.dayOfWeek) - DAY_ORDER.indexOf(b.dayOfWeek));
 }
 
 export class OpeningHoursController {
@@ -58,7 +48,6 @@ export class OpeningHoursController {
 
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
-      
       const parsed = createOpeningHoursSchema.parse(req.body);
 
       const result = await db

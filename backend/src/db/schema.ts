@@ -23,9 +23,7 @@ export const BarberShop = pgTable('BarberShop', {
   phoneNumber: varchar('phoneNumber', { length: 15 }),
   email: varchar('email', { length: 100 }),
   street: varchar('street', { length: 100 }),
-  postalCode: varchar('postalCode', { length: 4 }).references(
-    () => PostalCode.postalCode
-  ),
+  postalCode: varchar('postalCode', { length: 4 }).references(() => PostalCode.postalCode),
   description: text('description'),
 });
 

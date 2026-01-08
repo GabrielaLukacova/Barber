@@ -24,19 +24,12 @@ export interface ServiceUpdateInput {
 
 class ServiceModel {
   async findAll(): Promise<ServiceRow[]> {
-    const rows = await db
-      .select()
-      .from(Service)
-      .orderBy(desc(Service.serviceID));
+    const rows = await db.select().from(Service).orderBy(desc(Service.serviceID));
     return rows;
   }
 
   async findById(id: number): Promise<ServiceRow | undefined> {
-    const rows = await db
-      .select()
-      .from(Service)
-      .where(eq(Service.serviceID, id))
-      .limit(1);
+    const rows = await db.select().from(Service).where(eq(Service.serviceID, id)).limit(1);
 
     return rows[0];
   }
@@ -81,9 +74,7 @@ class ServiceModel {
 
   async delete(id: number): Promise<void> {
     // 1) delete dependent AppointmentService rows to avoid FK errors
-    await db
-      .delete(AppointmentService)
-      .where(eq(AppointmentService.serviceID, id));
+    await db.delete(AppointmentService).where(eq(AppointmentService.serviceID, id));
 
     // 2) delete the Service row
     await db.delete(Service).where(eq(Service.serviceID, id));

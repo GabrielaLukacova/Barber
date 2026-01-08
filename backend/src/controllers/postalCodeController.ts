@@ -1,10 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
-import {
-  createPostalCodeSchema,
-  updatePostalCodeSchema,
-} from '../validation/postalCodeSchemas';
+import { createPostalCodeSchema, updatePostalCodeSchema } from '../validation/postalCodeSchemas';
 
 export class PostalCodeController {
   static async getAll(_req: Request, res: Response, next: NextFunction) {
@@ -94,10 +91,7 @@ export class PostalCodeController {
       const code = req.params.code;
       if (!code) return res.status(400).json({ error: 'postalCode is required' });
 
-      await db
-        .delete(schema.PostalCode)
-        .where(eq(schema.PostalCode.postalCode, code))
-        .execute();
+      await db.delete(schema.PostalCode).where(eq(schema.PostalCode.postalCode, code)).execute();
 
       res.json({ success: true });
     } catch (err) {

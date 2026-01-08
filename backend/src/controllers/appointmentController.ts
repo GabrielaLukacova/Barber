@@ -55,8 +55,14 @@ export class AppointmentController {
         })
         .from(schema.Appointment)
         .leftJoin(schema.Client, eq(schema.Client.clientID, schema.Appointment.clientID))
-        .leftJoin(schema.AppointmentService, eq(schema.AppointmentService.appointmentID, schema.Appointment.appointmentID))
-        .leftJoin(schema.Service, eq(schema.Service.serviceID, schema.AppointmentService.serviceID));
+        .leftJoin(
+          schema.AppointmentService,
+          eq(schema.AppointmentService.appointmentID, schema.Appointment.appointmentID),
+        )
+        .leftJoin(
+          schema.Service,
+          eq(schema.Service.serviceID, schema.AppointmentService.serviceID),
+        );
 
       const map = new Map<number, any>();
 
@@ -75,7 +81,12 @@ export class AppointmentController {
             lastName: r.lastName ?? null,
             email: r.email ?? null,
             phoneNumber: r.phoneNumber ?? null,
-            services: [] as Array<{ serviceID: number; name: string; duration: number; price: number }>,
+            services: [] as Array<{
+              serviceID: number;
+              name: string;
+              duration: number;
+              price: number;
+            }>,
           });
         }
 
@@ -142,9 +153,9 @@ export class AppointmentController {
         })
         .execute();
 
-      const insertId = (Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId) as
-        | number
-        | undefined;
+      const insertId = (
+        Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
+      ) as number | undefined;
 
       if (!insertId) {
         return res.status(201).json({ success: true });

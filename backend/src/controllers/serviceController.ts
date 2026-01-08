@@ -63,9 +63,7 @@ export class ServiceController {
     } catch (err: any) {
       if (err?.name === 'ZodError') {
         const issues = err.issues?.map((i: any) => i.message) ?? [];
-        return res
-          .status(400)
-          .json({ error: 'Validation error', details: issues });
+        return res.status(400).json({ error: 'Validation error', details: issues });
       }
 
       console.error('ServiceController.create error:', err);
@@ -109,9 +107,7 @@ export class ServiceController {
     } catch (err: any) {
       if (err?.name === 'ZodError') {
         const issues = err.issues?.map((i: any) => i.message) ?? [];
-        return res
-          .status(400)
-          .json({ error: 'Validation error', details: issues });
+        return res.status(400).json({ error: 'Validation error', details: issues });
       }
 
       console.error('ServiceController.update error:', err);

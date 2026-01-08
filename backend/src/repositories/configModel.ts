@@ -1,12 +1,7 @@
 import { db, schema } from '../db/db';
 import { asc, desc, eq } from 'drizzle-orm';
 
-const {
-  OpeningHours,
-  TimeOff,
-  BarberShop,
-  PostalCode,
-} = schema;
+const { OpeningHours, TimeOff, BarberShop, PostalCode } = schema;
 
 export type OpeningHoursRow = typeof OpeningHours.$inferSelect;
 export type TimeOffRow = typeof TimeOff.$inferSelect;
@@ -45,10 +40,7 @@ export interface PostalCodeInput {
 export class ConfigModels {
   // --- OpeningHours ---
   async listOpeningHours(): Promise<OpeningHoursRow[]> {
-    return db
-      .select()
-      .from(OpeningHours)
-      .orderBy(asc(OpeningHours.dayOfWeek));
+    return db.select().from(OpeningHours).orderBy(asc(OpeningHours.dayOfWeek));
   }
 
   async getOpeningHours(id: number): Promise<OpeningHoursRow | undefined> {
@@ -102,11 +94,7 @@ export class ConfigModels {
   }
 
   async getTimeOff(id: number): Promise<TimeOffRow | undefined> {
-    const rows = await db
-      .select()
-      .from(TimeOff)
-      .where(eq(TimeOff.timeOffID, id))
-      .limit(1);
+    const rows = await db.select().from(TimeOff).where(eq(TimeOff.timeOffID, id)).limit(1);
     return rows[0];
   }
 
@@ -118,11 +106,7 @@ export class ConfigModels {
     });
 
     const insertId = Number((result as any).insertId);
-    const rows = await db
-      .select()
-      .from(TimeOff)
-      .where(eq(TimeOff.timeOffID, insertId))
-      .limit(1);
+    const rows = await db.select().from(TimeOff).where(eq(TimeOff.timeOffID, insertId)).limit(1);
 
     if (!rows[0]) {
       throw new Error('Failed to fetch created TimeOff row');
@@ -152,11 +136,7 @@ export class ConfigModels {
   }
 
   async getBarberShop(id: number): Promise<BarberShopRow | undefined> {
-    const rows = await db
-      .select()
-      .from(BarberShop)
-      .where(eq(BarberShop.barberShopID, id))
-      .limit(1);
+    const rows = await db.select().from(BarberShop).where(eq(BarberShop.barberShopID, id)).limit(1);
     return rows[0];
   }
 
@@ -210,11 +190,7 @@ export class ConfigModels {
   }
 
   async getPostalCode(code: string): Promise<PostalCodeRow | undefined> {
-    const rows = await db
-      .select()
-      .from(PostalCode)
-      .where(eq(PostalCode.postalCode, code))
-      .limit(1);
+    const rows = await db.select().from(PostalCode).where(eq(PostalCode.postalCode, code)).limit(1);
     return rows[0];
   }
 

@@ -3,7 +3,7 @@ import {
   type OpeningHoursInput,
   type TimeOffInput,
   type BarberShopInput,
-  type PostalCodeInput
+  type PostalCodeInput,
 } from '../repositories/configModel';
 
 export class ConfigService {
@@ -57,7 +57,6 @@ export class ConfigService {
   deleteBarberShop(id: number) {
     return configModel.deleteBarberShop(id);
   }
-
 
   // PostalCode
   listPostalCodes() {

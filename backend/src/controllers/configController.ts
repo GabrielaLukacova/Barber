@@ -81,9 +81,9 @@ export class ConfigController {
         })
         .execute();
 
-      const insertId = (Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId) as
-        | number
-        | undefined;
+      const insertId = (
+        Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
+      ) as number | undefined;
 
       if (!insertId) {
         return res.status(201).json({ success: true });
@@ -142,7 +142,10 @@ export class ConfigController {
         return res.status(400).json({ error: 'Invalid openingHoursID' });
       }
 
-      await db.delete(schema.OpeningHours).where(eq(schema.OpeningHours.openingHoursID, id)).execute();
+      await db
+        .delete(schema.OpeningHours)
+        .where(eq(schema.OpeningHours.openingHoursID, id))
+        .execute();
       res.json({ success: true });
     } catch (err) {
       console.error('ConfigController.deleteOpeningHours error:', err);
@@ -169,10 +172,7 @@ export class ConfigController {
         return res.status(400).json({ error: 'Invalid timeOffID' });
       }
 
-      const [row] = await db
-        .select()
-        .from(schema.TimeOff)
-        .where(eq(schema.TimeOff.timeOffID, id));
+      const [row] = await db.select().from(schema.TimeOff).where(eq(schema.TimeOff.timeOffID, id));
 
       if (!row) {
         return res.status(404).json({ error: 'TimeOff not found' });
@@ -198,9 +198,9 @@ export class ConfigController {
         })
         .execute();
 
-      const insertId = (Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId) as
-        | number
-        | undefined;
+      const insertId = (
+        Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
+      ) as number | undefined;
 
       if (!insertId) {
         return res.status(201).json({ success: true });
@@ -318,9 +318,9 @@ export class ConfigController {
         })
         .execute();
 
-      const insertId = (Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId) as
-        | number
-        | undefined;
+      const insertId = (
+        Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
+      ) as number | undefined;
 
       if (!insertId) {
         return res.status(201).json({ success: true });
@@ -389,7 +389,6 @@ export class ConfigController {
       next(err);
     }
   }
-
 
   // PostalCode -----------------------
 

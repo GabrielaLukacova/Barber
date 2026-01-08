@@ -30,10 +30,7 @@ export class ClientController {
         return res.status(400).json({ error: 'Invalid client ID' });
       }
 
-      const [client] = await db
-        .select()
-        .from(schema.Client)
-        .where(eq(schema.Client.clientID, id));
+      const [client] = await db.select().from(schema.Client).where(eq(schema.Client.clientID, id));
 
       if (!client) {
         return res.status(404).json({ error: 'Client not found' });
@@ -61,9 +58,9 @@ export class ClientController {
         })
         .execute();
 
-      const insertId = (Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId) as
-        | number
-        | undefined;
+      const insertId = (
+        Array.isArray(result) ? (result as any)[0]?.insertId : (result as any).insertId
+      ) as number | undefined;
 
       if (!insertId) {
         return res.status(201).json({ success: true });

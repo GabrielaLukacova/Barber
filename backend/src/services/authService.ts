@@ -12,10 +12,7 @@ if (!ADMIN_PASSWORD_HASH) {
 }
 
 export class AuthService {
-  async validateAdmin(
-    username: string,
-    password: string,
-  ): Promise<{ username: string } | null> {
+  async validateAdmin(username: string, password: string): Promise<{ username: string } | null> {
     // 1) username must match
     if (username !== ADMIN_USERNAME) {
       return null;

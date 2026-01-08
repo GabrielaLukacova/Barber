@@ -1,10 +1,7 @@
 import { z } from 'zod';
 
 export const serviceBaseSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Name is required')
-    .max(30, 'Name must be at most 30 characters'),
+  name: z.string().min(1, 'Name is required').max(30, 'Name must be at most 30 characters'),
   duration: z.preprocess(
     (val) => (typeof val === 'string' ? parseInt(val, 10) : val),
     z.number().int().positive(),

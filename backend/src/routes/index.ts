@@ -8,8 +8,8 @@ import timeOffRouter from './timeOffRoutes';
 import barberShopRouter from './barberShopRoutes';
 import galleryImageRouter from './galleryImageRoutes';
 import postalCodeRouter from './postalCodeRoutes';
-import debugRouter from "./dev/debugRoutes";
-import publicBookingRouter from "./public/publicBookingRoutes";
+import debugRouter from './dev/debugRoutes';
+import publicBookingRouter from './public/publicBookingRoutes';
 
 const router = Router();
 

@@ -7,7 +7,7 @@ const ADMIN_PASSWORD_HASH = process.env.ADMIN_PASSWORD_HASH || '';
 
 const JWT_SECRET: any = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET is missing");
+  throw new Error('JWT_SECRET is missing');
 }
 const JWT_EXPIRES_IN: SignOptions['expiresIn'] =
   (process.env.JWT_EXPIRES_IN as SignOptions['expiresIn']) || '1h';
@@ -18,22 +18,16 @@ export class AuthController {
       const { username, password } = req.body;
 
       if (!username || !password) {
-        return res
-          .status(400)
-          .json({ error: 'Username and password are required' });
+        return res.status(400).json({ error: 'Username and password are required' });
       }
 
       if (username !== ADMIN_USERNAME) {
-        return res
-          .status(401)
-          .json({ error: 'Invalid username or password' });
+        return res.status(401).json({ error: 'Invalid username or password' });
       }
 
       const ok = await bcrypt.compare(password, ADMIN_PASSWORD_HASH);
       if (!ok) {
-        return res
-          .status(401)
-          .json({ error: 'Invalid username or password' });
+        return res.status(401).json({ error: 'Invalid username or password' });
       }
 
       const payload = { sub: username, role: 'admin' };
@@ -45,9 +39,7 @@ export class AuthController {
       return res.json({ token });
     } catch (err) {
       console.error('AuthController.login error:', err);
-      return res
-        .status(500)
-        .json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Internal server error' });
     }
   }
 }

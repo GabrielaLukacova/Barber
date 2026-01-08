@@ -1,10 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { eq } from 'drizzle-orm';
 import { db, schema } from '../db/db';
-import {
-  createBarberShopSchema,
-  updateBarberShopSchema,
-} from '../validation/barberShopSchemas';
+import { createBarberShopSchema, updateBarberShopSchema } from '../validation/barberShopSchemas';
 
 async function upsertPostalCode(postalCode: string, city: string) {
   // Postgres upsert
@@ -65,10 +62,7 @@ export class BarberShopController {
           description: schema.BarberShop.description,
         })
         .from(schema.BarberShop)
-        .leftJoin(
-          schema.PostalCode,
-          eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode),
-        )
+        .leftJoin(schema.PostalCode, eq(schema.BarberShop.postalCode, schema.PostalCode.postalCode))
         .where(eq(schema.BarberShop.barberShopID, id));
 
       if (!row) return res.status(404).json({ error: 'Barber shop not found' });
@@ -160,10 +154,7 @@ export class BarberShopController {
         return res.status(400).json({ error: 'Invalid barberShopID' });
       }
 
-      await db
-        .delete(schema.BarberShop)
-        .where(eq(schema.BarberShop.barberShopID, id))
-        .execute();
+      await db.delete(schema.BarberShop).where(eq(schema.BarberShop.barberShopID, id)).execute();
 
       res.json({ success: true });
     } catch (err) {

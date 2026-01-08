@@ -54,7 +54,7 @@ export class PublicBookingController {
       if (err?.code === 'DOUBLE_BOOKING') {
         return res.status(409).json({ error: err.message || 'Time slot is no longer available' });
       }
-      
+
       if (typeof err?.message === 'string') {
         return res.status(400).json({ error: err.message });
       }
