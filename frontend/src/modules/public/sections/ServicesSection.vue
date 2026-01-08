@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getImageUrl } from "../../../shared/utils/getImageUrl";
 import { onMounted, computed } from 'vue';
 import { useServicesStore } from '@/stores/services';
 
@@ -7,12 +8,6 @@ const servicesStore = useServicesStore();
 // Hardcoded backend base as fallback so images ALWAYS work
 const backendBase = 'https://barber-backend-b77j.onrender.com';
 
-function getImageUrl(path: string | null) {
-  if (!path) return '';
-  if (path.startsWith('http')) return path;
-  if (path.startsWith('/')) return backendBase + path;
-  return backendBase + '/' + path;
-}
 
 function formatPrice(price: number) {
   return `${price} kr`;

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getImageUrl } from "../../../shared/utils/getImageUrl";
 import { onMounted, computed } from 'vue';
 import { useServicesStore } from '@/stores/services';
 
@@ -6,12 +7,6 @@ const servicesStore = useServicesStore();
 
 const apiBaseUrl = import.meta.env.VITE_API_URL;
 
-function getImageUrl(path: string | null) {
-  if (!path) return '';
-  if (path.startsWith('http')) return path;
-  if (path.startsWith('/')) return apiBaseUrl + path;
-  return apiBaseUrl + '/' + path;
-}
 
 function formatPrice(price: number) {
   return `${price} kr`;
