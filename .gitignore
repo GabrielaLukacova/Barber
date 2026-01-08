@@ -11,3 +11,8 @@ coverage
 node_modules
 
 *.tgz
+
+# local sqlite files
+*.sqlite
+*.db
+*.sqlite3
