@@ -29,3 +29,10 @@ uploads/**
 !uploads/.gitkeep
 !uploads/gallery/.gitkeep
 !uploads/services/.gitkeep
+
+# local sqlite/db artifacts (never commit)
+barber.db
+barber.sqlite
+*.db
+*.sqlite
+*.sqlite3
