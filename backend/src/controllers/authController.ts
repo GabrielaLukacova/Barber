@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import jwt, { type Secret, type SignOptions } from 'jsonwebtoken';
+import jwt, { type SignOptions } from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 
 const ADMIN_USERNAME = process.env.ADMIN_USERNAME || 'admin';
