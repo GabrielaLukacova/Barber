@@ -22,3 +22,23 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# build output
+dist/
+coverage/
+test-results/
+playwright-report/
+.vitest/
+
+# deps
+node_modules/
+
+# env
+.env
+.env.*
+
+# OS / editor
+.DS_Store
+
+# TS build info
+*.tsbuildinfo
