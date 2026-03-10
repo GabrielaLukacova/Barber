@@ -7,13 +7,9 @@ if (!process.env.DATABASE_URL) {
   throw new Error('DATABASE_URL is not set');
 }
 
-const needsSsl =
-  process.env.DATABASE_URL.includes('sslmode=require') ||
-  process.env.DATABASE_URL.includes('render.com');
-
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: needsSsl ? { rejectUnauthorized: false } : undefined,
+  ssl: { rejectUnauthorized: false },
 });
 
 const db = drizzle(pool, { schema });

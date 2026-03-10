@@ -18,14 +18,12 @@ function toMinutes(hhmm: string) {
 }
 
 function fromMinutes(min: number) {
-  // minutes -> hh:mm
   const h = String(Math.floor(min / 60)).padStart(2, '0');
   const m = String(min % 60).padStart(2, '0');
   return `${h}:${m}`;
 }
 
 function overlaps(aStart: number, aEnd: number, bStart: number, bEnd: number) {
-  // half-open ranges
   return aStart < bEnd && bStart < aEnd;
 }
 
@@ -154,6 +152,7 @@ export async function createPublicBooking(params: {
   const endTime = fromMinutes(endMin) + ':00';
 
   // prevent double booking
+  
   const overlapsCount = await db.execute(sql`
     SELECT COUNT(*)::int AS c
     FROM "Appointment"
