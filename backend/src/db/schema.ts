@@ -10,26 +10,55 @@ import {
   primaryKey,
 } from 'drizzle-orm/pg-core';
 
-// PostalCode
+/* =========================
+   POSTAL CODE
+========================= */
+
 export const postalcode = pgTable('postalcode', {
   postalcode: varchar('postalcode', { length: 4 }).primaryKey(),
   city: varchar('city', { length: 50 }).notNull(),
 });
 
-// BarberShop
+/* =========================
+   BARBER SHOP
+========================= */
+
 export const barbershop = pgTable('barbershop', {
-  barbershopid: integer('barbershopid').generatedAlwaysAsIdentity().primaryKey(),
+  barbershopid: integer('barbershopid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
   phonenumber: varchar('phonenumber', { length: 15 }),
   email: varchar('email', { length: 100 }),
   street: varchar('street', { length: 100 }),
-  postalcode: varchar('postalcode', { length: 4 }).references(() => postalcode.postalcode),
+  postalcode: varchar('postalcode', { length: 4 }).references(
+    () => postalcode.postalcode
+  ),
   description: text('description'),
 });
 
-// Client
+/* =========================
+   GALLERY IMAGE
+========================= */
+
+export const galleryimage = pgTable('galleryimage', {
+  imageid: integer('imageid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
+  barbershopid: integer('barbershopid')
+    .references(() => barbershop.barbershopid),
+  filepath: text('filepath').notNull(),
+  sortorder: integer('sortorder').default(0),
+});
+
+/* =========================
+   CLIENT
+========================= */
+
 export const client = pgTable('client', {
-  clientid: integer('clientid').generatedAlwaysAsIdentity().primaryKey(),
+  clientid: integer('clientid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   firstname: varchar('firstname', { length: 15 }).notNull(),
   lastname: varchar('lastname', { length: 15 }).notNull(),
   email: varchar('email', { length: 50 }).notNull(),
@@ -37,9 +66,14 @@ export const client = pgTable('client', {
   note: text('note'),
 });
 
-// Service
+/* =========================
+   SERVICE
+========================= */
+
 export const service = pgTable('service', {
-  serviceid: integer('serviceid').generatedAlwaysAsIdentity().primaryKey(),
+  serviceid: integer('serviceid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   name: varchar('name', { length: 30 }).notNull().unique(),
   imagepath: text('imagepath'),
   duration: integer('duration').notNull(),
@@ -47,25 +81,40 @@ export const service = pgTable('service', {
   isbooked: boolean('isbooked').notNull().default(false),
 });
 
-// OpeningHours
+/* =========================
+   OPENING HOURS
+========================= */
+
 export const openinghours = pgTable('openinghours', {
-  openinghoursid: integer('openinghoursid').generatedAlwaysAsIdentity().primaryKey(),
+  openinghoursid: integer('openinghoursid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   dayofweek: varchar('dayofweek', { length: 10 }).notNull(),
   openingtime: time('openingtime'),
   closingtime: time('closingtime'),
 });
 
-// TimeOff
+/* =========================
+   TIME OFF
+========================= */
+
 export const timeoff = pgTable('timeoff', {
-  timeoffid: integer('timeoffid').generatedAlwaysAsIdentity().primaryKey(),
+  timeoffid: integer('timeoffid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   start: timestamp('start', { mode: 'string' }).notNull(),
   end: timestamp('end', { mode: 'string' }).notNull(),
   reason: text('reason'),
 });
 
-// Appointment
+/* =========================
+   APPOINTMENT
+========================= */
+
 export const appointment = pgTable('appointment', {
-  appointmentid: integer('appointmentid').generatedAlwaysAsIdentity().primaryKey(),
+  appointmentid: integer('appointmentid')
+    .generatedAlwaysAsIdentity()
+    .primaryKey(),
   clientid: integer('clientid').references(() => client.clientid),
   appointmentdate: date('appointmentdate', { mode: 'string' }).notNull(),
   starttime: time('starttime').notNull(),
@@ -74,7 +123,10 @@ export const appointment = pgTable('appointment', {
   totalpricecents: integer('totalpricecents'),
 });
 
-// AppointmentService
+/* =========================
+   APPOINTMENT SERVICE
+========================= */
+
 export const appointmentservice = pgTable(
   'appointmentservice',
   {
@@ -88,6 +140,8 @@ export const appointmentservice = pgTable(
     duration: integer('duration').notNull(),
   },
   (t) => ({
-    pk: primaryKey({ columns: [t.appointmentid, t.serviceid] }),
+    pk: primaryKey({
+      columns: [t.appointmentid, t.serviceid],
+    }),
   }),
 );
