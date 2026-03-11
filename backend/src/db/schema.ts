@@ -14,25 +14,25 @@ import {
    POSTAL CODE
 ========================= */
 
-export const postalcode = pgTable('postalcode', {
-  postalcode: varchar('postalcode', { length: 4 }).primaryKey(),
-  city: varchar('city', { length: 50 }).notNull(),
+export const PostalCode = pgTable('postalcode', {
+  postalCode: varchar('postalcode', { length: 4 }).primaryKey(),
+  city: varchar('city', { length: 100 }).notNull(),
 });
 
 /* =========================
    BARBER SHOP
 ========================= */
 
-export const barbershop = pgTable('barbershop', {
-  barbershopid: integer('barbershopid')
+export const BarberShop = pgTable('barbershop', {
+  barberShopID: integer('barbershopid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
-  phonenumber: varchar('phonenumber', { length: 15 }),
+  phoneNumber: varchar('phonenumber', { length: 15 }),
   email: varchar('email', { length: 100 }),
   street: varchar('street', { length: 100 }),
-  postalcode: varchar('postalcode', { length: 4 }).references(
-    () => postalcode.postalcode
+  postalCode: varchar('postalcode', { length: 4 }).references(
+    () => PostalCode.postalCode
   ),
   description: text('description'),
 });
@@ -41,28 +41,29 @@ export const barbershop = pgTable('barbershop', {
    GALLERY IMAGE
 ========================= */
 
-export const galleryimage = pgTable('galleryimage', {
-  imageid: integer('imageid')
+export const GalleryImage = pgTable('galleryimage', {
+  imageID: integer('imageid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
-  barbershopid: integer('barbershopid')
-    .references(() => barbershop.barbershopid),
-  filepath: text('filepath').notNull(),
-  sortorder: integer('sortorder').default(0),
+  barberShopID: integer('barbershopid')
+    .notNull()
+    .references(() => BarberShop.barberShopID),
+  filePath: text('filepath').notNull(),
+  sortOrder: integer('sortorder').default(0),
 });
 
 /* =========================
    CLIENT
 ========================= */
 
-export const client = pgTable('client', {
-  clientid: integer('clientid')
+export const Client = pgTable('client', {
+  clientID: integer('clientid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
-  firstname: varchar('firstname', { length: 15 }).notNull(),
-  lastname: varchar('lastname', { length: 15 }).notNull(),
+  firstName: varchar('firstname', { length: 15 }).notNull(),
+  lastName: varchar('lastname', { length: 15 }).notNull(),
   email: varchar('email', { length: 50 }).notNull(),
-  phonenumber: varchar('phonenumber', { length: 15 }),
+  phoneNumber: varchar('phonenumber', { length: 15 }),
   note: text('note'),
 });
 
@@ -70,36 +71,39 @@ export const client = pgTable('client', {
    SERVICE
 ========================= */
 
-export const service = pgTable('service', {
-  serviceid: integer('serviceid')
+export const Service = pgTable('service', {
+  serviceID: integer('serviceid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
   name: varchar('name', { length: 30 }).notNull().unique(),
-  imagepath: text('imagepath'),
+  imagePath: text('imagepath'),
   duration: integer('duration').notNull(),
   price: integer('price').notNull(),
-  isbooked: boolean('isbooked').notNull().default(false),
+  isBooked: boolean('isbooked').notNull().default(false),
 });
+
+export type ServiceRow = typeof Service.$inferSelect;
+export type NewServiceRow = typeof Service.$inferInsert;
 
 /* =========================
    OPENING HOURS
 ========================= */
 
-export const openinghours = pgTable('openinghours', {
-  openinghoursid: integer('openinghoursid')
+export const OpeningHours = pgTable('openinghours', {
+  openingHoursID: integer('openinghoursid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
-  dayofweek: varchar('dayofweek', { length: 10 }).notNull(),
-  openingtime: time('openingtime'),
-  closingtime: time('closingtime'),
+  dayOfWeek: varchar('dayofweek', { length: 10 }).notNull(),
+  openingTime: time('openingtime'),
+  closingTime: time('closingtime'),
 });
 
 /* =========================
    TIME OFF
 ========================= */
 
-export const timeoff = pgTable('timeoff', {
-  timeoffid: integer('timeoffid')
+export const TimeOff = pgTable('timeoff', {
+  timeOffID: integer('timeoffid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
   start: timestamp('start', { mode: 'string' }).notNull(),
@@ -111,37 +115,35 @@ export const timeoff = pgTable('timeoff', {
    APPOINTMENT
 ========================= */
 
-export const appointment = pgTable('appointment', {
-  appointmentid: integer('appointmentid')
+export const Appointment = pgTable('appointment', {
+  appointmentID: integer('appointmentid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
-  clientid: integer('clientid').references(() => client.clientid),
-  appointmentdate: date('appointmentdate', { mode: 'string' }).notNull(),
-  starttime: time('starttime').notNull(),
-  endtime: time('endtime').notNull(),
+  clientID: integer('clientid').references(() => Client.clientID),
+  appointmentDate: date('appointmentdate', { mode: 'string' }).notNull(),
+  startTime: time('starttime').notNull(),
+  endTime: time('endtime').notNull(),
   status: varchar('status', { length: 20 }).notNull().default('BOOKED'),
-  totalpricecents: integer('totalpricecents'),
+  totalPriceCents: integer('totalpricecents'),
 });
 
 /* =========================
-   APPOINTMENT SERVICE
+   APPOINTMENT SERVICE (COMPOSITE PK)
 ========================= */
 
-export const appointmentservice = pgTable(
+export const AppointmentService = pgTable(
   'appointmentservice',
   {
-    appointmentid: integer('appointmentid')
+    appointmentID: integer('appointmentid')
       .notNull()
-      .references(() => appointment.appointmentid, { onDelete: 'cascade' }),
-    serviceid: integer('serviceid')
+      .references(() => Appointment.appointmentID, { onDelete: 'cascade' }),
+    serviceID: integer('serviceid')
       .notNull()
-      .references(() => service.serviceid),
+      .references(() => Service.serviceID),
     price: integer('price').notNull(),
     duration: integer('duration').notNull(),
   },
   (t) => ({
-    pk: primaryKey({
-      columns: [t.appointmentid, t.serviceid],
-    }),
+    pk: primaryKey({ columns: [t.appointmentID, t.serviceID] }),
   }),
 );
