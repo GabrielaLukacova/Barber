@@ -11,96 +11,83 @@ import {
 } from 'drizzle-orm/pg-core';
 
 // PostalCode
-export const PostalCode = pgTable('postalcode', {
-  postalCode: varchar('postalCode', { length: 4 }).primaryKey(),
-  city: varchar('city', { length: 100 }).notNull(),
+export const postalcode = pgTable('postalcode', {
+  postalcode: varchar('postalcode', { length: 4 }).primaryKey(),
+  city: varchar('city', { length: 50 }).notNull(),
 });
 
 // BarberShop
-export const BarberShop = pgTable('barbershop', {
-  barberShopID: integer('barberShopID').generatedAlwaysAsIdentity().primaryKey(),
+export const barbershop = pgTable('barbershop', {
+  barbershopid: integer('barbershopid').generatedAlwaysAsIdentity().primaryKey(),
   name: varchar('name', { length: 100 }).notNull(),
-  phoneNumber: varchar('phoneNumber', { length: 15 }),
+  phonenumber: varchar('phonenumber', { length: 15 }),
   email: varchar('email', { length: 100 }),
   street: varchar('street', { length: 100 }),
-  postalCode: varchar('postalCode', { length: 4 }).references(() => PostalCode.postalCode),
+  postalcode: varchar('postalcode', { length: 4 }).references(() => postalcode.postalcode),
   description: text('description'),
 });
 
-// GalleryImage
-export const GalleryImage = pgTable('galleryimage', {
-  imageID: integer('imageID').generatedAlwaysAsIdentity().primaryKey(),
-  barberShopID: integer('barberShopID')
-    .notNull()
-    .references(() => BarberShop.barberShopID),
-  filePath: text('filePath').notNull(),
-  sortOrder: integer('sortOrder').default(0),
-});
-
 // Client
-export const Client = pgTable('client', {
-  clientID: integer('clientID').generatedAlwaysAsIdentity().primaryKey(),
-  firstName: varchar('firstName', { length: 15 }).notNull(),
-  lastName: varchar('lastName', { length: 15 }).notNull(),
+export const client = pgTable('client', {
+  clientid: integer('clientid').generatedAlwaysAsIdentity().primaryKey(),
+  firstname: varchar('firstname', { length: 15 }).notNull(),
+  lastname: varchar('lastname', { length: 15 }).notNull(),
   email: varchar('email', { length: 50 }).notNull(),
-  phoneNumber: varchar('phoneNumber', { length: 15 }),
+  phonenumber: varchar('phonenumber', { length: 15 }),
   note: text('note'),
 });
 
 // Service
-export const Service = pgTable('service', {
-  serviceID: integer('serviceID').generatedAlwaysAsIdentity().primaryKey(),
+export const service = pgTable('service', {
+  serviceid: integer('serviceid').generatedAlwaysAsIdentity().primaryKey(),
   name: varchar('name', { length: 30 }).notNull().unique(),
-  imagePath: text('imagePath'),
+  imagepath: text('imagepath'),
   duration: integer('duration').notNull(),
   price: integer('price').notNull(),
-  isBooked: boolean('isBooked').notNull().default(false),
+  isbooked: boolean('isbooked').notNull().default(false),
 });
 
-export type ServiceRow = typeof Service.$inferSelect;
-export type NewServiceRow = typeof Service.$inferInsert;
-
 // OpeningHours
-export const OpeningHours = pgTable('openinghours', {
-  openingHoursID: integer('openingHoursID').generatedAlwaysAsIdentity().primaryKey(),
-  dayOfWeek: varchar('dayOfWeek', { length: 10 }).notNull(),
-  openingTime: time('openingTime'),
-  closingTime: time('closingTime'),
+export const openinghours = pgTable('openinghours', {
+  openinghoursid: integer('openinghoursid').generatedAlwaysAsIdentity().primaryKey(),
+  dayofweek: varchar('dayofweek', { length: 10 }).notNull(),
+  openingtime: time('openingtime'),
+  closingtime: time('closingtime'),
 });
 
 // TimeOff
-export const TimeOff = pgTable('timeoff', {
-  timeOffID: integer('timeOffID').generatedAlwaysAsIdentity().primaryKey(),
+export const timeoff = pgTable('timeoff', {
+  timeoffid: integer('timeoffid').generatedAlwaysAsIdentity().primaryKey(),
   start: timestamp('start', { mode: 'string' }).notNull(),
   end: timestamp('end', { mode: 'string' }).notNull(),
   reason: text('reason'),
 });
 
 // Appointment
-export const Appointment = pgTable('appointment', {
-  appointmentID: integer('appointmentID').generatedAlwaysAsIdentity().primaryKey(),
-  clientID: integer('clientID').references(() => Client.clientID),
-  appointmentDate: date('appointmentDate', { mode: 'string' }).notNull(),
-  startTime: time('startTime').notNull(),
-  endTime: time('endTime').notNull(),
+export const appointment = pgTable('appointment', {
+  appointmentid: integer('appointmentid').generatedAlwaysAsIdentity().primaryKey(),
+  clientid: integer('clientid').references(() => client.clientid),
+  appointmentdate: date('appointmentdate', { mode: 'string' }).notNull(),
+  starttime: time('starttime').notNull(),
+  endtime: time('endtime').notNull(),
   status: varchar('status', { length: 20 }).notNull().default('BOOKED'),
-  totalPriceCents: integer('totalPriceCents'),
+  totalpricecents: integer('totalpricecents'),
 });
 
-// AppointmentService (composite PK)
-export const AppointmentService = pgTable(
+// AppointmentService
+export const appointmentservice = pgTable(
   'appointmentservice',
   {
-    appointmentID: integer('appointmentID')
+    appointmentid: integer('appointmentid')
       .notNull()
-      .references(() => Appointment.appointmentID, { onDelete: 'cascade' }),
-    serviceID: integer('serviceID')
+      .references(() => appointment.appointmentid, { onDelete: 'cascade' }),
+    serviceid: integer('serviceid')
       .notNull()
-      .references(() => Service.serviceID),
+      .references(() => service.serviceid),
     price: integer('price').notNull(),
     duration: integer('duration').notNull(),
   },
   (t) => ({
-    pk: primaryKey({ columns: [t.appointmentID, t.serviceID] }),
+    pk: primaryKey({ columns: [t.appointmentid, t.serviceid] }),
   }),
 );
