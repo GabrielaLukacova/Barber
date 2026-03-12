@@ -31,6 +31,24 @@ export class ServiceController {
     }
   }
 
+  static async getOne(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service ID' });
+      }
+
+      const service = await serviceService.getService(id);
+      if (!service) {
+        return res.status(404).json({ error: 'Service not found' });
+      }
+
+      res.json(service);
+    } catch (err) {
+      next(err);
+    }
+  }
+
   static async create(req: Request, res: Response, next: NextFunction) {
     try {
       let imagePath: string | null = null;
@@ -53,7 +71,58 @@ export class ServiceController {
       });
 
       res.status(201).json(created);
-    } catch (err: any) {
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async update(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service ID' });
+      }
+
+      let imagePath: string | null | undefined;
+
+      if (req.file) {
+        imagePath = await uploadServiceImage(req.file);
+      }
+
+      const parsed = updateServiceSchema.parse({
+        ...req.body,
+        imagePath,
+      });
+
+      const payload: any = {
+        name: parsed.name,
+        duration: parsed.duration,
+        price: parsed.price,
+        isBooked: parsed.isBooked ?? false,
+      };
+
+      if (imagePath !== undefined) {
+        payload.imagePath = imagePath;
+      }
+
+      await serviceService.updateService(id, payload);
+
+      res.json({ success: true });
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid service ID' });
+      }
+
+      await serviceService.deleteService(id);
+      res.json({ success: true });
+    } catch (err) {
       next(err);
     }
   }

@@ -23,12 +23,6 @@ function getFiles(req: Request): Express.Multer.File[] {
   return [];
 }
 
-function getBarberShopId(req: Request): number {
-  const raw = (req.body?.barberShopID ?? '').toString().trim();
-  const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : BARBER_SHOP_ID;
-}
-
 async function uploadToSupabase(file: Express.Multer.File) {
   const fileName = `gallery/${Date.now()}-${file.originalname}`;
 
@@ -69,12 +63,10 @@ export class GalleryImageController {
         return res.status(400).json({ error: 'No files uploaded' });
       }
 
-      const barberShopID = getBarberShopId(req);
-
       const existing = await db
         .select({ sortOrder: schema.GalleryImage.sortOrder })
         .from(schema.GalleryImage)
-        .where(eq(schema.GalleryImage.barberShopID, barberShopID));
+        .where(eq(schema.GalleryImage.barberShopID, BARBER_SHOP_ID));
 
       const maxSort = existing.reduce((m, r) => Math.max(m, r.sortOrder ?? 0), 0);
       let nextSort = maxSort + 1;
@@ -85,7 +77,7 @@ export class GalleryImageController {
         const publicUrl = await uploadToSupabase(f);
 
         values.push({
-          barberShopID,
+          barberShopID: BARBER_SHOP_ID,
           filePath: publicUrl,
           sortOrder: nextSort++,
         });
@@ -96,10 +88,30 @@ export class GalleryImageController {
       const rows = await db
         .select()
         .from(schema.GalleryImage)
-        .where(eq(schema.GalleryImage.barberShopID, barberShopID))
+        .where(eq(schema.GalleryImage.barberShopID, BARBER_SHOP_ID))
         .orderBy(asc(schema.GalleryImage.sortOrder), asc(schema.GalleryImage.imageID));
 
       res.status(201).json(rows);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  static async updateSortOrder(req: Request, res: Response, next: NextFunction) {
+    try {
+      const id = Number(req.params.id);
+      const sortOrder = Number(req.body?.sortOrder);
+
+      if (Number.isNaN(id)) {
+        return res.status(400).json({ error: 'Invalid image ID' });
+      }
+
+      await db
+        .update(schema.GalleryImage)
+        .set({ sortOrder })
+        .where(eq(schema.GalleryImage.imageID, id));
+
+      res.json({ success: true });
     } catch (err) {
       next(err);
     }
@@ -114,12 +126,7 @@ export class GalleryImageController {
 
       await db
         .delete(schema.GalleryImage)
-        .where(
-          and(
-            eq(schema.GalleryImage.imageID, id),
-            eq(schema.GalleryImage.barberShopID, BARBER_SHOP_ID),
-          ),
-        );
+        .where(eq(schema.GalleryImage.imageID, id));
 
       res.status(204).send();
     } catch (err) {
