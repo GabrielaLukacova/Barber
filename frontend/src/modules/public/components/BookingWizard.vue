@@ -72,10 +72,12 @@ async function loadSlots() {
 
   loadingSlots.value = true;
   try {
+
     const data: any = await fetchAvailableSlots({
       date: bookingAny.dateISO,
       serviceIDs: selectedServiceIDs.value as number[],
     });
+
 
     slots.value = Array.isArray(data?.slots) ? data.slots : [];
     durationMin.value = Number(data?.durationMin ?? 0);
@@ -161,10 +163,13 @@ async function submit() {
     bookingAny.step = 4;
   } catch (e: any) {
     const status = e?.response?.status;
+    
     if (status === 409) {
       errorMsg.value =
-        e?.response?.data?.error ?? 'That time was just taken. Please choose another slot.';
+        e?.response?.data?.error ?? 'That time was just taken. Please choose another time.';
       await loadSlots();
+
+
       bookingAny.step = 2;
       return;
     }

@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import { getImageUrl } from '../../../shared/utils/getImageUrl';
 import { onMounted, computed } from 'vue';
 import { useServicesStore } from '@/stores/services';
 
 const servicesStore = useServicesStore();
-
-const backendBase = 'https://barber-backend-b77j.onrender.com';
 
 function formatPrice(price: number) {
   return `${price} kr`;
@@ -28,20 +25,10 @@ const error = computed(() => servicesStore.error);
   >
     <div class="section-block">
       <div style="margin-top: calc(-1 * clamp(48px, 5vw, 64px))">
-        <!-- semi-transparent glass plate -->
         <div
           class="relative border-zinc-800/70 backdrop-blur-md shadow-[0_-26px_70px_rgba(0,0,0,0.60),0_26px_90px_rgba(0,0,0,0.35)]"
           style="background: rgba(15, 18, 22, 0.58)"
         >
-          <div class="pointer-events-none absolute inset-x-0 top-0 h-px bg-[#C7A47D]/55"></div>
-          <div
-            class="pointer-events-none absolute inset-x-0 top-0 h-16 bg-gradient-to-b from-black/55 to-transparent"
-          ></div>
-
-          <div
-            class="pointer-events-none absolute inset-0 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]"
-          ></div>
-
           <div class="p-6 sm:p-8">
             <div class="section-head">
               <p class="section-kicker">Services</p>
@@ -51,7 +38,9 @@ const error = computed(() => servicesStore.error);
               {{ error }}
             </p>
 
-            <p v-else-if="loading" class="text-sm text-zinc-200 text-center">Loading services…</p>
+            <p v-else-if="loading" class="text-sm text-zinc-200 text-center">
+              Loading services…
+            </p>
 
             <div v-else class="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
               <article
@@ -59,12 +48,11 @@ const error = computed(() => servicesStore.error);
                 :key="svc.serviceID"
                 class="border border-zinc-800/80 bg-black/20"
               >
-                <!-- Image: poster style + subtle overlay -->
                 <div class="relative border-b border-zinc-800/80 bg-black/30">
                   <div class="aspect-[4/3] w-full overflow-hidden">
                     <img
                       v-if="svc.imagePath"
-                      :src="getImageUrl(svc.imagePath)"
+                      :src="svc.imagePath"
                       alt=""
                       class="h-full w-full object-cover"
                     />
@@ -74,24 +62,8 @@ const error = computed(() => servicesStore.error);
                       </span>
                     </div>
                   </div>
-
-                  <div
-                    class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"
-                  ></div>
-                  <div
-                    class="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-[#C7A47D]/40"
-                  ></div>
-
-                  <div
-                    class="pointer-events-none absolute left-0 top-0 border-r border-b border-zinc-800/80 bg-black/35 px-3 py-2"
-                  >
-                    <span class="text-[10px] uppercase tracking-[0.22em] text-[#C7A47D]">
-                      Service
-                    </span>
-                  </div>
                 </div>
 
-                <!-- Content -->
                 <div class="p-5 space-y-3">
                   <div class="flex items-start justify-between gap-3">
                     <h3 class="text-[15px] font-semibold text-zinc-100 leading-snug">
@@ -108,13 +80,10 @@ const error = computed(() => servicesStore.error);
                     </div>
                   </div>
 
-                  <div class="h-px w-full bg-zinc-800/70"></div>
-
                   <p
                     v-if="svc.isBooked"
                     class="inline-flex items-center gap-2 border border-[#C7A47D]/35 bg-black/25 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#C7A47D]"
                   >
-                    <span class="h-1.5 w-1.5 bg-[#C7A47D]"></span>
                     Not bookable
                   </p>
                 </div>
@@ -124,7 +93,7 @@ const error = computed(() => servicesStore.error);
                 v-if="services.length === 0"
                 class="col-span-full text-center text-sm text-zinc-300/80"
               >
-                No services are available yet. Please check back later.
+                No services are available yet.
               </p>
             </div>
           </div>
@@ -138,9 +107,7 @@ const error = computed(() => servicesStore.error);
 .section-head {
   text-align: center;
   margin: 0 0 24px 0;
-  padding: 0;
 }
-
 .section-kicker {
   margin: 0 0 10px 0;
   font-size: 14px;

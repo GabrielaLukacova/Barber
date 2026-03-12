@@ -5,12 +5,9 @@ import api from '@/shared/api/api';
 type GalleryImageDto = {
   imageID: number;
   barberShopID: number;
-  filePath: string;
+  filePath: string; // teraz je to už full public URL
   sortOrder: number;
 };
-
-const API_URL = (import.meta.env.VITE_API_URL as string).replace(/\/+$/, '');
-const fullSrc = (p: string) => `${API_URL}${p.startsWith('/') ? '' : '/'}${p}`;
 
 const loading = ref(false);
 const error = ref<string | null>(null);
@@ -35,6 +32,7 @@ async function load() {
 
 onMounted(load);
 </script>
+
 <template>
   <section id="gallery" class="section-block">
     <div class="flex items-end justify-center gap-4 mb-4">
@@ -50,14 +48,14 @@ onMounted(load);
       <a
         v-for="img in sorted"
         :key="img.imageID"
-        :href="fullSrc(img.filePath)"
+        :href="img.filePath"
         target="_blank"
         rel="noreferrer"
         class="block overflow-hidden"
       >
         <div class="aspect-square bg-black/20">
           <img
-            :src="fullSrc(img.filePath)"
+            :src="img.filePath"
             class="w-full h-full object-cover block"
             loading="lazy"
             alt="Gallery image"
