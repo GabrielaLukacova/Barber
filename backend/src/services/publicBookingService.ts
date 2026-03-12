@@ -153,14 +153,17 @@ export async function createPublicBooking(params: {
 
   // prevent double booking
   
-  const overlapsCount = await db.execute(sql`
-    SELECT COUNT(*)::int AS c
-    FROM "Appointment"
-    WHERE "appointmentDate" = ${params.dateISO}
-      AND "status" = 'BOOKED'
-      AND (${startTime} < "endTime")
-      AND ("startTime" < ${endTime})
-  `);
+const overlapsCount = await db
+  .select({ c: sql<number>`count(*)` })
+  .from(schema.Appointment)
+  .where(
+    and(
+      eq(schema.Appointment.appointmentDate, params.dateISO),
+      eq(schema.Appointment.status, 'BOOKED'),
+      sql`${startTime} < ${schema.Appointment.endTime}`,
+      sql`${schema.Appointment.startTime} < ${endTime}`,
+    ),
+  );
 
   const c = (overlapsCount as any)?.rows?.[0]?.c ?? 0;
   if (c > 0) {
