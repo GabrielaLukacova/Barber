@@ -26,11 +26,18 @@
         class="!rounded-none border border-zinc-200 bg-white overflow-hidden shadow-sm"
       >
         <div class="aspect-square bg-zinc-100 !rounded-none">
-          <img :src="fullSrc(img.filePath)" class="w-full h-full object-cover" alt="" />
+          <!-- 🔥 FIX: používame priamo img.filePath -->
+          <img
+            :src="img.filePath"
+            class="w-full h-full object-cover"
+            alt=""
+          />
         </div>
 
         <div class="p-3 flex items-center justify-between gap-2">
-          <div class="text-xs text-zinc-600 font-semibold">#{{ img.sortOrder }}</div>
+          <div class="text-xs text-zinc-600 font-semibold">
+            #{{ img.sortOrder }}
+          </div>
 
           <div class="flex items-center gap-2">
             <button
@@ -40,6 +47,7 @@
             >
               Up
             </button>
+
             <button
               class="admin-btn admin-btn--accent"
               :disabled="idx === sorted.length - 1 || loading"
@@ -47,6 +55,7 @@
             >
               Down
             </button>
+
             <button
               class="admin-btn admin-btn--danger"
               :disabled="loading"
@@ -59,7 +68,9 @@
       </div>
     </div>
 
-    <p v-else class="admin-subtitle">No images yet. Choose files to upload.</p>
+    <p v-else class="admin-subtitle">
+      No images yet. Choose files to upload.
+    </p>
   </div>
 </template>
 
@@ -67,18 +78,15 @@
 import { computed, onMounted, ref } from 'vue';
 import { AdminGalleryApi, type GalleryImageDto } from '@/modules/admin/api/AdminGalleryApi';
 
-const API_URL = (import.meta.env.VITE_API_URL as string).replace(/\/+$/, '');
-// builds absolute image url
-const fullSrc = (p: string) => `${API_URL}${p.startsWith('/') ? '' : '/'}${p}`;
-
 const loading = ref(false);
 const error = ref<string | null>(null);
 const images = ref<GalleryImageDto[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
-// stable sort by order
 const sorted = computed(() =>
-  [...images.value].sort((a, b) => a.sortOrder - b.sortOrder || a.imageID - b.imageID),
+  [...images.value].sort(
+    (a, b) => a.sortOrder - b.sortOrder || a.imageID - b.imageID,
+  ),
 );
 
 async function refresh() {
@@ -87,7 +95,10 @@ async function refresh() {
   try {
     images.value = await AdminGalleryApi.list();
   } catch (e: any) {
-    error.value = e?.response?.data?.message ?? e?.message ?? 'Failed to load gallery';
+    error.value =
+      e?.response?.data?.message ??
+      e?.message ??
+      'Failed to load gallery';
   } finally {
     loading.value = false;
   }
@@ -102,10 +113,12 @@ async function onPickFiles(ev: Event) {
   error.value = null;
   try {
     images.value = await AdminGalleryApi.upload(files);
-    // reset input value
     if (fileInput.value) fileInput.value.value = '';
   } catch (e: any) {
-    error.value = e?.response?.data?.message ?? e?.message ?? 'Upload failed';
+    error.value =
+      e?.response?.data?.message ??
+      e?.message ??
+      'Upload failed';
   } finally {
     loading.value = false;
   }
@@ -118,14 +131,12 @@ async function swap(idxA: number, idxB: number) {
   const a = arr[idxA];
   const b = arr[idxB];
 
-  // swap sortOrder values
   await AdminGalleryApi.setSortOrder(a.imageID, b.sortOrder);
   await AdminGalleryApi.setSortOrder(b.imageID, a.sortOrder);
   await refresh();
 }
 
 async function del(id: number) {
-  // confirm destructive action
   if (!confirm('Delete this image?')) return;
 
   loading.value = true;
@@ -134,7 +145,10 @@ async function del(id: number) {
     await AdminGalleryApi.remove(id);
     await refresh();
   } catch (e: any) {
-    error.value = e?.response?.data?.message ?? e?.message ?? 'Delete failed';
+    error.value =
+      e?.response?.data?.message ??
+      e?.message ??
+      'Delete failed';
   } finally {
     loading.value = false;
   }
