@@ -1,54 +1,54 @@
-import { serviceModel, type ServiceRow } from '../repositories/serviceModel';
+import { db, schema } from '../db/db';
+import { eq } from 'drizzle-orm';
 
-export interface ServiceInput {
-  name: string;
-  duration: number;
-  price: number;
-  isBooked?: boolean;
-  imagePath?: string | null;
-}
+export const serviceService = {
+  async listServices() {
+    return db.select().from(schema.Service);
+  },
 
-export class ServiceService {
-  async listServices(): Promise<ServiceRow[]> {
-    return serviceModel.findAll();
-  }
+  async getService(id: number) {
+    const [service] = await db
+      .select()
+      .from(schema.Service)
+      .where(eq(schema.Service.serviceID, id));
 
-  async getService(id: number): Promise<ServiceRow | undefined> {
-    return serviceModel.findById(id);
-  }
+    return service ?? null;
+  },
 
-  async createService(input: ServiceInput): Promise<ServiceRow> {
-    return serviceModel.create({
-      name: input.name,
-      duration: input.duration,
-      price: input.price,
-      isBooked: input.isBooked ?? false,
-      imagePath: input.imagePath ?? null,
-    });
-  }
+  async createService(data: {
+    name: string;
+    duration: number;
+    price: number;
+    isBooked: boolean;
+    imagePath: string | null;
+  }) {
+    const [created] = await db
+      .insert(schema.Service)
+      .values(data)
+      .returning();
 
-  async updateService(id: number, input: ServiceInput): Promise<void> {
-    const existing = await serviceModel.findById(id);
-    if (!existing) {
-      throw new Error('Service not found');
-    }
+    return created;
+  },
 
-    // keep existing image
-    const imagePath =
-      input.imagePath !== undefined ? (input.imagePath ?? null) : existing.imagePath;
+  async updateService(
+    id: number,
+    data: {
+      name?: string;
+      duration?: number;
+      price?: number;
+      isBooked?: boolean;
+      imagePath?: string | null;
+    },
+  ) {
+    await db
+      .update(schema.Service)
+      .set(data)
+      .where(eq(schema.Service.serviceID, id));
+  },
 
-    await serviceModel.update(id, {
-      name: input.name,
-      duration: input.duration,
-      price: input.price,
-      isBooked: input.isBooked ?? false,
-      imagePath,
-    });
-  }
-
-  async deleteService(id: number): Promise<void> {
-    await serviceModel.delete(id);
-  }
-}
-
-export const serviceService = new ServiceService();
+  async deleteService(id: number) {
+    await db
+      .delete(schema.Service)
+      .where(eq(schema.Service.serviceID, id));
+  },
+};
