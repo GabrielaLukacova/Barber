@@ -1,79 +1,3 @@
-<template>
-  <div class="admin-page">
-    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h1 class="admin-title">Gallery</h1>
-        <p class="admin-subtitle">Upload, reorder, delete</p>
-      </div>
-
-      <input
-        ref="fileInput"
-        type="file"
-        multiple
-        accept="image/*"
-        class="admin-input sm:max-w-xs"
-        @change="onPickFiles"
-      />
-    </header>
-
-    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
-    <div v-if="loading" class="admin-alert">Working…</div>
-
-    <div v-if="sorted.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-      <div
-        v-for="(img, idx) in sorted"
-        :key="img.imageID"
-        class="!rounded-none border border-zinc-200 bg-white overflow-hidden shadow-sm"
-      >
-        <div class="aspect-square bg-zinc-100 !rounded-none">
-          <!-- 🔥 FIX: používame priamo img.filePath -->
-          <img
-            :src="img.filePath"
-            class="w-full h-full object-cover"
-            alt=""
-          />
-        </div>
-
-        <div class="p-3 flex items-center justify-between gap-2">
-          <div class="text-xs text-zinc-600 font-semibold">
-            #{{ img.sortOrder }}
-          </div>
-
-          <div class="flex items-center gap-2">
-            <button
-              class="admin-btn admin-btn--accent"
-              :disabled="idx === 0 || loading"
-              @click="swap(idx, idx - 1)"
-            >
-              Up
-            </button>
-
-            <button
-              class="admin-btn admin-btn--accent"
-              :disabled="idx === sorted.length - 1 || loading"
-              @click="swap(idx, idx + 1)"
-            >
-              Down
-            </button>
-
-            <button
-              class="admin-btn admin-btn--danger"
-              :disabled="loading"
-              @click="del(img.imageID)"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <p v-else class="admin-subtitle">
-      No images yet. Choose files to upload.
-    </p>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue';
 import { AdminGalleryApi, type GalleryImageDto } from '@/modules/admin/api/AdminGalleryApi';
@@ -84,9 +8,7 @@ const images = ref<GalleryImageDto[]>([]);
 const fileInput = ref<HTMLInputElement | null>(null);
 
 const sorted = computed(() =>
-  [...images.value].sort(
-    (a, b) => a.sortOrder - b.sortOrder || a.imageID - b.imageID,
-  ),
+  [...images.value].sort((a, b) => a.sortOrder - b.sortOrder || a.imageID - b.imageID),
 );
 
 async function refresh() {
@@ -95,10 +17,7 @@ async function refresh() {
   try {
     images.value = await AdminGalleryApi.list();
   } catch (e: any) {
-    error.value =
-      e?.response?.data?.message ??
-      e?.message ??
-      'Failed to load gallery';
+    error.value = e?.response?.data?.message ?? e?.message ?? 'Failed to load gallery';
   } finally {
     loading.value = false;
   }
@@ -115,10 +34,7 @@ async function onPickFiles(ev: Event) {
     images.value = await AdminGalleryApi.upload(files);
     if (fileInput.value) fileInput.value.value = '';
   } catch (e: any) {
-    error.value =
-      e?.response?.data?.message ??
-      e?.message ??
-      'Upload failed';
+    error.value = e?.response?.data?.message ?? e?.message ?? 'Upload failed';
   } finally {
     loading.value = false;
   }
@@ -145,10 +61,7 @@ async function del(id: number) {
     await AdminGalleryApi.remove(id);
     await refresh();
   } catch (e: any) {
-    error.value =
-      e?.response?.data?.message ??
-      e?.message ??
-      'Delete failed';
+    error.value = e?.response?.data?.message ?? e?.message ?? 'Delete failed';
   } finally {
     loading.value = false;
   }
@@ -156,3 +69,77 @@ async function del(id: number) {
 
 onMounted(refresh);
 </script>
+
+<template>
+  <div class="admin-page">
+    <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="admin-title">Gallery</h1>
+        <p class="admin-subtitle">Upload, reorder, delete</p>
+      </div>
+
+      <input
+        ref="fileInput"
+        type="file"
+        multiple
+        accept="image/*"
+        class="admin-input sm:max-w-xs"
+        @change="onPickFiles"
+      />
+    </header>
+
+    <div v-if="error" class="admin-alert admin-alert--error">{{ error }}</div>
+    <div v-if="loading" class="admin-alert">Working…</div>
+
+    <div v-if="sorted.length" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div
+        v-for="(img, idx) in sorted"
+        :key="img.imageID"
+        class="border border-zinc-200 bg-white overflow-hidden shadow-sm"
+      >
+        <div class="aspect-square bg-zinc-100">
+          <!-- 🔥 TU JE FIX -->
+          <img
+            v-if="img.filePath"
+            :src="img.filePath"
+            class="w-full h-full object-cover"
+            alt=""
+          />
+          <div v-else class="flex items-center justify-center h-full text-xs text-zinc-500">
+            No image
+          </div>
+        </div>
+
+        <div class="p-3 flex items-center justify-between gap-2">
+          <div class="text-xs text-zinc-600 font-semibold">#{{ img.sortOrder }}</div>
+
+          <div class="flex items-center gap-2">
+            <button
+              class="admin-btn admin-btn--accent"
+              :disabled="idx === 0 || loading"
+              @click="swap(idx, idx - 1)"
+            >
+              Up
+            </button>
+            <button
+              class="admin-btn admin-btn--accent"
+              :disabled="idx === sorted.length - 1 || loading"
+              @click="swap(idx, idx + 1)"
+            >
+              Down
+            </button>
+            <button
+              class="admin-btn admin-btn--danger"
+              :disabled="loading"
+              @click="del(img.imageID)"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p v-else class="admin-subtitle">No images yet. Choose files to upload.</p>
+  </div>
+</template>
