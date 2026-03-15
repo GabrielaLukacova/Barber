@@ -38,7 +38,7 @@
               >
                 <img
                   v-if="svc.imagePath"
-                  :src="getImageUrl(svc.imagePath)"
+                  :src="svc.imagePath"
                   alt="Service image"
                   class="w-full h-full object-cover"
                 />
@@ -46,16 +46,27 @@
               </div>
             </td>
 
-            <td class="font-regular" style="color:#000 !important;">{{ svc.name }}</td>
+            <td class="font-regular" style="color:#000 !important;">
+              {{ svc.name }}
+            </td>
+
             <td class="text-zinc-800">{{ svc.duration }}</td>
             <td class="text-zinc-800">{{ formatPrice(svc.price) }}</td>
 
             <td class="text-right">
               <div class="inline-flex gap-2">
-                <button type="button" class="admin-btn admin-btn--accent" @click="openEdit(svc)">
+                <button
+                  type="button"
+                  class="admin-btn admin-btn--accent"
+                  @click="openEdit(svc)"
+                >
                   Edit
                 </button>
-                <button type="button" class="admin-btn admin-btn--danger" @click="onDelete(svc)">
+                <button
+                  type="button"
+                  class="admin-btn admin-btn--danger"
+                  @click="onDelete(svc)"
+                >
                   Delete
                 </button>
               </div>
@@ -71,6 +82,7 @@
       </table>
     </div>
 
+    <!-- MODAL -->
     <div
       v-if="formVisible"
       class="fixed inset-0 bg-black/25 flex items-center justify-center z-50 p-4"
@@ -80,27 +92,20 @@
         style="color: var(--text)"
       >
         <header class="flex items-center justify-between">
-          <h2 class="text-lg font-bold" style="color: var(--text)">
+          <h2 class="text-lg font-bold">
             {{ formMode === 'create' ? 'Add service' : 'Edit service' }}
           </h2>
-          <button
-            type="button"
-            class="hover:opacity-80"
-            style="color: rgba(242, 244, 247, 0.8)"
-            @click="closeForm"
-          >
-            x
-          </button>
+          <button @click="closeForm">x</button>
         </header>
 
         <form class="space-y-4" @submit.prevent="onSubmit">
           <div class="space-y-2">
-            <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)">Name</label>
+            <label>Name</label>
             <input v-model="form.name" type="text" class="admin-input" required />
           </div>
 
           <div class="space-y-2">
-            <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)">Image</label>
+            <label>Image</label>
             <input
               type="file"
               accept="image/*"
@@ -108,20 +113,11 @@
               @change="onImageChange"
               class="admin-input"
             />
-            <p class="admin-help" style="color: rgba(242, 244, 247, 0.72)">
-              {{
-                formMode === 'create'
-                  ? 'Image is required.'
-                  : 'Leave empty to keep the current image.'
-              }}
-            </p>
           </div>
 
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)"
-                >Duration (minutes)</label
-              >
+            <div>
+              <label>Duration (minutes)</label>
               <input
                 v-model.number="form.duration"
                 type="number"
@@ -130,10 +126,9 @@
                 required
               />
             </div>
-            <div class="space-y-2">
-              <label class="admin-label" style="color: rgba(242, 244, 247, 0.9)"
-                >Price (DKK)</label
-              >
+
+            <div>
+              <label>Price (DKK)</label>
               <input
                 v-model.number="form.price"
                 type="number"
@@ -145,13 +140,14 @@
           </div>
 
           <div class="flex justify-end gap-2 pt-2">
-            <button type="button" class="admin-btn" @click="closeForm">Cancel</button>
+            <button type="button" class="admin-btn" @click="closeForm">
+              Cancel
+            </button>
 
             <button
               type="submit"
               class="admin-btn admin-btn--accent"
               :disabled="saving"
-              style="color: #111827"
             >
               {{ saving ? 'Saving…' : formMode === 'create' ? 'Create' : 'Save changes' }}
             </button>
@@ -163,7 +159,6 @@
 </template>
 
 <script setup lang="ts">
-import { getImageUrl } from '../../../shared/utils/getImageUrl';
 import { ref, onMounted } from 'vue';
 import {
   fetchServices,
@@ -202,7 +197,6 @@ async function load() {
     services.value = await fetchServices();
   } catch (e) {
     error.value = 'Failed to load services.';
-    console.error(e);
   } finally {
     loading.value = false;
   }
@@ -220,14 +214,12 @@ function resetForm() {
 }
 
 function openCreate() {
-  // open create mode
   formMode.value = 'create';
   resetForm();
   formVisible.value = true;
 }
 
 function openEdit(svc: Service) {
-  // open edit mode
   formMode.value = 'edit';
   editingId.value = svc.serviceID;
   form.value = {
@@ -253,21 +245,9 @@ async function onSubmit() {
   try {
     error.value = null;
 
-    if (!form.value.name.trim() || !form.value.duration || !form.value.price) {
-      error.value = 'All fields are required.';
-      return;
-    }
-
-    if (formMode.value === 'create' && !form.value.imageFile) {
-      error.value = 'Image is required.';
-      return;
-    }
-
-    saving.value = true;
-
     if (formMode.value === 'create') {
       await createService(form.value);
-    } else if (formMode.value === 'edit' && editingId.value != null) {
+    } else if (editingId.value != null) {
       await updateService(editingId.value, form.value);
     }
 
@@ -275,22 +255,15 @@ async function onSubmit() {
     formVisible.value = false;
   } catch (e) {
     error.value = 'Failed to save service.';
-    console.error(e);
   } finally {
     saving.value = false;
   }
 }
 
 async function onDelete(svc: Service) {
-  // confirm delete
   if (!confirm(`Delete service "${svc.name}"?`)) return;
-  try {
-    await deleteService(svc.serviceID);
-    await load();
-  } catch (e) {
-    error.value = 'Failed to delete service.';
-    console.error(e);
-  }
+  await deleteService(svc.serviceID);
+  await load();
 }
 
 onMounted(load);
