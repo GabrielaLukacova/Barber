@@ -1,13 +1,24 @@
 import { Router } from 'express';
 import multer from 'multer';
-import path from "node:path";
 import { ServiceController } from '../controllers/serviceController';
 import { requireAdmin } from '../middlewares/authMiddleware';
 
 const router = Router();
 
+/**
+ * IMPORTANT:
+ * For Supabase upload we MUST use memoryStorage.
+ * We do NOT store files on disk anymore.
+ */
 const upload = multer({
-  dest: 'uploads/services/',
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 8 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      return cb(new Error('Only images allowed'));
+    }
+    cb(null, true);
+  },
 });
 
 /**
@@ -28,27 +39,9 @@ const upload = multer({
  *       - BearerAuth: []
  *     requestBody:
  *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               duration:
- *                 type: integer
- *               price:
- *                 type: integer
- *               isBooked:
- *                 type: boolean
- *             required: [name, duration, price]
  *     responses:
  *       201:
  *         description: Created.
- *       400:
- *         description: Validation error.
- *       401:
- *         description: Unauthorized.
  */
 router.get('/', ServiceController.getAll);
 router.post('/', requireAdmin, upload.single('image'), ServiceController.create);
@@ -58,71 +51,10 @@ router.post('/', requireAdmin, upload.single('image'), ServiceController.create)
  * /api/services/{id}:
  *   get:
  *     summary: Get a service by ID
- *     tags:
- *       - Services
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Service.
- *       404:
- *         description: Not found.
  *   put:
  *     summary: Update a service
- *     tags:
- *       - Services
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               duration:
- *                 type: integer
- *               price:
- *                 type: integer
- *               isBooked:
- *                 type: boolean
- *             required: [name, duration, price]
- *     responses:
- *       200:
- *         description: Updated.
- *       400:
- *         description: Validation error.
- *       401:
- *         description: Unauthorized.
  *   delete:
  *     summary: Delete a service
- *     tags:
- *       - Services
- *     security:
- *       - BearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Deleted.
- *       401:
- *         description: Unauthorized.
  */
 router.get('/:id', ServiceController.getOne);
 router.put('/:id', requireAdmin, upload.single('image'), ServiceController.update);

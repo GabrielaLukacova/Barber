@@ -4,10 +4,11 @@ import { createServiceSchema, updateServiceSchema } from '../validation/serviceS
 import { supabase } from '../lib/supabase';
 
 async function uploadServiceImage(file: Express.Multer.File) {
-  const fileName = `services/${Date.now()}-${file.originalname}`;
+  const fileName = `${Date.now()}-${file.originalname}`;
 
+  // 👇 upload to SERVICES bucket
   const { error } = await supabase.storage
-    .from('gallery')
+    .from('services')
     .upload(fileName, file.buffer, {
       contentType: file.mimetype,
     });
@@ -15,14 +16,14 @@ async function uploadServiceImage(file: Express.Multer.File) {
   if (error) throw error;
 
   const { data } = supabase.storage
-    .from('gallery')
+    .from('services')
     .getPublicUrl(fileName);
 
   return data.publicUrl;
 }
 
 export class ServiceController {
-  static async getAll(req: Request, res: Response, next: NextFunction) {
+  static async getAll(_req: Request, res: Response, next: NextFunction) {
     try {
       const services = await serviceService.listServices();
       res.json(services);
@@ -67,7 +68,7 @@ export class ServiceController {
         duration: parsed.duration,
         price: parsed.price,
         isBooked: parsed.isBooked ?? false,
-        imagePath: parsed.imagePath ?? null,
+        imagePath,
       });
 
       res.status(201).json(created);
@@ -83,7 +84,7 @@ export class ServiceController {
         return res.status(400).json({ error: 'Invalid service ID' });
       }
 
-      let imagePath: string | null | undefined;
+      let imagePath: string | undefined;
 
       if (req.file) {
         imagePath = await uploadServiceImage(req.file);
@@ -101,7 +102,7 @@ export class ServiceController {
         isBooked: parsed.isBooked ?? false,
       };
 
-      if (imagePath !== undefined) {
+      if (imagePath) {
         payload.imagePath = imagePath;
       }
 
