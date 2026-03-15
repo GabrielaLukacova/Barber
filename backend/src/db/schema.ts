@@ -47,7 +47,7 @@ export const GalleryImage = pgTable('galleryimage', {
     .primaryKey(),
   barberShopID: integer('barbershopid')
     .notNull()
-    .references(() => BarberShop.barberShopID),
+    .references(() => BarberShop.barberShopID, { onDelete: 'cascade' }),
   filePath: text('filepath').notNull(),
   sortOrder: integer('sortorder').default(0),
 });
@@ -119,7 +119,9 @@ export const Appointment = pgTable('appointment', {
   appointmentID: integer('appointmentid')
     .generatedAlwaysAsIdentity()
     .primaryKey(),
-  clientID: integer('clientid').references(() => Client.clientID),
+  clientID: integer('clientid').references(() => Client.clientID, {
+    onDelete: 'set null',
+  }),
   appointmentDate: date('appointmentdate', { mode: 'string' }).notNull(),
   startTime: time('starttime').notNull(),
   endTime: time('endtime').notNull(),
@@ -128,7 +130,7 @@ export const Appointment = pgTable('appointment', {
 });
 
 /* =========================
-   APPOINTMENT SERVICE (COMPOSITE PK)
+   APPOINTMENT SERVICE
 ========================= */
 
 export const AppointmentService = pgTable(
@@ -136,10 +138,17 @@ export const AppointmentService = pgTable(
   {
     appointmentID: integer('appointmentid')
       .notNull()
-      .references(() => Appointment.appointmentID, { onDelete: 'cascade' }),
+      .references(() => Appointment.appointmentID, {
+        onDelete: 'cascade',
+      }),
+
+    // 🔥 THIS IS THE IMPORTANT FIX
     serviceID: integer('serviceid')
       .notNull()
-      .references(() => Service.serviceID),
+      .references(() => Service.serviceID, {
+        onDelete: 'cascade', // ← THIS FIXES YOUR DELETE PROBLEM
+      }),
+
     price: integer('price').notNull(),
     duration: integer('duration').notNull(),
   },

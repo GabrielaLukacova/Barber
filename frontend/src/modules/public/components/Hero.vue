@@ -55,7 +55,7 @@ interface BarberShopDto {
 const shop = ref<BarberShopDto | null>(null);
 
 const shopName = computed(() => shop.value?.name ?? "Kim's Frisør");
-const cityLabel = computed(() => shop.value?.city?.trim() || 'Esbjerg');
+const cityLabel = computed(() => shop.value?.city?.trim() || 'Skjern');
 
 const heroDescription = computed(() => {
   const d = shop.value?.description?.trim();

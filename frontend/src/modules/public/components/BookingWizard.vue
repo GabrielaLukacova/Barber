@@ -887,4 +887,19 @@ function resetAllUX() {
   padding: 12px 14px;
   margin-bottom: var(--v3);
 }
+
+
+
+/* Turn the calendar icon white */
+.input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 1;
+  cursor: pointer;
+}
+
+/*slightly larger clickable icon */
+.input[type="date"]::-webkit-calendar-picker-indicator:hover {
+  filter: invert(1) brightness(1.2);
+}
+
 </style>

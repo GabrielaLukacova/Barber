@@ -482,10 +482,6 @@ onMounted(load);
           </tbody>
         </table>
       </div>
-
-      <p class="admin-help" style="color: var(--admin-muted)">
-        Dates/times are entered in your local timezone and stored as ISO timestamps.
-      </p>
     </div>
   </div>
 </template>
